@@ -14,6 +14,6 @@ class ShowcaseResponse(BaseModel):
 
     @model_validator(mode="before")
     def _handle_no_showcase(cls, v: Dict[str, Any]) -> Dict[str, Any]:
-        if "avatarInfoList" not in v:
+        if "avatarInfoList" not in v or v["avatarInfoList"] is None:
             v["avatarInfoList"] = []
         return v
