@@ -1,2 +1,2 @@
 # enka-py
- An async wrapper for enka.network written in Python.
+ An async API wrapper for enka.network written in Python.
