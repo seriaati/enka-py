@@ -6,7 +6,7 @@ from .character import Character
 from .player import Player
 
 
-class ShowcaseResponse(BaseModel):
+class GenshinShowcaseResponse(BaseModel):
     characters: List[Character] = Field(alias="avatarInfoList")
     player: Player = Field(alias="playerInfo")
     ttl: int
