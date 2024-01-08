@@ -46,6 +46,10 @@ class Artifact(BaseModel):
     def _convert_level(cls, v: int) -> int:
         return v - 1
 
+    @field_validator("icon", mode="before")
+    def _convert_icon(cls, v: str) -> str:
+        return f"https://enka.network/ui/{v}.png"
+
 
 class WeaponStat(BaseModel):
     type: StatType = Field(alias="appendPropId")
@@ -67,6 +71,10 @@ class Weapon(BaseModel):
     @field_validator("refinement", mode="before")
     def _extract_refinement(cls, v: Dict[str, int]) -> int:
         return list(v.values())[0] + 1
+
+    @field_validator("icon", mode="before")
+    def _convert_icon(cls, v: str) -> str:
+        return f"https://enka.network/ui/{v}.png"
 
 
 class Character(BaseModel):
