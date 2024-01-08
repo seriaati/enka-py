@@ -3,6 +3,7 @@ from enum import StrEnum
 from typing import Any, Final
 
 import aiohttp
+import cachetools
 
 from .assets.text_map import TextMap
 from .assets.updater import AssetUpdater
@@ -32,10 +33,16 @@ class Language(StrEnum):
 
 class EnkaAPI:
     def __init__(
-        self, language: Language = Language.ENGLISH, headers: dict[str, Any] | None = None
+        self,
+        language: Language = Language.ENGLISH,
+        headers: dict[str, Any] | None = None,
+        cache_maxsize: int = 100,
+        cache_ttl: int = 60,
     ) -> None:
         self.language = language
         self.headers = headers
+        self.cache_maxsize = cache_maxsize
+        self.cache_ttl = cache_ttl
 
         self.GENSHIN_API_URL: Final[str] = "https://enka.network/api/uid/{uid}"
         self.HSR_API_URL: Final[str] = "https://enka.network/api/hsr/uid/{uid}"
@@ -50,14 +57,23 @@ class EnkaAPI:
     async def _request(self, url: str) -> dict[str, Any]:
         LOGGER_.debug("Requesting %s", url)
 
+        if url in self._cache:
+            LOGGER_.debug("Using cache for %s", url)
+            return self._cache[url]
+
         async with self._session.get(url) as resp:
             if resp.status != 200:
                 raise_for_retcode(resp.status)
 
-            return await resp.json()
+            data: dict[str, Any] = await resp.json()
+            self._cache[url] = data
+            return data
 
     async def start(self) -> None:
         self._session = aiohttp.ClientSession(headers=self.headers)
+        self._cache: cachetools.TTLCache[str, dict[str, Any]] = cachetools.TTLCache(
+            maxsize=self.cache_maxsize, ttl=self.cache_ttl
+        )
 
         self.text_map = TextMap(self.language)
         self.asset_updater = AssetUpdater(self._session)
@@ -68,6 +84,7 @@ class EnkaAPI:
 
     async def close(self) -> None:
         await self._session.close()
+        self._cache.clear()
 
     async def update_assets(self) -> None:
         LOGGER_.info("Updating assets...")
