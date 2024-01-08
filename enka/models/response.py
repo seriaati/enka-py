@@ -5,6 +5,8 @@ from pydantic import BaseModel, Field, model_validator
 from .character import Character
 from .player import Player
 
+__all__ = ("GenshinShowcaseResponse",)
+
 
 class GenshinShowcaseResponse(BaseModel):
     characters: List[Character] = Field(alias="avatarInfoList")

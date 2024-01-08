@@ -1,48 +1,32 @@
 import logging
-from enum import StrEnum
 from typing import Any, Final
 
 import aiohttp
 import cachetools
 
-from .assets.text_map import TextMap
+from .assets.manager import AssetManager
 from .assets.updater import AssetUpdater
+from .enums import Language
 from .exceptions import raise_for_retcode
 from .models.response import GenshinShowcaseResponse
 
+__all__ = ("EnkaAPI",)
+
 LOGGER_ = logging.getLogger("enka-py.client")
-
-
-class Language(StrEnum):
-    ENGLISH = "en"
-    RUSSIAN = "ru"
-    VIETNAMESE = "vi"
-    THAI = "th"
-    PORTUGUESE = "pt"
-    KOREAN = "ko"
-    JAPANESE = "ja"
-    INDONESIAN = "id"
-    FRENCH = "fr"
-    SPANISH = "es"
-    GERMAN = "de"
-    TRADITIONAL_CHINESE = "zh-tw"
-    SIMPLIFIED_CHINESE = "zh-cn"
-    ITALIAN = "it"
-    TURKISH = "tr"
 
 
 class EnkaAPI:
     def __init__(
         self,
-        language: Language = Language.ENGLISH,
+        lang: Language = Language.ENGLISH,
         headers: dict[str, Any] | None = None,
         cache_maxsize: int = 100,
         cache_ttl: int = 60,
     ) -> None:
-        self.language = language
-        self.headers = headers
-        self.cache_maxsize = cache_maxsize
-        self.cache_ttl = cache_ttl
+        self._lang = lang
+        self._headers = headers
+        self._cache_maxsize = cache_maxsize
+        self._cache_ttl = cache_ttl
 
         self.GENSHIN_API_URL: Final[str] = "https://enka.network/api/uid/{uid}"
         self.HSR_API_URL: Final[str] = "https://enka.network/api/hsr/uid/{uid}"
@@ -70,17 +54,20 @@ class EnkaAPI:
             return data
 
     async def start(self) -> None:
-        self._session = aiohttp.ClientSession(headers=self.headers)
+        self._session = aiohttp.ClientSession(headers=self._headers)
         self._cache: cachetools.TTLCache[str, dict[str, Any]] = cachetools.TTLCache(
-            maxsize=self.cache_maxsize, ttl=self.cache_ttl
+            maxsize=self._cache_maxsize, ttl=self._cache_ttl
         )
 
-        self.text_map = TextMap(self.language)
-        self.asset_updater = AssetUpdater(self._session)
+        self._asset_manager = AssetManager(self._lang)
+        self._asset_updater = AssetUpdater(self._session)
 
-        await self.text_map.load()
-        if self.text_map.text_map is None:
+        loaded = await self._asset_manager.load()
+        if not loaded:
             await self.update_assets()
+
+        self._text_map = self._asset_manager.text_map
+        self._character_data = self._asset_manager.character_data
 
     async def close(self) -> None:
         await self._session.close()
@@ -89,17 +76,37 @@ class EnkaAPI:
     async def update_assets(self) -> None:
         LOGGER_.info("Updating assets...")
 
-        await self.asset_updater.update()
-        await self.text_map.load()
+        await self._asset_updater.update()
+        await self._asset_manager.load()
 
         LOGGER_.info("Assets updated")
 
     async def fetch_genshin_showcase(
-        self, uid: str, *, info_only: bool = False
+        self, uid: str | int, *, info_only: bool = False
     ) -> GenshinShowcaseResponse:
         url = self.GENSHIN_API_URL.format(uid=uid)
         if info_only:
             url += "?info"
 
         data = await self._request(url)
-        return GenshinShowcaseResponse(**data)
+        showcase_response = GenshinShowcaseResponse(**data)
+
+        for character in showcase_response.characters:
+            character_name_text_map_hash = self._character_data[str(character.id)][
+                "NameTextMapHash"
+            ]
+            character.name = self._text_map[character_name_text_map_hash]
+
+            weapon = character.weapon
+            weapon.name = self._text_map[weapon.name]
+            for stat in weapon.stats:
+                stat.name = self._text_map[stat.type.value]
+
+            for artifact in character.artifacts:
+                artifact.name = self._text_map[artifact.name]
+                artifact.set_name = self._text_map[artifact.set_name]
+                artifact.main_stat.name = self._text_map[artifact.main_stat.type.value]
+                for stat in artifact.sub_stats:
+                    stat.name = self._text_map[stat.type.value]
+
+        return showcase_response

@@ -1,11 +1,30 @@
 from enum import IntEnum, StrEnum
 
 __all__ = (
+    "Language",
     "EquipmentType",
     "ItemType",
     "StatType",
     "FightProp",
 )
+
+
+class Language(StrEnum):
+    ENGLISH = "en"
+    RUSSIAN = "ru"
+    VIETNAMESE = "vi"
+    THAI = "th"
+    PORTUGUESE = "pt"
+    KOREAN = "ko"
+    JAPANESE = "ja"
+    INDONESIAN = "id"
+    FRENCH = "fr"
+    SPANISH = "es"
+    GERMAN = "de"
+    TRADITIONAL_CHINESE = "zh-TW"
+    SIMPLIFIED_CHINESE = "zh-CN"
+    ITALIAN = "it"
+    TURKISH = "tr"
 
 
 class EquipmentType(StrEnum):

@@ -2,6 +2,8 @@ from typing import Dict
 
 from pydantic import BaseModel, Field, field_validator
 
+__all__ = ("Player",)
+
 
 class Player(BaseModel):
     achievements: int = Field(alias="finishAchievementNum")

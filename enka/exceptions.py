@@ -9,6 +9,7 @@ __all__ = (
     "raise_for_retcode",
     "EnkaPyError",
     "InvalidItemTypeError",
+    "AssetUpdateError",
 )
 
 
@@ -76,3 +77,12 @@ class EnkaPyError(Exception):
 class InvalidItemTypeError(EnkaPyError):
     def __str__(self) -> str:
         return "Invalid item type"
+
+
+class AssetUpdateError(EnkaPyError):
+    def __init__(self, status: int, url: str) -> None:
+        self.status = status
+        self.url = url
+
+    def __str__(self) -> str:
+        return f"Failed to update assets, status code: {self.status}, url: {self.url}"
