@@ -50,6 +50,7 @@ preview = true
 [tool.ruff.per-file-ignores]
 "**/__init__.py" = ["F403"]
 "enka/models/*.py" = ["ALL"]
+"playground.py" = ["T201"]
 
 
 [tool.ruff.lint.flake8-type-checking]
