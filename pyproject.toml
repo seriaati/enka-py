@@ -15,6 +15,7 @@ aiohttp = "^3.9.1"
 cachetools = "^5.3.2"
 asyncache = "^0.3.1"
 pydantic = "^2.5.3"
+orjson = "^3.9.10"
 
 [tool.poetry.group.dev]
 optional = true
