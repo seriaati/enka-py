@@ -8,7 +8,6 @@ from ..enums import EquipmentType, ItemType, StatType
 __all__ = (
     "Artifact",
     "Character",
-    "CharacterCostume",
     "MainStat",
     "SubStat",
     "Weapon",
@@ -171,37 +170,6 @@ class Weapon(BaseModel):
         return f"https://enka.network/ui/{v}.png"
 
 
-class CharacterCostume(BaseModel):
-    """
-    Represents a character costume.
-
-    Attributes
-    ----------
-    id: :class:`str`
-        The costume's ID.
-    side_icon: :class:`str`
-        The costume's side icon.
-        Example: https://enka.network/ui/UI_AvatarIcon_Side_AmborCostumeWic.png
-    icon: :class:`str`
-        The costume's icon.
-        Example: https://enka.network/ui/UI_AvatarIcon_AmborCostumeWic.png
-    art: :class:`str`
-        The costume's art.
-        Example: https://enka.network/ui/UI_Costume_AmborCostumeWic.png
-    """
-
-    id: str
-    side_icon: str
-
-    @property
-    def icon(self) -> str:
-        return self.side_icon.replace("Side_", "")
-
-    @property
-    def art(self) -> str:
-        return self.side_icon.replace("AvatarIcon_Side", "Costume")
-
-
 class Character(BaseModel):
     """
     Represents a character.
@@ -237,8 +205,6 @@ class Character(BaseModel):
     art: :class:`str`
         The character's art.
         Example: https://enka.network/ui/UI_Gacha_AvatarImg_Ambor.png
-    costumes: List[:class:`CharacterCostume`]
-        The character's costumes.
     """
 
     id: int = Field(alias="avatarId")
@@ -252,7 +218,6 @@ class Character(BaseModel):
     skill_depot_id: int = Field(alias="skillDepotId")
     name: str = Field(None)
     side_icon: str = Field(None)
-    costumes: List[CharacterCostume] = Field(list)
 
     @property
     def icon(self) -> str:

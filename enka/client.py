@@ -8,7 +8,6 @@ from .assets.manager import AssetManager
 from .assets.updater import AssetUpdater
 from .enums import Language
 from .exceptions import raise_for_retcode
-from .models.character import CharacterCostume
 from .models.response import GenshinShowcaseResponse
 
 __all__ = ("EnkaAPI",)
@@ -118,34 +117,31 @@ class EnkaAPI:
             url += "?info"
 
         data = await self._request(url)
-        showcase_response = GenshinShowcaseResponse(**data)
+        showcase = GenshinShowcaseResponse(**data)
 
         # Post-processing
-        namecard_icon = self._namecard_data.get_icon(str(showcase_response.player.namecard_id))
-        showcase_response.player.namecard_icon = f"https://enka.network/ui/{namecard_icon}.png"
-        profile_picture_icon = self._character_data[
-            str(showcase_response.player.profile_picture_id)
-        ]["SideIconName"].replace("Side_", "")
-        showcase_response.player.profile_picture_icon = (
-            f"https://enka.network/ui/{profile_picture_icon}.png"
-        )
+        namecard_icon = self._namecard_data.get_icon(str(showcase.player.namecard_id))
+        showcase.player.namecard_icon = f"https://enka.network/ui/{namecard_icon}.png"
+        profile_picture_icon = self._character_data[str(showcase.player.profile_picture_id)][
+            "SideIconName"
+        ].replace("Side_", "")
+        showcase.player.profile_picture_icon = f"https://enka.network/ui/{profile_picture_icon}.png"
 
-        for character in showcase_response.characters:
+        for character in showcase.player.showcase_characters:
+            if character.costume_id is None:
+                continue
+            costume_data = self._character_data[str(character.id)]["Costumes"]
+            if costume_data is None:
+                continue
+            character.costume_side_icon = f"https://enka.network/ui/{costume_data[str(character.costume_id)]['sideIconName']}.png"
+
+        for character in showcase.characters:
             character_name_text_map_hash = self._character_data[str(character.id)][
                 "NameTextMapHash"
             ]
             character.name = self._text_map[character_name_text_map_hash]
             side_icon_name = self._character_data[str(character.id)]["SideIconName"]
             character.side_icon = f"https://enka.network/ui/{side_icon_name}.png"
-            character.costumes = [
-                CharacterCostume(
-                    id=costume_id,
-                    side_icon=f"https://enka.network/ui/{costume_data['sideIconName']}.png",
-                )
-                for costume_id, costume_data in self._character_data[str(character.id)]
-                .get("Costumes", {})
-                .items()
-            ]
 
             weapon = character.weapon
             weapon.name = self._text_map[weapon.name]
@@ -159,4 +155,4 @@ class EnkaAPI:
                 for stat in artifact.sub_stats:
                     stat.name = self._text_map[stat.type.value]
 
-        return showcase_response
+        return showcase

@@ -1,8 +1,27 @@
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
 __all__ = ("GenshinPlayer",)
+
+
+class ShowcaseCharacter(BaseModel):
+    id: int = Field(alias="avatarId")
+    level: int
+    costume_id: Optional[int] = Field(None, alias="costumeId")
+    costume_side_icon: Optional[str] = Field(None)
+
+    @property
+    def costume_icon(self) -> Optional[str]:
+        if self.costume_side_icon is None:
+            return None
+        return self.costume_side_icon.replace("Side_", "")
+
+    @property
+    def costume_art(self) -> Optional[str]:
+        if self.costume_side_icon is None:
+            return None
+        return self.costume_side_icon.replace("AvatarIcon_Side", "Costume")
 
 
 class GenshinPlayer(BaseModel):
@@ -30,7 +49,9 @@ class GenshinPlayer(BaseModel):
     world_level: :class:`int`
         The player's world level.
     profile_picture_id: :class:`int`
-        The player's profile picture avatar ID.
+        The player's profile picture's ID.
+    profile_picture_icon: :class:`str`
+        The player's profile picture's icon.
     """
 
     achievements: int = Field(alias="finishAchievementNum")
@@ -44,6 +65,7 @@ class GenshinPlayer(BaseModel):
     world_level: int = Field(0, alias="worldLevel")
     profile_picture_id: int = Field(alias="profilePicture")
     profile_picture_icon: str = Field(None)
+    showcase_characters: List[ShowcaseCharacter] = Field(alias="showAvatarInfoList")
 
     @field_validator("profile_picture_id", mode="before")
     def _extract_avatar_id(cls, v: Dict[str, int]) -> int:
