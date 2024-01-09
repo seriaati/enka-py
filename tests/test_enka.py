@@ -29,3 +29,10 @@ async def test_traveler_showcase() -> None:
 async def test_update_assets() -> None:
     async with EnkaAPI() as api:
         await api.update_assets()
+
+
+@pytest.mark.asyncio
+async def test_costume() -> None:
+    async with EnkaAPI() as api:
+        showcase = await api.fetch_genshin_showcase("618285856")
+        assert showcase.characters[0].costumes

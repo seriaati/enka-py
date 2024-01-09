@@ -8,6 +8,7 @@ from .assets.manager import AssetManager
 from .assets.updater import AssetUpdater
 from .enums import Language
 from .exceptions import raise_for_retcode
+from .models.character import CharacterCostume
 from .models.response import GenshinShowcaseResponse
 
 __all__ = ("EnkaAPI",)
@@ -91,11 +92,23 @@ class EnkaAPI:
         data = await self._request(url)
         showcase_response = GenshinShowcaseResponse(**data)
 
+        # Post-processing
         for character in showcase_response.characters:
             character_name_text_map_hash = self._character_data[str(character.id)][
                 "NameTextMapHash"
             ]
             character.name = self._text_map[character_name_text_map_hash]
+            side_icon_name = self._character_data[str(character.id)]["SideIconName"]
+            character.side_icon = f"https://enka.network/ui/{side_icon_name}.png"
+            character.costumes = [
+                CharacterCostume(
+                    id=costume_id,
+                    side_icon=f"https://enka.network/ui/{costume_data['sideIconName']}.png",
+                )
+                for costume_id, costume_data in self._character_data[str(character.id)]
+                .get("Costumes", {})
+                .items()
+            ]
 
             weapon = character.weapon
             weapon.name = self._text_map[weapon.name]

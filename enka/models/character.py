@@ -8,6 +8,7 @@ from ..enums import EquipmentType, ItemType, StatType
 __all__ = (
     "Artifact",
     "Character",
+    "CharacterCostume",
     "MainStat",
     "SubStat",
     "Weapon",
@@ -77,6 +78,19 @@ class Weapon(BaseModel):
         return f"https://enka.network/ui/{v}.png"
 
 
+class CharacterCostume(BaseModel):
+    id: str
+    side_icon: str
+
+    @property
+    def icon(self) -> str:
+        return self.side_icon.replace("Side_", "")
+
+    @property
+    def art(self) -> str:
+        return self.side_icon.replace("AvatarIcon_Side", "Costume")
+
+
 class Character(BaseModel):
     id: int = Field(alias="avatarId")
     artifacts: List[Artifact]
@@ -88,6 +102,16 @@ class Character(BaseModel):
     level: int
     skill_depot_id: int = Field(alias="skillDepotId")
     name: str = Field(None)
+    side_icon: str = Field(None)
+    costumes: List[CharacterCostume] = Field(list)
+
+    @property
+    def icon(self) -> str:
+        return self.side_icon.replace("Side_", "")
+
+    @property
+    def art(self) -> str:
+        return self.side_icon.replace("AvatarIcon_Side", "Gacha_AvatarImg")
 
     @field_validator("constellations", mode="before")
     def _convert_constellations(cls, v: Optional[List[int]]) -> int:
