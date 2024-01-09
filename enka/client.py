@@ -123,6 +123,13 @@ class EnkaAPI:
         # Post-processing
         namecard_icon = self._namecard_data.get_icon(str(showcase_response.player.namecard_id))
         showcase_response.player.namecard_icon = f"https://enka.network/ui/{namecard_icon}.png"
+        profile_picture_icon = self._character_data[
+            str(showcase_response.player.profile_picture_id)
+        ]["SideIconName"].replace("Side_", "")
+        showcase_response.player.profile_picture_icon = (
+            f"https://enka.network/ui/{profile_picture_icon}.png"
+        )
+
         for character in showcase_response.characters:
             character_name_text_map_hash = self._character_data[str(character.id)][
                 "NameTextMapHash"

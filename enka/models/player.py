@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -12,9 +12,9 @@ class GenshinPlayer(BaseModel):
     Attributes
     ----------
     achievements: :class:`int`
-        The number of achievements the player has.
+        The number of completed achievements.
     level: :class:`int`
-        The player's level.
+        The player's adventure level.
     namecard_id: :class:`int`
         The player's namecard's ID.
     namecard_icon: :class:`str`
@@ -29,7 +29,7 @@ class GenshinPlayer(BaseModel):
         The player's Spiral Abyss level.
     world_level: :class:`int`
         The player's world level.
-    profile_picture_avatar_id: :class:`int`
+    profile_picture_id: :class:`int`
         The player's profile picture avatar ID.
     """
 
@@ -38,13 +38,13 @@ class GenshinPlayer(BaseModel):
     namecard_id: int = Field(alias="nameCardId")
     namecard_icon: str = Field(None)
     nickname: str
-    signature: str = Field("")
+    signature: Optional[str] = Field(None)
     abyss_floor: int = Field(0, alias="towerFloorIndex")
     abyss_level: int = Field(0, alias="towerLevelIndex")
     world_level: int = Field(0, alias="worldLevel")
-    profile_picture_avatar_id: int = Field(alias="profilePicture")
+    profile_picture_id: int = Field(alias="profilePicture")
+    profile_picture_icon: str = Field(None)
 
-    @field_validator("profile_picture_avatar_id", mode="before")
-    @classmethod
+    @field_validator("profile_picture_id", mode="before")
     def _extract_avatar_id(cls, v: Dict[str, int]) -> int:
-        return v.get("avatarId", v.get("id", 0))
+        return v["avatarId"]
