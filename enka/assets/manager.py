@@ -50,6 +50,17 @@ class TextMap:
 
         return text
 
+    def get(self, key: str, default: Any = None) -> str | Any:
+        if self._map is None:
+            msg = "Text map not loaded"
+            raise RuntimeError(msg)
+
+        text = self._map.get(str(key))
+        if text is None:
+            return default
+
+        return text
+
 
 class CharacterData:
     def __init__(self) -> None:

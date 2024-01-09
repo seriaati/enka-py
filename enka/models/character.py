@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from ..exceptions import InvalidItemTypeError
-from ..enums import EquipmentType, ItemType, StatType
+from ..enums import EquipmentType, FightProp, ItemType, StatType
 
 __all__ = (
     "Artifact",
@@ -170,6 +170,12 @@ class Weapon(BaseModel):
         return f"https://enka.network/ui/{v}.png"
 
 
+class CharacterStat(BaseModel):
+    type: FightProp
+    value: float
+    name: Optional[str] = Field(None)
+
+
 class Character(BaseModel):
     """
     Represents a character.
@@ -210,7 +216,7 @@ class Character(BaseModel):
     id: int = Field(alias="avatarId")
     artifacts: List[Artifact]
     weapon: Weapon
-    stat_map: Dict[str, float] = Field(alias="fightPropMap")
+    stats: List[CharacterStat] = Field(alias="fightPropMap")
     constellations: int = Field(0, alias="talentIdList")
     skills: Dict[str, int] = Field(alias="skillLevelMap")
     ascension: int
@@ -226,6 +232,10 @@ class Character(BaseModel):
     @property
     def art(self) -> str:
         return self.side_icon.replace("AvatarIcon_Side", "Gacha_AvatarImg")
+
+    @field_validator("stats", mode="before")
+    def _convert_stats(cls, v: Dict[str, float]):
+        return [CharacterStat(type=FightProp(int(k)), value=v) for k, v in v.items()]  # type: ignore
 
     @field_validator("constellations", mode="before")
     def _convert_constellations(cls, v: Optional[List[int]]) -> int:

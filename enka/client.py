@@ -155,4 +155,7 @@ class EnkaAPI:
                 for stat in artifact.sub_stats:
                     stat.name = self._text_map[stat.type.value]
 
+            for stat in character.stats:
+                stat.name = self._text_map.get(stat.type.name)
+
         return showcase
