@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Any
 import aiofiles
 import orjson
 
-from .file_paths import CHARACTER_DATA_PATH, TEXT_MAP_PATH
+from .file_paths import CHARACTER_DATA_PATH, NAMECARD_DATA_PATH, TEXT_MAP_PATH
 
 if TYPE_CHECKING:
     from ..client import Language
@@ -17,12 +17,14 @@ class AssetManager:
         self._lang = lang
         self.text_map = TextMap(lang)
         self.character_data = CharacterData()
+        self.namecard_data = NamecardData()
 
     async def load(self) -> bool:
         text_map_loaded = await self.text_map.load()
         character_data_loaded = await self.character_data.load()
+        namecard_data_loaded = await self.namecard_data.load()
 
-        return text_map_loaded and character_data_loaded
+        return text_map_loaded and character_data_loaded and namecard_data_loaded
 
 
 class TextMap:
@@ -71,3 +73,27 @@ class CharacterData:
             raise KeyError(msg)
 
         return data
+
+
+class NamecardData:
+    def __init__(self) -> None:
+        self._data: dict[str, Any] | None = None
+
+    async def load(self) -> bool:
+        with contextlib.suppress(FileNotFoundError):
+            async with aiofiles.open(NAMECARD_DATA_PATH, encoding="utf-8") as f:
+                self._data = orjson.loads(await f.read())
+
+        return self._data is not None
+
+    def get_icon(self, namecard_id: str) -> str:
+        if self._data is None:
+            msg = "Namecard data not loaded"
+            raise RuntimeError(msg)
+
+        data = self._data.get(namecard_id)
+        if data is None:
+            msg = f"Cannot find data for key {namecard_id} in namecard data, consider calling `EnkaNetworkAPI.update_assets` to update the namecard data"
+            raise KeyError(msg)
+
+        return data["icon"]

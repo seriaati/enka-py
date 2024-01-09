@@ -29,6 +29,13 @@ class EnkaAPI:
         self._cache_maxsize = cache_maxsize
         self._cache_ttl = cache_ttl
 
+        self._session: aiohttp.ClientSession | None = None
+        self._cache: cachetools.TTLCache[str, dict[str, Any]] = cachetools.TTLCache(
+            maxsize=self._cache_maxsize, ttl=self._cache_ttl
+        )
+        self._assets: AssetManager | None = None
+        self._asset_updater: AssetUpdater | None = None
+
         self.GENSHIN_API_URL: Final[str] = "https://enka.network/api/uid/{uid}"
         self.HSR_API_URL: Final[str] = "https://enka.network/api/hsr/uid/{uid}"
 
@@ -40,6 +47,10 @@ class EnkaAPI:
         await self.close()
 
     async def _request(self, url: str) -> dict[str, Any]:
+        if self._session is None:
+            msg = "Client is not started, call `EnkaNetworkAPI.start` first"
+            raise RuntimeError(msg)
+
         LOGGER_.debug("Requesting %s", url)
 
         if url in self._cache:
@@ -56,29 +67,35 @@ class EnkaAPI:
 
     async def start(self) -> None:
         self._session = aiohttp.ClientSession(headers=self._headers)
-        self._cache: cachetools.TTLCache[str, dict[str, Any]] = cachetools.TTLCache(
-            maxsize=self._cache_maxsize, ttl=self._cache_ttl
-        )
 
-        self._asset_manager = AssetManager(self._lang)
+        self._assets = AssetManager(self._lang)
         self._asset_updater = AssetUpdater(self._session)
 
-        loaded = await self._asset_manager.load()
+        loaded = await self._assets.load()
         if not loaded:
             await self.update_assets()
 
-        self._text_map = self._asset_manager.text_map
-        self._character_data = self._asset_manager.character_data
+        self._text_map = self._assets.text_map
+        self._character_data = self._assets.character_data
+        self._namecard_data = self._assets.namecard_data
 
     async def close(self) -> None:
+        if self._session is None:
+            msg = "Client is not started, call `EnkaNetworkAPI.start` first"
+            raise RuntimeError(msg)
+
         await self._session.close()
         self._cache.clear()
 
     async def update_assets(self) -> None:
+        if self._asset_updater is None or self._assets is None:
+            msg = "Client is not started, call `EnkaNetworkAPI.start` first"
+            raise RuntimeError(msg)
+
         LOGGER_.info("Updating assets...")
 
         await self._asset_updater.update()
-        await self._asset_manager.load()
+        await self._assets.load()
 
         LOGGER_.info("Assets updated")
 
@@ -104,6 +121,8 @@ class EnkaAPI:
         showcase_response = GenshinShowcaseResponse(**data)
 
         # Post-processing
+        namecard_icon = self._namecard_data.get_icon(str(showcase_response.player.namecard_id))
+        showcase_response.player.namecard_icon = f"https://enka.network/ui/{namecard_icon}.png"
         for character in showcase_response.characters:
             character_name_text_map_hash = self._character_data[str(character.id)][
                 "NameTextMapHash"

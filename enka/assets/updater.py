@@ -5,7 +5,7 @@ import aiofiles
 import orjson
 
 from ..exceptions import AssetUpdateError
-from .file_paths import CHARACTER_DATA_PATH, TEXT_MAP_PATH
+from .file_paths import CHARACTER_DATA_PATH, NAMECARD_DATA_PATH, TEXT_MAP_PATH
 
 if TYPE_CHECKING:
     import aiohttp
@@ -23,6 +23,9 @@ class AssetUpdater:
         self.CHARACTER_DATA: Final[
             str
         ] = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/characters.json"
+        self.NAMECARD_DATA: Final[
+            str
+        ] = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/namecards.json"
 
     async def _fetch_json(self, url: str) -> Any:
         async with self._session.get(url) as resp:
@@ -34,10 +37,12 @@ class AssetUpdater:
     async def update(self) -> None:
         text_map = await self._fetch_json(self.TEXT_MAP)
         characters = await self._fetch_json(self.CHARACTER_DATA)
+        namecards = await self._fetch_json(self.NAMECARD_DATA)
 
         data_to_save: dict[str, str] = {
             TEXT_MAP_PATH: text_map,
             CHARACTER_DATA_PATH: characters,
+            NAMECARD_DATA_PATH: namecards,
         }
         for path, data in data_to_save.items():
             if not os.path.exists(os.path.dirname(path)):

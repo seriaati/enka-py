@@ -15,8 +15,10 @@ class GenshinPlayer(BaseModel):
         The number of achievements the player has.
     level: :class:`int`
         The player's level.
-    name_card_id: :class:`int`
-        The player's name card ID.
+    namecard_id: :class:`int`
+        The player's namecard's ID.
+    namecard_icon: :class:`str`
+        The player's namecard's icon.
     nickname: :class:`str`
         The player's nickname.
     signature: :class:`str`
@@ -33,7 +35,8 @@ class GenshinPlayer(BaseModel):
 
     achievements: int = Field(alias="finishAchievementNum")
     level: int
-    name_card_id: int = Field(alias="nameCardId")
+    namecard_id: int = Field(alias="nameCardId")
+    namecard_icon: str = Field(None)
     nickname: str
     signature: str = Field("")
     abyss_floor: int = Field(0, alias="towerFloorIndex")
