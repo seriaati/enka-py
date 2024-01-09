@@ -85,6 +85,17 @@ class EnkaAPI:
     async def fetch_genshin_showcase(
         self, uid: str | int, *, info_only: bool = False
     ) -> GenshinShowcaseResponse:
+        """
+        Fetches the Genshin Impact character showcase of the given UID.
+
+        Parameters
+        ----------
+        uid: :class:`str` | :class:`int`
+            The UID of the user.
+        info_only: :class:`bool`
+            Whether to only fetch the info of the showcase.
+        """
+
         url = self.GENSHIN_API_URL.format(uid=uid)
         if info_only:
             url += "?info"

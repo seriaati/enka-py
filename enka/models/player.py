@@ -2,10 +2,35 @@ from typing import Dict
 
 from pydantic import BaseModel, Field, field_validator
 
-__all__ = ("Player",)
+__all__ = ("GenshinPlayer",)
 
 
-class Player(BaseModel):
+class GenshinPlayer(BaseModel):
+    """
+    Represents a Genshin Impact player.
+
+    Attributes
+    ----------
+    achievements: :class:`int`
+        The number of achievements the player has.
+    level: :class:`int`
+        The player's level.
+    name_card_id: :class:`int`
+        The player's name card ID.
+    nickname: :class:`str`
+        The player's nickname.
+    signature: :class:`str`
+        The player's signature.
+    abyss_floor: :class:`int`
+        The player's Spiral Abyss floor.
+    abyss_level: :class:`int`
+        The player's Spiral Abyss level.
+    world_level: :class:`int`
+        The player's world level.
+    profile_picture_avatar_id: :class:`int`
+        The player's profile picture avatar ID.
+    """
+
     achievements: int = Field(alias="finishAchievementNum")
     level: int
     name_card_id: int = Field(alias="nameCardId")

@@ -17,18 +17,75 @@ __all__ = (
 
 
 class MainStat(BaseModel):
+    """
+    Represents the main stat of an artifact.
+
+    Attributes
+    ----------
+    type: :class:`StatType`
+        The stat's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.)
+    value: :class:`float`
+        The stat's value.
+    name: :class:`str`
+        The stat's name.
+    """
+
     type: StatType = Field(alias="mainPropId")
     value: float = Field(alias="statValue")
     name: str = Field(None)
 
 
 class SubStat(BaseModel):
+    """
+    Represents the sub stat of an artifact.
+
+    Attributes
+    ----------
+    type: :class:`StatType`
+        The stat's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.)
+    value: :class:`float`
+        The stat's value.
+    name: :class:`str`
+        The stat's name.
+    """
+
     type: StatType = Field(alias="appendPropId")
     value: float = Field(alias="statValue")
     name: str = Field(None)
 
 
 class Artifact(BaseModel):
+    """
+    Represents an artifact.
+
+    Attributes
+    ----------
+    item_id: :class:`int`
+        The artifact's ID.
+    main_stat_id: :class:`int`
+        The main stat's ID.
+    sub_stat_ids: List[:class:`int`]
+        The sub stats' IDs.
+    level: :class:`int`
+        The artifact's level.
+    equip_type: :class:`EquipmentType`
+        The artifact's type (e.g. FLOWER, GOBLET, etc.)
+    icon: :class:`str`
+        The artifact's icon.
+    item_type: :class:`ItemType`
+        The artifact's type.
+    name: :class:`str`
+        The artifact's name.
+    rarity: :class:`int`
+        The artifact's rarity.
+    main_stat: :class:`MainStat`
+        The artifact's main stat.
+    sub_stats: List[:class:`SubStat`]
+        The artifact's sub stats.
+    set_name: :class:`str`
+        The artifact's set name.
+    """
+
     item_id: int = Field(alias="itemId")
     main_stat_id: int = Field(alias="mainPropId")
     sub_stat_ids: List[int] = Field(alias="appendPropIdList")
@@ -53,12 +110,48 @@ class Artifact(BaseModel):
 
 
 class WeaponStat(BaseModel):
+    """
+    Represents a weapon stat.
+
+    Attributes
+    ----------
+    type: :class:`StatType`
+        The stat's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.)
+    value: :class:`float`
+        The stat's value.
+    name: :class:`str`
+        The stat's name.
+    """
+
     type: StatType = Field(alias="appendPropId")
     value: float = Field(alias="statValue")
     name: str = Field(None)
 
 
 class Weapon(BaseModel):
+    """
+    Represents a weapon.
+
+    Attributes
+    ----------
+    item_id: :class:`int`
+        The weapon's ID.
+    refinement: :class:`int`
+        The weapon's refinement level (1~5).
+    level: :class:`int`
+        The weapon's level.
+    ascension: :class:`int`
+        The weapon's ascension level.
+    icon: :class:`str`
+        The weapon's icon.
+    name: :class:`str`
+        The weapon's name.
+    rarity: :class:`int`
+        The weapon's rarity.
+    stats: List[:class:`WeaponStat`]
+        The weapon's stats.
+    """
+
     item_id: int = Field(alias="itemId")
     refinement: int = Field(1, alias="affixMap")
     level: int
@@ -79,6 +172,24 @@ class Weapon(BaseModel):
 
 
 class CharacterCostume(BaseModel):
+    """
+    Represents a character costume.
+
+    Attributes
+    ----------
+    id: :class:`str`
+        The costume's ID.
+    side_icon: :class:`str`
+        The costume's side icon.
+        Example: https://enka.network/ui/UI_AvatarIcon_Side_AmborCostumeWic.png
+    icon: :class:`str`
+        The costume's icon.
+        Example: https://enka.network/ui/UI_AvatarIcon_AmborCostumeWic.png
+    art: :class:`str`
+        The costume's art.
+        Example: https://enka.network/ui/UI_Costume_AmborCostumeWic.png
+    """
+
     id: str
     side_icon: str
 
@@ -92,6 +203,44 @@ class CharacterCostume(BaseModel):
 
 
 class Character(BaseModel):
+    """
+    Represents a character.
+
+    Attributes
+    ----------
+    id: :class:`int`
+        The character's ID.
+    artifacts: List[:class:`Artifact`]
+        The character's artifacts.
+    weapon: :class:`Weapon`
+        The character's weapon.
+    stat_map: Dict[:class:`str`, :class:`float`]
+        The character's stat map.
+    constellations: :class:`int`
+        The character's constellation level.
+    skills: Dict[:class:`str`, :class:`int`]
+        The character's skill levels.
+    ascension: :class:`int`
+        The character's ascension level.
+    level: :class:`int`
+        The character's level.
+    skill_depot_id: :class:`int`
+        The character's skill depot ID.
+    name: :class:`str`
+        The character's name.
+    side_icon: :class:`str`
+        The character's side icon.
+        Example: https://enka.network/ui/UI_AvatarIcon_Side_Ambor.png
+    icon: :class:`str`
+        The character's icon.
+        Example: https://enka.network/ui/UI_AvatarIcon_Ambor.png
+    art: :class:`str`
+        The character's art.
+        Example: https://enka.network/ui/UI_Gacha_AvatarImg_Ambor.png
+    costumes: List[:class:`CharacterCostume`]
+        The character's costumes.
+    """
+
     id: int = Field(alias="avatarId")
     artifacts: List[Artifact]
     weapon: Weapon

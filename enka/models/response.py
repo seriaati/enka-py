@@ -3,14 +3,29 @@ from typing import Any, Dict, List
 from pydantic import BaseModel, Field, model_validator
 
 from .character import Character
-from .player import Player
+from .player import GenshinPlayer
 
 __all__ = ("GenshinShowcaseResponse",)
 
 
 class GenshinShowcaseResponse(BaseModel):
+    """
+    Represents a Genshin Impact showcase response.
+
+    Attributes
+    ----------
+    characters: List[:class:`Character`]
+        The characters in the showcase.
+    player: :class:`GenshinPlayer`
+        The player of the showcase.
+    ttl: :class:`int`
+        The time to live of the response.
+    uid: :class:`str`
+        The UID of the showcase.
+    """
+
     characters: List[Character] = Field(alias="avatarInfoList")
-    player: Player = Field(alias="playerInfo")
+    player: GenshinPlayer = Field(alias="playerInfo")
     ttl: int
     uid: str
 
