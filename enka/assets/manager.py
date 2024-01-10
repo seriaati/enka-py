@@ -4,7 +4,13 @@ from typing import TYPE_CHECKING, Any
 import aiofiles
 import orjson
 
-from .file_paths import CHARACTER_DATA_PATH, NAMECARD_DATA_PATH, TEXT_MAP_PATH
+from .file_paths import (
+    CHARACTER_DATA_PATH,
+    CONSTS_DATA_PATH,
+    NAMECARD_DATA_PATH,
+    TALENTS_DATA_PATH,
+    TEXT_MAP_PATH,
+)
 
 if TYPE_CHECKING:
     from ..client import Language
@@ -18,93 +24,90 @@ class AssetManager:
         self.text_map = TextMap(lang)
         self.character_data = CharacterData()
         self.namecard_data = NamecardData()
+        self.consts_data = ConstsData()
+        self.talents_data = TalentsData()
 
     async def load(self) -> bool:
         text_map_loaded = await self.text_map.load()
         character_data_loaded = await self.character_data.load()
         namecard_data_loaded = await self.namecard_data.load()
+        consts_data_loaded = await self.consts_data.load()
+        talents_data_loaded = await self.talents_data.load()
 
-        return text_map_loaded and character_data_loaded and namecard_data_loaded
+        return (
+            text_map_loaded
+            and character_data_loaded
+            and namecard_data_loaded
+            and consts_data_loaded
+            and talents_data_loaded
+        )
 
 
-class TextMap:
-    def __init__(self, lang: "Language") -> None:
-        self._lang = lang
-        self._map: dict[str, str] | None = None
+class AssetData:
+    def __init__(self) -> None:
+        self._data: dict[str, Any] | None = None
 
-    async def load(self) -> bool:
-        with contextlib.suppress(FileNotFoundError):
-            async with aiofiles.open(TEXT_MAP_PATH, encoding="utf-8") as f:
-                self._map = orjson.loads(await f.read())[self._lang.value]
-        return self._map is not None
-
-    def __getitem__(self, key: str) -> str:
-        if self._map is None:
-            msg = "Text map not loaded"
+    def __getitem__(self, key: str) -> Any:
+        if self._data is None:
+            msg = f"{self.__class__.__name__} not loaded"
             raise RuntimeError(msg)
 
-        text = self._map.get(str(key))
+        text = self._data.get(str(key))
         if text is None:
-            msg = f"Cannot find text for key {key} in text map, consider calling `EnkaNetworkAPI.update_assets` to update the text map"
+            msg = f"Cannot find text for key {key!r} in `{self.__class__.__name__}._data`, consider calling `EnkaNetworkAPI.update_assets` to update the assets"
             raise KeyError(msg)
 
         return text
 
+    async def _open_json(self, path: str) -> dict[str, Any] | None:
+        with contextlib.suppress(FileNotFoundError):
+            async with aiofiles.open(path, encoding="utf-8") as f:
+                return orjson.loads(await f.read())
+        return None
+
     def get(self, key: str, default: Any = None) -> str | Any:
-        if self._map is None:
-            msg = "Text map not loaded"
+        if self._data is None:
+            msg = f"{self.__class__.__name__} not loaded"
             raise RuntimeError(msg)
 
-        text = self._map.get(str(key))
+        text = self._data.get(str(key))
         if text is None:
             return default
 
         return text
 
 
-class CharacterData:
-    def __init__(self) -> None:
-        self._data: dict[str, Any] | None = None
+class TextMap(AssetData):
+    def __init__(self, lang: "Language") -> None:
+        super().__init__()
+        self._lang = lang
 
     async def load(self) -> bool:
-        with contextlib.suppress(FileNotFoundError):
-            async with aiofiles.open(CHARACTER_DATA_PATH, encoding="utf-8") as f:
-                self._data = orjson.loads(await f.read())
-
+        text_map = await self._open_json(TEXT_MAP_PATH)
+        if text_map is not None:
+            self._data = text_map[self._lang.value]
         return self._data is not None
 
-    def __getitem__(self, key: str) -> Any:
-        if self._data is None:
-            msg = "Character data not loaded"
-            raise RuntimeError(msg)
 
-        data = self._data.get(key)
-        if data is None:
-            msg = f"Cannot find data for key {key} in character data, consider calling `EnkaNetworkAPI.update_assets` to update the character data"
-            raise KeyError(msg)
-
-        return data
-
-
-class NamecardData:
-    def __init__(self) -> None:
-        self._data: dict[str, Any] | None = None
-
+class CharacterData(AssetData):
     async def load(self) -> bool:
-        with contextlib.suppress(FileNotFoundError):
-            async with aiofiles.open(NAMECARD_DATA_PATH, encoding="utf-8") as f:
-                self._data = orjson.loads(await f.read())
-
+        self._data = await self._open_json(CHARACTER_DATA_PATH)
         return self._data is not None
 
-    def get_icon(self, namecard_id: str) -> str:
-        if self._data is None:
-            msg = "Namecard data not loaded"
-            raise RuntimeError(msg)
 
-        data = self._data.get(namecard_id)
-        if data is None:
-            msg = f"Cannot find data for key {namecard_id} in namecard data, consider calling `EnkaNetworkAPI.update_assets` to update the namecard data"
-            raise KeyError(msg)
+class NamecardData(AssetData):
+    async def load(self) -> bool:
+        self._data = await self._open_json(NAMECARD_DATA_PATH)
+        return self._data is not None
 
-        return data["icon"]
+
+class ConstsData(AssetData):
+    async def load(self) -> bool:
+        self._data = await self._open_json(CONSTS_DATA_PATH)
+        return self._data is not None
+
+
+class TalentsData(AssetData):
+    async def load(self) -> bool:
+        self._data = await self._open_json(TALENTS_DATA_PATH)
+        return self._data is not None

@@ -12,7 +12,7 @@ from .models.response import GenshinShowcaseResponse
 
 __all__ = ("EnkaAPI",)
 
-LOGGER_ = logging.getLogger("enka-py.client")
+LOGGER_ = logging.getLogger("enka.client")
 
 
 class EnkaAPI:
@@ -92,6 +92,8 @@ class EnkaAPI:
         self._text_map = self._assets.text_map
         self._character_data = self._assets.character_data
         self._namecard_data = self._assets.namecard_data
+        self._consts_data = self._assets.consts_data
+        self._talents_data = self._assets.talents_data
 
     async def close(self) -> None:
         if self._session is None:
@@ -113,7 +115,7 @@ class EnkaAPI:
 
         LOGGER_.info("Assets updated")
 
-    async def fetch_genshin_showcase(
+    async def fetch_genshin_showcase(  # noqa: C901
         self, uid: str | int, *, info_only: bool = False
     ) -> GenshinShowcaseResponse:
         """
@@ -134,14 +136,17 @@ class EnkaAPI:
         data = await self._request(url)
         showcase = GenshinShowcaseResponse(**data)
 
-        # Post-processing
-        namecard_icon = self._namecard_data.get_icon(str(showcase.player.namecard_id))
+        # namecard
+        namecard_icon = self._namecard_data[str(showcase.player.namecard_id)]["icon"]
         showcase.player.namecard_icon = f"https://enka.network/ui/{namecard_icon}.png"
+
+        # profile picture
         profile_picture_icon = self._character_data[str(showcase.player.profile_picture_id)][
             "SideIconName"
         ].replace("Side_", "")
         showcase.player.profile_picture_icon = f"https://enka.network/ui/{profile_picture_icon}.png"
 
+        # costume
         for character in showcase.player.showcase_characters:
             if character.costume_id is None:
                 continue
@@ -150,19 +155,24 @@ class EnkaAPI:
                 continue
             character.costume_side_icon = f"https://enka.network/ui/{costume_data[str(character.costume_id)]['sideIconName']}.png"
 
+        # characters
         for character in showcase.characters:
-            character_name_text_map_hash = self._character_data[str(character.id)][
-                "NameTextMapHash"
-            ]
+            character_data = self._character_data[str(character.id)]
+            # name
+            character_name_text_map_hash = character_data["NameTextMapHash"]
             character.name = self._text_map[character_name_text_map_hash]
-            side_icon_name = self._character_data[str(character.id)]["SideIconName"]
+
+            # icon
+            side_icon_name = character_data["SideIconName"]
             character.side_icon = f"https://enka.network/ui/{side_icon_name}.png"
 
+            # weapon
             weapon = character.weapon
             weapon.name = self._text_map[weapon.name]
             for stat in weapon.stats:
                 stat.name = self._text_map[stat.type.value]
 
+            # artifacts
             for artifact in character.artifacts:
                 artifact.name = self._text_map[artifact.name]
                 artifact.set_name = self._text_map[artifact.set_name]
@@ -170,7 +180,24 @@ class EnkaAPI:
                 for stat in artifact.sub_stats:
                     stat.name = self._text_map[stat.type.value]
 
+            # stats
             for stat in character.stats:
                 stat.name = self._text_map.get(stat.type.name)
+
+            # constellations
+            for constellation in character.constellations:
+                const_data = self._consts_data[str(constellation.id)]
+                constellation.name = self._text_map[const_data["nameTextMapHash"]]
+                constellation.icon = f"https://enka.network/ui/{const_data['icon']}.png"
+
+            # talents
+            for talent in character.talents:
+                talent_data = self._talents_data[str(talent.id)]
+                talent.name = self._text_map[talent_data["nameTextMapHash"]]
+                talent.icon = f"https://enka.network/ui/{talent_data['icon']}.png"
+                if character.talent_extra_level_map:
+                    proud_map: dict[str, int] = character_data["ProudMap"]
+                    proud_id = proud_map[str(talent.id)]
+                    talent.level += character.talent_extra_level_map.get(str(proud_id), 0)
 
         return showcase

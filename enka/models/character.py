@@ -188,6 +188,47 @@ class CharacterStat(BaseModel):
     name: Optional[str] = Field(None)
 
 
+class Constellation(BaseModel):
+    """
+    Represents a character's constellation.
+
+    Attributes
+    ----------
+    id: :class:`int`
+        The constellation's ID.
+    name: :class:`str`
+        The constellation's name.
+    icon: :class:`str`
+        The constellation's icon.
+    """
+
+    id: int
+    name: str = Field(None)
+    icon: str = Field(None)
+
+
+class Talent(BaseModel):
+    """
+    Represents a character's talent.
+
+    Attributes
+    ----------
+    id: :class:`int`
+        The talent's ID.
+    level: :class:`int`
+        The talent's level.
+    name: :class:`str`
+        The talent's name.
+    icon: :class:`str`
+        The talent's icon.
+    """
+
+    id: int
+    level: int
+    name: str = Field(None)
+    icon: str = Field(None)
+
+
 class Character(BaseModel):
     """
     Represents a character.
@@ -202,10 +243,10 @@ class Character(BaseModel):
         The character's weapon.
     stats: List[:class:`CharacterStat`]
         The character's stats.
-    constellations: :class:`int`
-        The character's constellation level.
-    skills: Dict[:class:`str`, :class:`int`]
-        The character's skill levels.
+    constellations: List[:class:`Constellation`]
+        The character's unlocked constellations.
+    talents: List[:class:`Talent`]
+        The character's talents.
     ascension: :class:`int`
         The character's ascension level.
     level: :class:`int`
@@ -223,19 +264,23 @@ class Character(BaseModel):
     art: :class:`str`
         The character's art.
         Example: https://enka.network/ui/UI_Gacha_AvatarImg_Ambor.png
+    friendship_level: :class:`int`
+        The character's friendship level (1~10).
     """
 
     id: int = Field(alias="avatarId")
     artifacts: List[Artifact]
     weapon: Weapon
     stats: List[CharacterStat] = Field(alias="fightPropMap")
-    constellations: int = Field(0, alias="talentIdList")
-    skills: Dict[str, int] = Field(alias="skillLevelMap")
+    constellations: List[Constellation] = Field([], alias="talentIdList")
+    talents: List[Talent] = Field(alias="skillLevelMap")
     ascension: int
     level: int
     skill_depot_id: int = Field(alias="skillDepotId")
     name: str = Field(None)
     side_icon: str = Field(None)
+    talent_extra_level_map: Optional[Dict[str, int]] = Field(None, alias="proudSkillExtraLevelMap")
+    friendship_level: int = Field(alias="friendshipLevel")
 
     @property
     def icon(self) -> str:
@@ -250,10 +295,12 @@ class Character(BaseModel):
         return [CharacterStat(type=FightProp(int(k)), value=v) for k, v in v.items()]  # type: ignore
 
     @field_validator("constellations", mode="before")
-    def _convert_constellations(cls, v: Optional[List[int]]) -> int:
-        if v is None:
-            return 0
-        return len(v)
+    def _convert_constellations(cls, v: List[int]) -> List[Constellation]:
+        return [Constellation(id=constellation_id) for constellation_id in v]  # type: ignore
+
+    @field_validator("talents", mode="before")
+    def _convert_talents(cls, v: Dict[str, int]) -> List[Talent]:
+        return [Talent(id=int(k), level=v) for k, v in v.items()]  # type: ignore
 
     @field_validator("weapon", mode="before")
     def _flatten_weapon_data(cls, v: Dict[str, Any]) -> Dict[str, Any]:
@@ -297,5 +344,8 @@ class Character(BaseModel):
                 v["artifacts"].append(equipment)
             else:
                 raise InvalidItemTypeError
+
+        # friendship level
+        v["friendshipLevel"] = v["fetterInfo"]["expLevel"]
 
         return v

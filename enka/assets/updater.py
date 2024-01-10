@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import TYPE_CHECKING, Any, Final
 
@@ -5,29 +6,37 @@ import aiofiles
 import orjson
 
 from ..exceptions import AssetUpdateError
-from .file_paths import CHARACTER_DATA_PATH, NAMECARD_DATA_PATH, TEXT_MAP_PATH
+from .file_paths import (
+    CHARACTER_DATA_PATH,
+    CONSTS_DATA_PATH,
+    NAMECARD_DATA_PATH,
+    TALENTS_DATA_PATH,
+    TEXT_MAP_PATH,
+)
 
 if TYPE_CHECKING:
     import aiohttp
 
 __all__ = ("AssetUpdater",)
 
+SOURCE_TO_PATH: Final[dict[str, str]] = {
+    "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/text_map.json": TEXT_MAP_PATH,
+    "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/characters.json": CHARACTER_DATA_PATH,
+    "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/namecards.json": NAMECARD_DATA_PATH,
+    "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/consts.json": CONSTS_DATA_PATH,
+    "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/talents.json": TALENTS_DATA_PATH,
+}
+
+LOGGER_ = logging.getLogger("enka.assets.updater")
+
 
 class AssetUpdater:
     def __init__(self, session: "aiohttp.ClientSession") -> None:
         self._session = session
 
-        self.TEXT_MAP: Final[
-            str
-        ] = "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/text_map.json"
-        self.CHARACTER_DATA: Final[
-            str
-        ] = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/characters.json"
-        self.NAMECARD_DATA: Final[
-            str
-        ] = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/namecards.json"
-
     async def _fetch_json(self, url: str) -> Any:
+        LOGGER_.debug("Fetching %s", url)
+
         async with self._session.get(url) as resp:
             if resp.status != 200:
                 raise AssetUpdateError(resp.status, url)
@@ -35,18 +44,11 @@ class AssetUpdater:
             return orjson.loads(await resp.read())
 
     async def update(self) -> None:
-        text_map = await self._fetch_json(self.TEXT_MAP)
-        characters = await self._fetch_json(self.CHARACTER_DATA)
-        namecards = await self._fetch_json(self.NAMECARD_DATA)
-
-        data_to_save: dict[str, str] = {
-            TEXT_MAP_PATH: text_map,
-            CHARACTER_DATA_PATH: characters,
-            NAMECARD_DATA_PATH: namecards,
-        }
-        for path, data in data_to_save.items():
+        for source, path in SOURCE_TO_PATH.items():
             if not os.path.exists(os.path.dirname(path)):
                 os.makedirs(os.path.dirname(path))
+
+            data = await self._fetch_json(source)
 
             async with aiofiles.open(path, "w", encoding="utf-8") as f:
                 bytes_ = orjson.dumps(data)
