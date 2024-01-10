@@ -115,7 +115,7 @@ class EnkaAPI:
 
         LOGGER_.info("Assets updated")
 
-    async def fetch_genshin_showcase(  # noqa: C901
+    async def fetch_genshin_showcase(  # noqa: C901, PLR0912
         self, uid: str | int, *, info_only: bool = False
     ) -> GenshinShowcaseResponse:
         """
@@ -197,7 +197,9 @@ class EnkaAPI:
                 talent.icon = f"https://enka.network/ui/{talent_data['icon']}.png"
                 if character.talent_extra_level_map:
                     proud_map: dict[str, int] = character_data["ProudMap"]
-                    proud_id = proud_map[str(talent.id)]
+                    proud_id = proud_map.get(str(talent.id))
+                    if proud_id is None:
+                        continue
                     talent.level += character.talent_extra_level_map.get(str(proud_id), 0)
 
         return showcase
