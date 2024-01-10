@@ -6,6 +6,28 @@ __all__ = ("GenshinPlayer",)
 
 
 class ShowcaseCharacter(BaseModel):
+    """
+    Represents a showcase character.
+
+    Attributes
+    ----------
+    id: :class:`int`
+        The character's ID.
+    level: :class:`int`
+        The character's level.
+    costume_id: Optional[:class:`int`]
+        The character's costume's ID.
+    costume_side_icon: Optional[:class:`str`]
+        The character's costume's side icon.
+        Example: https://enka.network/ui/UI_AvatarIcon_Side_Ambor.png
+    costume_icon: Optional[:class:`str`]
+        The character's costume's icon.
+        Example: https://enka.network/ui/UI_AvatarIcon_Ambor.png
+    costume_art: Optional[:class:`str`]
+        The character's costume's art.
+        Example: https://enka.network/ui/UI_Gacha_AvatarImg_Ambor.png
+    """
+
     id: int = Field(alias="avatarId")
     level: int
     costume_id: Optional[int] = Field(None, alias="costumeId")
@@ -52,6 +74,8 @@ class GenshinPlayer(BaseModel):
         The player's profile picture's ID.
     profile_picture_icon: :class:`str`
         The player's profile picture's icon.
+    showcase_characters: List[:class:`ShowcaseCharacter`]
+        The player's showcase characters.
     """
 
     achievements: int = Field(alias="finishAchievementNum")

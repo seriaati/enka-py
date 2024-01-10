@@ -89,7 +89,6 @@ class Artifact(BaseModel):
     main_stat_id: int = Field(alias="mainPropId")
     sub_stat_ids: List[int] = Field(alias="appendPropIdList")
     level: int
-
     equip_type: EquipmentType = Field(alias="equipType")
     icon: str
     item_type: ItemType = Field(alias="itemType")
@@ -171,6 +170,19 @@ class Weapon(BaseModel):
 
 
 class CharacterStat(BaseModel):
+    """
+    Represents a character stat.
+
+    Attributes
+    ----------
+    type: :class:`FightProp`
+        The stat's type (e.g. HP, ATTACK, etc.)
+    value: :class:`float`
+        The stat's value.
+    name: Optional[:class:`str`]
+        The stat's name.
+    """
+
     type: FightProp
     value: float
     name: Optional[str] = Field(None)
@@ -188,8 +200,8 @@ class Character(BaseModel):
         The character's artifacts.
     weapon: :class:`Weapon`
         The character's weapon.
-    stat_map: Dict[:class:`str`, :class:`float`]
-        The character's stat map.
+    stats: List[:class:`CharacterStat`]
+        The character's stats.
     constellations: :class:`int`
         The character's constellation level.
     skills: Dict[:class:`str`, :class:`int`]

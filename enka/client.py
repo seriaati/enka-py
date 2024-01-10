@@ -16,6 +16,21 @@ LOGGER_ = logging.getLogger("enka-py.client")
 
 
 class EnkaAPI:
+    """
+    The main client for interacting with the Enka Network API.
+
+    Parameters
+    ----------
+    lang: :class:`Language`
+        The language to use for the client, defaults to :attr:`Language.ENGLISH`.
+    headers: :class:`dict`[:class:`str`, :class:`Any`] | :class:`None`
+        The headers to use for the client, defaults to ``None``.
+    cache_maxsize: :class:`int`
+        The maximum size of the cache, defaults to ``100``.
+    cache_ttl: :class:`int`
+        The time to live of the cache, defaults to ``60``.
+    """
+
     def __init__(
         self,
         lang: Language = Language.ENGLISH,
@@ -109,7 +124,7 @@ class EnkaAPI:
         uid: :class:`str` | :class:`int`
             The UID of the user.
         info_only: :class:`bool`
-            Whether to only fetch the info of the showcase.
+            Whether to only fetch player info, defaults to ``False``.
         """
 
         url = self.GENSHIN_API_URL.format(uid=uid)
