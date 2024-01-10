@@ -89,7 +89,7 @@ class GenshinPlayer(BaseModel):
     world_level: int = Field(0, alias="worldLevel")
     profile_picture_id: int = Field(alias="profilePicture")
     profile_picture_icon: str = Field(None)
-    showcase_characters: List[ShowcaseCharacter] = Field(alias="showAvatarInfoList")
+    showcase_characters: List[ShowcaseCharacter] = Field([], alias="showAvatarInfoList")
 
     @field_validator("profile_picture_id", mode="before")
     def _extract_avatar_id(cls, v: Dict[str, int]) -> int:
