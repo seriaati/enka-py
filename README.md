@@ -36,7 +36,8 @@ poetry add git+https://github.com/seriaati/enka-py
 ```
 **No pip install?**  
 I personally use [poetry](https://python-poetry.org/), that's why the build backend is using it. `pip` requires `setuptools`, and I don't think it's possible to use multiple build backends. However, if you know how to, I am more than happy to change it so the package can be installed with both tools.  
-> Side note: I strongly recommend you to try out poetry! It will make your Python life so much easier.
+> [!TIP]
+> I strongly recommend you to try out poetry! It will make your Python life so much easier.
 
 ## Quick Example
 ```py
@@ -84,7 +85,7 @@ asyncio.run(main())
 
 ## Updating assets
 In your first use, enka.py will download all the necessary data files to a directory named `.enka_py` (if you're using git, you should add it to `.gitignore`). However, sometimes (often after a game update), the local data will be outdated, and you'd need to update them.  
-All assets are hosted in [enka-py-assets](https://github.com/seriaati/enka-py-assets), this repo uses GitHub action to automatically update data.  
+All assets are hosted in [enka-py-assets](https://github.com/seriaati/enka-py-assets), it uses GitHub action to automatically update data.  
 To update assets, use the `update_assets()` method:
 ```py
 import enka
@@ -113,7 +114,7 @@ Default is 60 seconds, the cache is evicted when this time expires. Note that se
 ## Finding models' attributes
 If you're using an IDE like VSCode, then you can see all the attributes and methods the model has in the autocomplete.
 > [!TIP]
-> If you're using VSCode, `alt + left click` on the attribute, then teh IDE will bring you to the source code of this wrapper, most classes and methods have docstrings.
+> If you're using VSCode, `alt + left click` on the attribute, then the IDE will bring you to the source code of this wrapper, most classes and methods have docstrings.
 
 # Questions, issues, contributions
 For questions, you can contact me on [Discord](https://discord.com/users/410036441129943050) or open an [issue](https://github.com/seriaati/enka-py/issues).  
