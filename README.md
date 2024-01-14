@@ -1,5 +1,24 @@
 # enka.py
- An async API wrapper for [enka.network](https://enka.network/) written in Python.
+
+## Table of Contents
+1. [Introduction](#introduction)
+   - [Features](#features)
+   - [Installation](#installation)
+   - [Quick Example](#quick-example)
+
+2. [Usage](#usage)
+   - [Starting and closing the client properly](#starting-and-closing-the-client-properly)
+   - [Updating assets](#updating-assets)
+   - [Client parameters](#client-parameters)
+   - [Finding models' attributes](#finding-models-attributes)
+
+3. [Questions, issues, contributions](#questions-issues-contributions)
+
+## Quick links
+- [Enka.network API docs](http://api.enka.network/)
+
+# Introduction
+enka.py is an async API wrapper for [enka.network](https://enka.network/) written in Python.
 
 ## Features
  - Fully typed.
