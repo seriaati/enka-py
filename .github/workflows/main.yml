@@ -1,4 +1,4 @@
-name: Update Data
+name: Run tests
 
 on:
   push:
