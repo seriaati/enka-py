@@ -110,7 +110,12 @@ class EnkaAPI:
         return showcase_character
 
     def _post_process_character(self, character: "Character") -> "Character":
-        character_data = self._character_data[str(character.id)]
+        if character.id in {10000005, 10000007}:
+            characer_id = f"{character.id}-{character.skill_depot_id}"
+        else:
+            characer_id = str(character.id)
+
+        character_data = self._character_data[characer_id]
         # name
         character_name_text_map_hash = character_data["NameTextMapHash"]
         character.name = self._text_map[character_name_text_map_hash]
