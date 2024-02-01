@@ -1,14 +1,18 @@
 import logging
-from typing import Any, Final
+from typing import TYPE_CHECKING, Any, Final
 
 import aiohttp
 import cachetools
 
 from .assets.manager import AssetManager
 from .assets.updater import AssetUpdater
-from .enums import Language
+from .enums import Element, Language
 from .exceptions import raise_for_retcode
 from .models.response import GenshinShowcaseResponse
+
+if TYPE_CHECKING:
+    from .models.character import Character
+    from .models.player import GenshinPlayer, ShowcaseCharacter
 
 __all__ = ("EnkaAPI",)
 
@@ -79,6 +83,105 @@ class EnkaAPI:
             self._cache[url] = data
             return data
 
+    def _post_process_genshin_showcase_player(self, player: "GenshinPlayer") -> "GenshinPlayer":
+        # namecard
+        namecard_icon = self._namecard_data[str(player.namecard_id)]["icon"]
+        player.namecard_icon = f"https://enka.network/ui/{namecard_icon}.png"
+
+        # profile picture
+        profile_picture_icon = self._character_data[str(player.profile_picture_id)][
+            "SideIconName"
+        ].replace("Side_", "")
+        player.profile_picture_icon = f"https://enka.network/ui/{profile_picture_icon}.png"
+
+        return player
+
+    def _post_process_genshin_showcase_character(
+        self, showcase_character: "ShowcaseCharacter"
+    ) -> "ShowcaseCharacter":
+        if showcase_character.costume_id is None:
+            return showcase_character
+
+        costume_data = self._character_data[str(showcase_character.id)]["Costumes"]
+        if costume_data is None:
+            return showcase_character
+        showcase_character.costume_side_icon = f"https://enka.network/ui/{costume_data[str(showcase_character.costume_id)]['sideIconName']}.png"
+
+        return showcase_character
+
+    def _post_process_genshin_character(self, character: "Character") -> "Character":
+        character_data = self._character_data[str(character.id)]
+        # name
+        character_name_text_map_hash = character_data["NameTextMapHash"]
+        character.name = self._text_map[character_name_text_map_hash]
+
+        # icon
+        side_icon_name = character_data["SideIconName"]
+        character.side_icon = f"https://enka.network/ui/{side_icon_name}.png"
+
+        # weapon
+        weapon = character.weapon
+        weapon.name = self._text_map[weapon.name]
+        for stat in weapon.stats:
+            stat.name = self._text_map[stat.type.value]
+
+        # artifacts
+        for artifact in character.artifacts:
+            artifact.name = self._text_map[artifact.name]
+            artifact.set_name = self._text_map[artifact.set_name]
+            artifact.main_stat.name = self._text_map[artifact.main_stat.type.value]
+            for stat in artifact.sub_stats:
+                stat.name = self._text_map[stat.type.value]
+
+        # stats
+        for stat in character.stats:
+            stat.name = self._text_map.get(stat.type.name)
+
+        # constellations
+        for constellation in character.constellations:
+            const_data = self._consts_data[str(constellation.id)]
+            constellation.name = self._text_map[const_data["nameTextMapHash"]]
+            constellation.icon = f"https://enka.network/ui/{const_data['icon']}.png"
+
+        # talents
+        for talent in character.talents:
+            talent_data = self._talents_data[str(talent.id)]
+            talent.name = self._text_map[talent_data["nameTextMapHash"]]
+            talent.icon = f"https://enka.network/ui/{talent_data['icon']}.png"
+            if character.talent_extra_level_map:
+                proud_map: dict[str, int] = character_data["ProudMap"]
+                proud_id = proud_map.get(str(talent.id))
+                if proud_id is None:
+                    continue
+                talent.level += character.talent_extra_level_map.get(str(proud_id), 0)
+
+        # element
+        if character.id in {10000005, 10000007}:
+            character_id = f"{character.id}-{character.skill_depot_id}"
+            character_data = self._character_data[character_id]
+        element = character_data["Element"]
+        character.element = Element(element)
+
+        return character
+
+    def _post_process_genshin_showcase(
+        self, showcase: GenshinShowcaseResponse
+    ) -> GenshinShowcaseResponse:
+        showcase.player = self._post_process_genshin_showcase_player(showcase.player)
+
+        # costume
+        showcase_characters: list[ShowcaseCharacter] = []
+        for character in showcase.player.showcase_characters:
+            showcase_characters.append(self._post_process_genshin_showcase_character(character))
+        showcase.player.showcase_characters = showcase_characters
+
+        # characters
+        characters: list[Character] = []
+        for character in showcase.characters:
+            characters.append(self._post_process_genshin_character(character))
+
+        return showcase
+
     async def start(self) -> None:
         self._session = aiohttp.ClientSession(headers=self._headers)
 
@@ -135,71 +238,4 @@ class EnkaAPI:
 
         data = await self._request(url)
         showcase = GenshinShowcaseResponse(**data)
-
-        # namecard
-        namecard_icon = self._namecard_data[str(showcase.player.namecard_id)]["icon"]
-        showcase.player.namecard_icon = f"https://enka.network/ui/{namecard_icon}.png"
-
-        # profile picture
-        profile_picture_icon = self._character_data[str(showcase.player.profile_picture_id)][
-            "SideIconName"
-        ].replace("Side_", "")
-        showcase.player.profile_picture_icon = f"https://enka.network/ui/{profile_picture_icon}.png"
-
-        # costume
-        for character in showcase.player.showcase_characters:
-            if character.costume_id is None:
-                continue
-            costume_data = self._character_data[str(character.id)]["Costumes"]
-            if costume_data is None:
-                continue
-            character.costume_side_icon = f"https://enka.network/ui/{costume_data[str(character.costume_id)]['sideIconName']}.png"
-
-        # characters
-        for character in showcase.characters:
-            character_data = self._character_data[str(character.id)]
-            # name
-            character_name_text_map_hash = character_data["NameTextMapHash"]
-            character.name = self._text_map[character_name_text_map_hash]
-
-            # icon
-            side_icon_name = character_data["SideIconName"]
-            character.side_icon = f"https://enka.network/ui/{side_icon_name}.png"
-
-            # weapon
-            weapon = character.weapon
-            weapon.name = self._text_map[weapon.name]
-            for stat in weapon.stats:
-                stat.name = self._text_map[stat.type.value]
-
-            # artifacts
-            for artifact in character.artifacts:
-                artifact.name = self._text_map[artifact.name]
-                artifact.set_name = self._text_map[artifact.set_name]
-                artifact.main_stat.name = self._text_map[artifact.main_stat.type.value]
-                for stat in artifact.sub_stats:
-                    stat.name = self._text_map[stat.type.value]
-
-            # stats
-            for stat in character.stats:
-                stat.name = self._text_map.get(stat.type.name)
-
-            # constellations
-            for constellation in character.constellations:
-                const_data = self._consts_data[str(constellation.id)]
-                constellation.name = self._text_map[const_data["nameTextMapHash"]]
-                constellation.icon = f"https://enka.network/ui/{const_data['icon']}.png"
-
-            # talents
-            for talent in character.talents:
-                talent_data = self._talents_data[str(talent.id)]
-                talent.name = self._text_map[talent_data["nameTextMapHash"]]
-                talent.icon = f"https://enka.network/ui/{talent_data['icon']}.png"
-                if character.talent_extra_level_map:
-                    proud_map: dict[str, int] = character_data["ProudMap"]
-                    proud_id = proud_map.get(str(talent.id))
-                    if proud_id is None:
-                        continue
-                    talent.level += character.talent_extra_level_map.get(str(proud_id), 0)
-
-        return showcase
+        return self._post_process_genshin_showcase(showcase)
