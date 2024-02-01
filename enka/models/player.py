@@ -78,7 +78,7 @@ class Player(BaseModel):
         The player's showcase characters.
     """
 
-    achievements: int = Field(alias="finishAchievementNum")
+    achievements: int = Field(0, alias="finishAchievementNum")
     level: int
     namecard_id: int = Field(alias="nameCardId")
     namecard_icon: str = Field(None)
