@@ -20,7 +20,7 @@
 # Introduction
 enka.py is an async API wrapper for [enka.network](https://enka.network/) written in Python.
 > [!NOTE]  
-> The wrapper currently only supports fetching Genshin Impact showcase, Honkai Star Rail and profile fetching are planned.
+> The wrapper currently only supports fetching Genshin Impact showcase, for Honkai: Star Rail, use [mihomo](https://github.com/KT-Yeh/mihomo) instead.
 
 ## Features
  - Fully typed.
