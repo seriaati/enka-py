@@ -8,7 +8,7 @@ on:
       - main
 
 jobs:
-  update-data:
+  run-tests:
     runs-on: ubuntu-latest
 
     steps:
