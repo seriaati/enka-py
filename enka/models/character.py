@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from ..exceptions import InvalidItemTypeError
-from ..enums import EquipmentType, FightProp, ItemType, StatType
+from ..enums import Element, EquipmentType, FightProp, ItemType, StatType
 
 __all__ = (
     "Artifact",
@@ -269,6 +269,8 @@ class Character(BaseModel):
         Example: https://enka.network/ui/UI_Gacha_AvatarImg_Ambor.png
     friendship_level: :class:`int`
         The character's friendship level (1~10).
+    element: :class:`Element`
+        The character's element.
     """
 
     id: int = Field(alias="avatarId")
@@ -284,6 +286,7 @@ class Character(BaseModel):
     side_icon: str = Field(None)
     talent_extra_level_map: Optional[Dict[str, int]] = Field(None, alias="proudSkillExtraLevelMap")
     friendship_level: int = Field(alias="friendshipLevel")
+    element: Element = Field(None)
 
     @property
     def icon(self) -> str:

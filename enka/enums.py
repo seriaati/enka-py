@@ -182,3 +182,13 @@ class FightProp(IntEnum):
     FIGHT_PROP_ELEM_REACT_OVERGROW_FIRE_CRITICAL_HURT = 3042
     FIGHT_PROP_ELEM_REACT_OVERGROW_ELECTRIC_CRITICAL = 3043
     FIGHT_PROP_ELEM_REACT_OVERGROW_ELECTRIC_CRITICAL_HURT = 3044
+
+
+class Element(StrEnum):
+    ANEMO = "Wind"
+    GEO = "Rock"
+    ELECTRO = "Electric"
+    DENDRO = "Grass"
+    PYRO = "Fire"
+    CRYO = "Ice"
+    HYDRO = "Water"
