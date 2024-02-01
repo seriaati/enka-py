@@ -271,6 +271,11 @@ class Character(BaseModel):
         The character's friendship level (1~10).
     element: :class:`Element`
         The character's element.
+    talent_order: List[:class:`int`]
+        The character's talent order.
+        1. Normal attack
+        2. Elemental skill
+        3. Elemental burst
     """
 
     id: int = Field(alias="avatarId")
@@ -287,6 +292,7 @@ class Character(BaseModel):
     talent_extra_level_map: Optional[Dict[str, int]] = Field(None, alias="proudSkillExtraLevelMap")
     friendship_level: int = Field(alias="friendshipLevel")
     element: Element = Field(None)
+    talent_order: list[int] = Field(None)
 
     @property
     def icon(self) -> str:

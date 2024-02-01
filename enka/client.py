@@ -155,10 +155,10 @@ class EnkaAPI:
                     continue
                 talent.level += character.talent_extra_level_map.get(str(proud_id), 0)
 
+        # talent order
+        character.talent_order = character_data["SkillOrder"]
+
         # element
-        if character.id in {10000005, 10000007}:
-            character_id = f"{character.id}-{character.skill_depot_id}"
-            character_data = self._character_data[character_id]
         element = character_data["Element"]
         character.element = Element(element)
 
@@ -242,23 +242,3 @@ class EnkaAPI:
         data = await self._request(url)
         showcase = ShowcaseResponse(**data)
         return self._post_process_showcase(showcase)
-
-    def get_talent_order(self, character_id: str, skill_depot_id: str) -> list[int]:
-        """
-        Gets the talent order of a character.
-
-        Parameters
-        ----------
-        character_id: :class:`str`
-            The character's ID.
-        skill_depot_id: :class:`str`
-            The character's skill depot ID.
-
-        Returns
-        -------
-        List[:class:`int`]
-            List of talent IDs in order.
-        """
-
-        character_data = self._character_data[f"{character_id}-{skill_depot_id}"]
-        return character_data["SkillOrder"]
