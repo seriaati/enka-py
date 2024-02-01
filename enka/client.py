@@ -228,6 +228,11 @@ class EnkaAPI:
             The UID of the user.
         info_only: :class:`bool`
             Whether to only fetch player info, defaults to ``False``.
+
+        Returns
+        -------
+        :class:`ShowcaseResponse`
+            The response of the showcase.
         """
 
         url = self.GENSHIN_API_URL.format(uid=uid)
@@ -237,3 +242,23 @@ class EnkaAPI:
         data = await self._request(url)
         showcase = ShowcaseResponse(**data)
         return self._post_process_showcase(showcase)
+
+    def get_talent_order(self, character_id: str, skill_depot_id: str) -> list[int]:
+        """
+        Gets the talent order of a character.
+
+        Parameters
+        ----------
+        character_id: :class:`str`
+            The character's ID.
+        skill_depot_id: :class:`str`
+            The character's skill depot ID.
+
+        Returns
+        -------
+        List[:class:`int`]
+            List of talent IDs in order.
+        """
+
+        character_data = self._character_data[f"{character_id}-{skill_depot_id}"]
+        return character_data["SkillOrder"]
