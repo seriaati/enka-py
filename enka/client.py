@@ -81,7 +81,7 @@ class EnkaAPI:
                 raise_for_retcode(resp.status)
 
             data: dict[str, Any] = await resp.json()
-            self._cache[url] = copy.deepcopy(data)
+            self._cache[url] = data
             return data
 
     def _post_process_showcase_player(self, player: "Player") -> "Player":
@@ -246,5 +246,6 @@ class EnkaAPI:
             url += "?info"
 
         data = await self._request(url)
+        data = copy.deepcopy(data)
         showcase = ShowcaseResponse(**data)
         return self._post_process_showcase(showcase)
