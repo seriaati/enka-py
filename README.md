@@ -53,6 +53,8 @@ async def main() -> None:
 asyncio.run(main())
 ```
 
+Full example can be found in [example.py](https://github.com/seriaati/enka-py/blob/main/example.py)
+
 # Usage
 ## Starting and closing the client properly
 To use the client properly, you can either:  
@@ -115,6 +117,10 @@ Default is 60 seconds, the cache is evicted when this time expires. Note that se
 If you're using an IDE like VSCode, then you can see all the attributes and methods the model has in the autocomplete.
 > [!TIP]
 > If you're using VSCode, `alt + left click` on the attribute, then the IDE will bring you to the source code of this wrapper, most classes and methods have docstrings.
+
+## Catching exceptions
+All exception classes can be found in [enka/exceptions.py](https://github.com/seriaati/enka-py/blob/main/enka/exceptions.py), catch them with `try-except`.  
+Example can be found in [example.py](https://github.com/seriaati/enka-py/blob/main/example.py)
 
 # Questions, issues, contributions
 For questions, you can contact me on [Discord](https://discord.com/users/410036441129943050) or open an [issue](https://github.com/seriaati/enka-py/issues).  
