@@ -20,7 +20,7 @@
 # Introduction
 enka.py is an async API wrapper for [enka.network](https://enka.network/) written in Python.
 > [!NOTE]  
-> The wrapper currently only supports fetching Genshin Impact showcase, for Honkai: Star Rail, use [mihomo](https://github.com/KT-Yeh/mihomo) instead.
+> The wrapper only supports fetching Genshin Impact showcase, for Honkai: Star Rail, use [mihomo](https://github.com/KT-Yeh/mihomo) instead.
 
 ## Features
  - Fully typed.
@@ -46,7 +46,7 @@ import asyncio
 
 async def main() -> None:
     async with enka.EnkaAPI() as api:
-      response = await api.fetch_genshin_showcase(901211014)
+      response = await api.fetch_showcase(901211014)
       print(response.player.nickname)
       print(response.characters[0].name)
 
@@ -64,7 +64,7 @@ import asyncio
 async def main() -> None:
     api = enka.EnkaAPI()
     await api.start()
-    response = await api.fetch_genshin_showcase(901211014)
+    response = await api.fetch_showcase(901211014)
     await api.close()
 
 asyncio.run(main())
@@ -76,7 +76,7 @@ import asyncio
 
 async def main() -> None:
    async with enka.EnkaAPI() as api:
-     await api.fetch_genshin_showcase(901211014)
+     await api.fetch_showcase(901211014)
 
 asyncio.run(main())
 ```

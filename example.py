@@ -5,7 +5,7 @@ import enka
 
 async def main() -> None:
     async with enka.EnkaAPI() as api:
-        response = await api.fetch_genshin_showcase(901211014)
+        response = await api.fetch_showcase(901211014)
 
         print("Name:", response.player.nickname)
         print("Level:", response.player.level)

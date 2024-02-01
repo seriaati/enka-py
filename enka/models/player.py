@@ -2,7 +2,7 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
-__all__ = ("GenshinPlayer", "ShowcaseCharacter")
+__all__ = ("Player", "ShowcaseCharacter")
 
 
 class ShowcaseCharacter(BaseModel):
@@ -46,7 +46,7 @@ class ShowcaseCharacter(BaseModel):
         return self.costume_side_icon.replace("AvatarIcon_Side", "Costume")
 
 
-class GenshinPlayer(BaseModel):
+class Player(BaseModel):
     """
     Represents a Genshin Impact player.
 

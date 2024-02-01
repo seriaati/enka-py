@@ -8,11 +8,11 @@ from .assets.manager import AssetManager
 from .assets.updater import AssetUpdater
 from .enums import Element, Language
 from .exceptions import raise_for_retcode
-from .models.response import GenshinShowcaseResponse
+from .models.response import ShowcaseResponse
 
 if TYPE_CHECKING:
     from .models.character import Character
-    from .models.player import GenshinPlayer, ShowcaseCharacter
+    from .models.player import Player, ShowcaseCharacter
 
 __all__ = ("EnkaAPI",)
 
@@ -83,7 +83,7 @@ class EnkaAPI:
             self._cache[url] = data
             return data
 
-    def _post_process_genshin_showcase_player(self, player: "GenshinPlayer") -> "GenshinPlayer":
+    def _post_process_showcase_player(self, player: "Player") -> "Player":
         # namecard
         namecard_icon = self._namecard_data[str(player.namecard_id)]["icon"]
         player.namecard_icon = f"https://enka.network/ui/{namecard_icon}.png"
@@ -96,7 +96,7 @@ class EnkaAPI:
 
         return player
 
-    def _post_process_genshin_showcase_character(
+    def _post_process_showcase_character(
         self, showcase_character: "ShowcaseCharacter"
     ) -> "ShowcaseCharacter":
         if showcase_character.costume_id is None:
@@ -109,7 +109,7 @@ class EnkaAPI:
 
         return showcase_character
 
-    def _post_process_genshin_character(self, character: "Character") -> "Character":
+    def _post_process_character(self, character: "Character") -> "Character":
         character_data = self._character_data[str(character.id)]
         # name
         character_name_text_map_hash = character_data["NameTextMapHash"]
@@ -164,21 +164,19 @@ class EnkaAPI:
 
         return character
 
-    def _post_process_genshin_showcase(
-        self, showcase: GenshinShowcaseResponse
-    ) -> GenshinShowcaseResponse:
-        showcase.player = self._post_process_genshin_showcase_player(showcase.player)
+    def _post_process_showcase(self, showcase: ShowcaseResponse) -> ShowcaseResponse:
+        showcase.player = self._post_process_showcase_player(showcase.player)
 
         # costume
         showcase_characters: list[ShowcaseCharacter] = []
         for character in showcase.player.showcase_characters:
-            showcase_characters.append(self._post_process_genshin_showcase_character(character))
+            showcase_characters.append(self._post_process_showcase_character(character))
         showcase.player.showcase_characters = showcase_characters
 
         # characters
         characters: list[Character] = []
         for character in showcase.characters:
-            characters.append(self._post_process_genshin_character(character))
+            characters.append(self._post_process_character(character))
 
         return showcase
 
@@ -218,11 +216,11 @@ class EnkaAPI:
 
         LOGGER_.info("Assets updated")
 
-    async def fetch_genshin_showcase(  # noqa: C901, PLR0912
+    async def fetch_showcase(  # noqa: C901, PLR0912
         self, uid: str | int, *, info_only: bool = False
-    ) -> GenshinShowcaseResponse:
+    ) -> ShowcaseResponse:
         """
-        Fetches the Genshin Impact character showcase of the given UID.
+        Fetches the  Impact character showcase of the given UID.
 
         Parameters
         ----------
@@ -237,5 +235,5 @@ class EnkaAPI:
             url += "?info"
 
         data = await self._request(url)
-        showcase = GenshinShowcaseResponse(**data)
-        return self._post_process_genshin_showcase(showcase)
+        showcase = ShowcaseResponse(**data)
+        return self._post_process_showcase(showcase)
