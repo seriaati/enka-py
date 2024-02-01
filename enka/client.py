@@ -1,3 +1,4 @@
+import copy
 import logging
 from typing import TYPE_CHECKING, Any, Final
 
@@ -80,7 +81,7 @@ class EnkaAPI:
                 raise_for_retcode(resp.status)
 
             data: dict[str, Any] = await resp.json()
-            self._cache[url] = data
+            self._cache[url] = copy.deepcopy(data)
             return data
 
     def _post_process_showcase_player(self, player: "Player") -> "Player":
