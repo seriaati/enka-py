@@ -5,7 +5,12 @@ import enka
 
 async def main() -> None:
     async with enka.EnkaAPI() as api:
-        response = await api.fetch_showcase(901211014)
+        try:
+            response = await api.fetch_showcase(901211014)
+        except enka.exceptions.PlayerDoesNotExistError:
+            return print("Player does not exist.")
+        except enka.exceptions.GameMaintenanceError:
+            return print("Game is in maintenance.")
 
         print("Name:", response.player.nickname)
         print("Level:", response.player.level)
