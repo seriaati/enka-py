@@ -8,14 +8,17 @@ from ..enums import EquipmentType, FightProp, ItemType, StatType
 __all__ = (
     "Artifact",
     "Character",
-    "MainStat",
-    "SubStat",
+    "ArtifactMainStat",
+    "ArtifactSubStat",
     "Weapon",
     "WeaponStat",
+    "CharacterStat",
+    "Constellation",
+    "Talent",
 )
 
 
-class MainStat(BaseModel):
+class ArtifactMainStat(BaseModel):
     """
     Represents the main stat of an artifact.
 
@@ -34,7 +37,7 @@ class MainStat(BaseModel):
     name: str = Field(None)
 
 
-class SubStat(BaseModel):
+class ArtifactSubStat(BaseModel):
     """
     Represents the sub stat of an artifact.
 
@@ -94,8 +97,8 @@ class Artifact(BaseModel):
     item_type: ItemType = Field(alias="itemType")
     name: str = Field(alias="nameTextMapHash")
     rarity: int = Field(alias="rankLevel")
-    main_stat: MainStat = Field(alias="reliquaryMainstat")
-    sub_stats: List[SubStat] = Field(alias="reliquarySubstats")
+    main_stat: ArtifactMainStat = Field(alias="reliquaryMainstat")
+    sub_stats: List[ArtifactSubStat] = Field(alias="reliquarySubstats")
     set_name: str = Field(alias="setNameTextMapHash")
 
     @field_validator("level", mode="before")
@@ -176,7 +179,7 @@ class CharacterStat(BaseModel):
     Attributes
     ----------
     type: :class:`FightProp`
-        The stat's type (e.g. HP, ATTACK, etc.)
+        The stat's type
     value: :class:`float`
         The stat's value.
     name: Optional[:class:`str`]

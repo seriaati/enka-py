@@ -2,7 +2,7 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
-__all__ = ("GenshinPlayer",)
+__all__ = ("GenshinPlayer", "ShowcaseCharacter")
 
 
 class ShowcaseCharacter(BaseModel):
