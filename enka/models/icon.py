@@ -1,7 +1,8 @@
 class Icon:
-    def __init__(self, side_icon_ui_path: str) -> None:
+    def __init__(self, side_icon_ui_path: str, *, is_costume: bool = False) -> None:
         self._side_icon_ui_path = side_icon_ui_path
         self._side_icon = f"https://enka.network/ui/{side_icon_ui_path}.png"
+        self._is_costume = is_costume
 
     @property
     def icon_ui_path(self) -> str:
@@ -33,7 +34,9 @@ class Icon:
         The gacha art of the character.
         e.g. https://enka.network/ui/UI_Gacha_AvatarImg_Ambor.png
         """
-        return self._side_icon.replace("AvatarIcon_Side", "Gacha_AvatarImg")
+        return self._side_icon.replace(
+            "AvatarIcon_Side", "Costume" if self._is_costume else "Gacha_AvatarImg"
+        )
 
     @property
     def front(self) -> str:

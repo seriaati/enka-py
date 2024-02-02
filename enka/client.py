@@ -118,7 +118,7 @@ class EnkaAPI:
         costume_data = self._assets.character_data[str(showcase_character.id)]["Costumes"]
         if costume_data is not None:
             showcase_character.costuime_icon = Icon(
-                costume_data[str(showcase_character.costume_id)]["sideIconName"]
+                costume_data[str(showcase_character.costume_id)]["sideIconName"], is_costume=True
             )
 
         return showcase_character
