@@ -158,8 +158,8 @@ class EnkaAPI:
                 stat.name = self._assets.text_map[stat.type.value]
 
         # stats
-        for stat in character.stats:
-            stat.name = self._assets.text_map.get(stat.type.name)
+        for stat_type, stat in character.stats.items():
+            stat.name = self._assets.text_map.get(stat_type.name)
 
         # constellations
         for constellation in character.constellations:

@@ -1,6 +1,7 @@
 import asyncio
 
 import enka
+from enka.enums import FightProp
 
 
 async def main() -> None:
@@ -27,9 +28,12 @@ async def main() -> None:
             print("Weapon level:", character.weapon.level)
             print("Weapon refinement:", character.weapon.refinement)
             print("Side icon:", character.icon.side)
-            print("Circle icon:", character.icon.circle)
-            print("Gacha art:", character.icon.gacha)
-            print("Front icon:", character.icon.front)
+            print("HP:", round(character.stats[FightProp.FIGHT_PROP_CUR_HP].value))
+            print("Attack:", round(character.stats[FightProp.FIGHT_PROP_CUR_ATTACK].value))
+            print(
+                "Defense:",
+                round(character.stats[FightProp.FIGHT_PROP_CUR_DEFENSE].value),
+            )
 
 
 asyncio.run(main())

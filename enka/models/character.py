@@ -180,15 +180,12 @@ class CharacterStat(BaseModel):
 
     Attributes
     ----------
-    type: :class:`FightProp`
-        The stat's type
     value: :class:`float`
         The stat's value.
     name: Optional[:class:`str`]
         The stat's name.
     """
 
-    type: FightProp
     value: float
     name: Optional[str] = Field(None)
 
@@ -246,7 +243,7 @@ class Character(BaseModel):
         The character's artifacts.
     weapon: :class:`Weapon`
         The character's weapon.
-    stats: List[:class:`CharacterStat`]
+    stats: Dict[:class:`CharacterStat`]
         The character's stats.
     constellations: List[:class:`Constellation`]
         The character's unlocked constellations.
@@ -278,7 +275,7 @@ class Character(BaseModel):
     id: int = Field(alias="avatarId")
     artifacts: List[Artifact]
     weapon: Weapon
-    stats: List[CharacterStat] = Field(alias="fightPropMap")
+    stats: Dict[FightProp, CharacterStat] = Field(alias="fightPropMap")
     constellations: List[Constellation] = Field([], alias="talentIdList")
     talents: List[Talent] = Field(alias="skillLevelMap")
     ascension: int
@@ -294,8 +291,8 @@ class Character(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
     @field_validator("stats", mode="before")
-    def _convert_stats(cls, v: Dict[str, float]):
-        return [CharacterStat(type=FightProp(int(k)), value=v) for k, v in v.items()]  # type: ignore
+    def _convert_stats(cls, v: Dict[str, float]) -> Dict[FightProp, CharacterStat]:
+        return {FightProp(int(k)): CharacterStat(value=v) for k, v in v.items()}  # type: ignore
 
     @field_validator("constellations", mode="before")
     def _convert_constellations(cls, v: List[int]) -> List[Constellation]:
