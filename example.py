@@ -15,7 +15,7 @@ async def main() -> None:
         print("Name:", response.player.nickname)
         print("Level:", response.player.level)
         print("Achievements:", response.player.achievements)
-        print("Namecard:", response.player.namecard_icon)
+        print("Namecard:", response.player.namecard.full)
 
         for character in response.characters:
             print("\n==================\n")
@@ -26,6 +26,10 @@ async def main() -> None:
             print("Weapon:", character.weapon.name)
             print("Weapon level:", character.weapon.level)
             print("Weapon refinement:", character.weapon.refinement)
+            print("Side icon:", character.icon.side)
+            print("Circle icon:", character.icon.circle)
+            print("Gacha art:", character.icon.gacha)
+            print("Front icon:", character.icon.front)
 
 
 asyncio.run(main())
