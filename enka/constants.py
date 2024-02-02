@@ -1,5 +1,6 @@
 __all__ = ("PERCENT_STAT_TYPES", "CHARACTER_RARITY_MAP")
 
+
 PERCENT_STAT_TYPES = (
     "FIGHT_PROP_HP_PERCENT",
     "FIGHT_PROP_ATTACK_PERCENT",
@@ -21,4 +22,14 @@ PERCENT_STAT_TYPES = (
 CHARACTER_RARITY_MAP: dict[str, int] = {
     "QUALITY_ORANGE": 5,
     "QUALITY_PURPLE": 4,
+}
+
+ASCENSION_TO_MAX_LEVEL: dict[int, int] = {
+    0: 20,
+    1: 40,
+    2: 50,
+    3: 60,
+    4: 70,
+    5: 80,
+    6: 90,
 }

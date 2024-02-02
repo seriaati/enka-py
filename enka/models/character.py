@@ -6,7 +6,7 @@ from .icon import Icon
 
 from ..exceptions import InvalidItemTypeError
 from ..enums import Element, EquipmentType, ItemType, StatType, FightPropType
-from ..constants import PERCENT_STAT_TYPES
+from ..constants import ASCENSION_TO_MAX_LEVEL, PERCENT_STAT_TYPES
 
 __all__ = (
     "Stat",
@@ -164,6 +164,8 @@ class Weapon(BaseModel):
         The weapon's rarity.
     stats: List[:class:`WeaponStat`]
         The weapon's stats.
+    max_level: :class:`int`
+        The weapon's max level.
     """
 
     item_id: int = Field(alias="itemId")
@@ -175,6 +177,10 @@ class Weapon(BaseModel):
     name: str = Field(alias="nameTextMapHash")
     rarity: int = Field(alias="rankLevel")
     stats: List[Stat] = Field(alias="weaponStats")
+
+    @property
+    def max_level(self) -> int:
+        return ASCENSION_TO_MAX_LEVEL[self.ascension]
 
     @field_validator("refinement", mode="before")
     def _extract_refinement(cls, v: Dict[str, int]) -> int:
@@ -274,6 +280,8 @@ class Character(BaseModel):
         3. Elemental burst
     rarity: :class:`int`
         The character's rarity (4~5).
+    max_level: :class:`int`
+        The character's max level.
     """
 
     id: int = Field(alias="avatarId")
@@ -294,6 +302,10 @@ class Character(BaseModel):
     rarity: int = Field(None)
 
     model_config = {"arbitrary_types_allowed": True}
+
+    @property
+    def max_level(self) -> int:
+        return ASCENSION_TO_MAX_LEVEL[self.ascension]
 
     @field_validator("stats", mode="before")
     def _convert_stats(cls, v: Dict[str, float]) -> Dict[FightPropType, FightProp]:
