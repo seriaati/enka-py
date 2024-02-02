@@ -36,3 +36,10 @@ async def test_zero_achievement() -> None:
     async with EnkaAPI() as api:
         showcase = await api.fetch_showcase("831335714")
         assert showcase.player.achievements == 0
+
+
+@pytest.mark.asyncio
+async def test_new_profile_picture_format() -> None:
+    async with EnkaAPI() as api:
+        showcase = await api.fetch_showcase("724824926")
+        assert showcase.player.profile_picture_icon is not None

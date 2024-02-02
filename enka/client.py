@@ -90,10 +90,12 @@ class EnkaAPI:
         player.namecard_icon = f"https://enka.network/ui/{namecard_icon}.png"
 
         # profile picture
-        profile_picture_icon = self._character_data[str(player.profile_picture_id)][
-            "SideIconName"
-        ].replace("Side_", "")
-        player.profile_picture_icon = f"https://enka.network/ui/{profile_picture_icon}.png"
+        profile_picture_id = str(player.profile_picture_id)
+        if len(profile_picture_id) == 8:
+            profile_picture_icon = self._assets.character_data[profile_picture_id]["SideIconName"]
+        else:
+            profile_picture_icon = self._assets.pfps_data[profile_picture_id]["iconPath"]
+        player.profile_picture_icon = Icon(profile_picture_icon)
 
         return player
 
