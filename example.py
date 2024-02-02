@@ -1,7 +1,17 @@
 import asyncio
 
 import enka
-from enka.enums import FightProp
+from enka.enums import FightPropType
+
+FIGHT_PROPS_TO_SHOW = (
+    FightPropType.FIGHT_PROP_MAX_HP,
+    FightPropType.FIGHT_PROP_CUR_ATTACK,
+    FightPropType.FIGHT_PROP_CUR_DEFENSE,
+    FightPropType.FIGHT_PROP_ELEMENT_MASTERY,
+    FightPropType.FIGHT_PROP_CRITICAL,
+    FightPropType.FIGHT_PROP_CRITICAL_HURT,
+    FightPropType.FIGHT_PROP_CHARGE_EFFICIENCY,
+)
 
 
 async def main() -> None:
@@ -19,25 +29,38 @@ async def main() -> None:
         print("Namecard:", response.player.namecard.full)
 
         for character in response.characters:
-            print("\n==================\n")
-            print(character.name)
-            print("Level:", character.level)
-            print("Element:", character.element.name)
-            print("Constellation:", len(character.constellations))
-            print("Weapon:", character.weapon.name)
-            print("Weapon level:", character.weapon.level)
-            print("Weapon refinement:", character.weapon.refinement)
+            print("\n===============================\n")
+            print(
+                f"Lv. {character.level}/{character.max_level} {character.name} (C{len(character.constellations)})"
+            )
+            print(f"Rarity: {character.rarity} ★")
+            print("Element:", character.element.name.title())
             print("Side icon:", character.icon.side)
-            print("HP:", round(character.stats[FightProp.FIGHT_PROP_CUR_HP].value))
-            print("Attack:", round(character.stats[FightProp.FIGHT_PROP_CUR_ATTACK].value))
-            print(
-                "Defense:",
-                round(character.stats[FightProp.FIGHT_PROP_CUR_DEFENSE].value),
-            )
-            print(
-                "Energy recharge:",
-                f"{round(character.stats[FightProp.FIGHT_PROP_CHARGE_EFFICIENCY].value, 1)}%",
-            )
+            print(f"Talent levels: {'/'.join(str(talent.level) for talent in character.talents)}")
+
+            weapon = character.weapon
+            print("\nWeapon:")
+            print(f"Lv. {weapon.level}/{weapon.max_level} {weapon.name} (R{weapon.refinement})")
+            print(f"Rarity: {weapon.rarity} ★")
+            for stat in weapon.stats:
+                print(stat.name, stat.formatted_value)
+
+            print("\nStats:")
+            for stat_type, stat in character.stats.items():
+                if stat_type in FIGHT_PROPS_TO_SHOW:
+                    print(stat.name, stat.formatted_value)
+            dmg_bonus = character.highest_dmg_bonus_stat
+            print(dmg_bonus.name, dmg_bonus.formatted_value)
+
+            print("\nArtifacts:")
+            for artifact in character.artifacts:
+                main_stat = artifact.main_stat
+                print(
+                    f"Lv. {artifact.level} {artifact.name}: {main_stat.name} {main_stat.formatted_value}"
+                )
+                for substat in artifact.sub_stats:
+                    print(f"- {substat.name} {substat.formatted_value}")
+                print("")
 
 
 asyncio.run(main())
