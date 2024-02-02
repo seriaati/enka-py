@@ -5,7 +5,7 @@ __all__ = (
     "EquipmentType",
     "ItemType",
     "StatType",
-    "FightProp",
+    "FightPropType",
 )
 
 
@@ -82,7 +82,7 @@ PERCENT_STAT_TYPES = (
 )
 
 
-class FightProp(IntEnum):
+class FightPropType(IntEnum):
     FIGHT_PROP_NONE = 0
     FIGHT_PROP_BASE_HP = 1
     FIGHT_PROP_HP = 2
