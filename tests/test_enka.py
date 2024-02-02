@@ -32,7 +32,7 @@ async def test_update_assets() -> None:
 
 
 @pytest.mark.asyncio
-async def test_empty_player() -> None:
+async def test_zero_achievement() -> None:
     async with EnkaAPI() as api:
         showcase = await api.fetch_showcase("831335714")
         assert showcase.player.achievements == 0
