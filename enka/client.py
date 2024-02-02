@@ -7,7 +7,7 @@ import cachetools
 
 from .assets.manager import AssetManager
 from .assets.updater import AssetUpdater
-from .enums import Element, Language
+from .enums import PERCENT_STAT_TYPES, Element, Language
 from .exceptions import raise_for_retcode
 from .models.icon import Icon, Namecard
 from .models.response import ShowcaseResponse
@@ -148,6 +148,8 @@ class EnkaAPI:
         weapon.name = self._assets.text_map[weapon.name]
         for stat in weapon.stats:
             stat.name = self._assets.text_map[stat.type.value]
+            if stat.type.name in PERCENT_STAT_TYPES:
+                stat.value *= 100
 
         # artifacts
         for artifact in character.artifacts:
@@ -156,10 +158,14 @@ class EnkaAPI:
             artifact.main_stat.name = self._assets.text_map[artifact.main_stat.type.value]
             for stat in artifact.sub_stats:
                 stat.name = self._assets.text_map[stat.type.value]
+                if stat.type.name in PERCENT_STAT_TYPES:
+                    stat.value *= 100
 
         # stats
         for stat_type, stat in character.stats.items():
             stat.name = self._assets.text_map.get(stat_type.name)
+            if stat_type.name in PERCENT_STAT_TYPES:
+                stat.value *= 100
 
         # constellations
         for constellation in character.constellations:
