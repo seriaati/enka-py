@@ -6,7 +6,7 @@ from .icon import Icon
 
 from ..exceptions import InvalidItemTypeError
 from ..enums import Element, EquipmentType, ItemType, StatType, FightPropType
-from ..constants import ASCENSION_TO_MAX_LEVEL, PERCENT_STAT_TYPES
+from ..constants import ASCENSION_TO_MAX_LEVEL, DMG_BONUS_FIGHT_PROPS, PERCENT_STAT_TYPES
 
 __all__ = (
     "Stat",
@@ -73,7 +73,7 @@ class FightProp(BaseModel):
     @property
     def formatted_value(self) -> str:
         if self.is_percentage:
-            return f"{round(self.value, 1)}%"
+            return f"{round(self.value * 100, 1)}%"
         return str(round(self.value))
 
 
@@ -282,6 +282,8 @@ class Character(BaseModel):
         The character's rarity (4~5).
     max_level: :class:`int`
         The character's max level.
+    highest_dmg_bonus_stat: :class:`FightProp`
+        The character's highest damage bonus stat.
     """
 
     id: int = Field(alias="avatarId")
@@ -306,6 +308,13 @@ class Character(BaseModel):
     @property
     def max_level(self) -> int:
         return ASCENSION_TO_MAX_LEVEL[self.ascension]
+
+    @property
+    def highest_dmg_bonus_stat(self) -> FightProp:
+        return max(
+            (stat for stat in self.stats.values() if stat.type in DMG_BONUS_FIGHT_PROPS),
+            key=lambda stat: stat.value,
+        )
 
     @field_validator("stats", mode="before")
     def _convert_stats(cls, v: Dict[str, float]) -> Dict[FightPropType, FightProp]:

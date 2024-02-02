@@ -1,6 +1,8 @@
 __all__ = ("PERCENT_STAT_TYPES", "CHARACTER_RARITY_MAP")
 
 
+from .enums import FightPropType
+
 PERCENT_STAT_TYPES = (
     "FIGHT_PROP_HP_PERCENT",
     "FIGHT_PROP_ATTACK_PERCENT",
@@ -33,3 +35,14 @@ ASCENSION_TO_MAX_LEVEL: dict[int, int] = {
     5: 80,
     6: 90,
 }
+
+DMG_BONUS_FIGHT_PROPS = (
+    FightPropType.FIGHT_PROP_PHYSICAL_ADD_HURT,
+    FightPropType.FIGHT_PROP_FIRE_ADD_HURT,
+    FightPropType.FIGHT_PROP_ELEC_ADD_HURT,
+    FightPropType.FIGHT_PROP_WATER_ADD_HURT,
+    FightPropType.FIGHT_PROP_WIND_ADD_HURT,
+    FightPropType.FIGHT_PROP_ROCK_ADD_HURT,
+    FightPropType.FIGHT_PROP_ICE_ADD_HURT,
+    FightPropType.FIGHT_PROP_GRASS_ADD_HURT,
+)
