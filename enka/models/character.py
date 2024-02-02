@@ -5,24 +5,23 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 from .icon import Icon
 
 from ..exceptions import InvalidItemTypeError
-from ..enums import Element, EquipmentType, FightProp, ItemType, StatType
+from ..enums import Element, EquipmentType, ItemType, StatType, FightPropType
+from ..constants import PERCENT_STAT_TYPES
 
 __all__ = (
+    "Stat",
+    "FightProp",
     "Artifact",
     "Character",
-    "ArtifactMainStat",
-    "ArtifactSubStat",
     "Weapon",
-    "WeaponStat",
-    "CharacterStat",
     "Constellation",
     "Talent",
 )
 
 
-class ArtifactMainStat(BaseModel):
+class Stat(BaseModel):
     """
-    Represents the main stat of an artifact.
+    Represents a stat.
 
     Attributes
     ----------
@@ -34,28 +33,48 @@ class ArtifactMainStat(BaseModel):
         The stat's name.
     """
 
-    type: StatType = Field(alias="mainPropId")
-    value: float = Field(alias="statValue")
+    type: StatType
+    value: float
     name: str = Field(None)
 
+    @property
+    def is_percentage(self) -> bool:
+        return self.type.name in PERCENT_STAT_TYPES
 
-class ArtifactSubStat(BaseModel):
+    @property
+    def formatted_value(self) -> str:
+        if self.is_percentage:
+            return f"{round(self.value, 1)}%"
+        return str(round(self.value))
+
+
+class FightProp(BaseModel):
     """
-    Represents the sub stat of an artifact.
+    Represents a fight prop.
 
     Attributes
     ----------
-    type: :class:`StatType`
-        The stat's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.)
+    type: :class:`FightProp`
+        The fight prop's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.)
     value: :class:`float`
-        The stat's value.
+        The fight prop's value.
     name: :class:`str`
-        The stat's name.
+        The fight prop's name.
     """
 
-    type: StatType = Field(alias="appendPropId")
-    value: float = Field(alias="statValue")
+    type: FightPropType
+    value: float
     name: str = Field(None)
+
+    @property
+    def is_percentage(self) -> bool:
+        return self.type.name in PERCENT_STAT_TYPES
+
+    @property
+    def formatted_value(self) -> str:
+        if self.is_percentage:
+            return f"{round(self.value, 1)}%"
+        return str(round(self.value))
 
 
 class Artifact(BaseModel):
@@ -99,8 +118,8 @@ class Artifact(BaseModel):
     item_type: ItemType = Field(alias="itemType")
     name: str = Field(alias="nameTextMapHash")
     rarity: int = Field(alias="rankLevel")
-    main_stat: ArtifactMainStat = Field(alias="reliquaryMainstat")
-    sub_stats: List[ArtifactSubStat] = Field(alias="reliquarySubstats")
+    main_stat: Stat = Field(alias="reliquaryMainstat")
+    sub_stats: List[Stat] = Field(alias="reliquarySubstats")
     set_name: str = Field(alias="setNameTextMapHash")
 
     @field_validator("level", mode="before")
@@ -111,24 +130,16 @@ class Artifact(BaseModel):
     def _convert_icon(cls, v: str) -> str:
         return f"https://enka.network/ui/{v}.png"
 
+    @field_validator("main_stat", mode="before")
+    def _convert_main_stat(cls, v: Dict[str, Any]) -> Stat:
+        return Stat(type=StatType(v["mainPropId"]), value=v["statValue"], name="")
 
-class WeaponStat(BaseModel):
-    """
-    Represents a weapon stat.
-
-    Attributes
-    ----------
-    type: :class:`StatType`
-        The stat's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.)
-    value: :class:`float`
-        The stat's value.
-    name: :class:`str`
-        The stat's name.
-    """
-
-    type: StatType = Field(alias="appendPropId")
-    value: float = Field(alias="statValue")
-    name: str = Field(None)
+    @field_validator("sub_stats", mode="before")
+    def _convert_sub_stats(cls, v: List[Dict[str, Any]]) -> List[Stat]:
+        return [
+            Stat(type=StatType(stat["appendPropId"]), value=stat["statValue"], name="")
+            for stat in v
+        ]
 
 
 class Weapon(BaseModel):
@@ -163,7 +174,7 @@ class Weapon(BaseModel):
     item_type: ItemType = Field(alias="itemType")
     name: str = Field(alias="nameTextMapHash")
     rarity: int = Field(alias="rankLevel")
-    stats: List[WeaponStat] = Field(alias="weaponStats")
+    stats: List[Stat] = Field(alias="weaponStats")
 
     @field_validator("refinement", mode="before")
     def _extract_refinement(cls, v: Dict[str, int]) -> int:
@@ -173,21 +184,12 @@ class Weapon(BaseModel):
     def _convert_icon(cls, v: str) -> str:
         return f"https://enka.network/ui/{v}.png"
 
-
-class CharacterStat(BaseModel):
-    """
-    Represents a character stat.
-
-    Attributes
-    ----------
-    value: :class:`float`
-        The stat's value.
-    name: Optional[:class:`str`]
-        The stat's name.
-    """
-
-    value: float
-    name: Optional[str] = Field(None)
+    @field_validator("stats", mode="before")
+    def _convert_stats(cls, v: List[Dict[str, Any]]) -> List[Stat]:
+        return [
+            Stat(type=StatType(stat["appendPropId"]), value=stat["statValue"], name="")
+            for stat in v
+        ]
 
 
 class Constellation(BaseModel):
@@ -275,7 +277,7 @@ class Character(BaseModel):
     id: int = Field(alias="avatarId")
     artifacts: List[Artifact]
     weapon: Weapon
-    stats: Dict[FightProp, CharacterStat] = Field(alias="fightPropMap")
+    stats: Dict[FightPropType, FightProp] = Field(alias="fightPropMap")
     constellations: List[Constellation] = Field([], alias="talentIdList")
     talents: List[Talent] = Field(alias="skillLevelMap")
     ascension: int
@@ -291,16 +293,19 @@ class Character(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
     @field_validator("stats", mode="before")
-    def _convert_stats(cls, v: Dict[str, float]) -> Dict[FightProp, CharacterStat]:
-        return {FightProp(int(k)): CharacterStat(value=v) for k, v in v.items()}  # type: ignore
+    def _convert_stats(cls, v: Dict[str, float]) -> Dict[FightPropType, FightProp]:
+        return {
+            FightPropType(int(k)): FightProp(type=FightPropType(int(k)), value=v, name="")
+            for k, v in v.items()
+        }
 
     @field_validator("constellations", mode="before")
     def _convert_constellations(cls, v: List[int]) -> List[Constellation]:
-        return [Constellation(id=constellation_id) for constellation_id in v]  # type: ignore
+        return [Constellation(id=constellation_id, name="", icon="") for constellation_id in v]
 
     @field_validator("talents", mode="before")
     def _convert_talents(cls, v: Dict[str, int]) -> List[Talent]:
-        return [Talent(id=int(k), level=v) for k, v in v.items()]  # type: ignore
+        return [Talent(id=int(k), level=v, name="", icon="") for k, v in v.items()]
 
     @field_validator("weapon", mode="before")
     def _flatten_weapon_data(cls, v: Dict[str, Any]) -> Dict[str, Any]:
