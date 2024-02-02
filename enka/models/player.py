@@ -2,6 +2,8 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
+from .icon import Icon, Namecard
+
 __all__ = ("Player", "ShowcaseCharacter")
 
 
@@ -17,33 +19,15 @@ class ShowcaseCharacter(BaseModel):
         The character's level.
     costume_id: Optional[:class:`int`]
         The character's costume's ID.
-    costume_side_icon: Optional[:class:`str`]
-        The character's costume's side icon.
-        Example: https://enka.network/ui/UI_AvatarIcon_Side_Ambor.png
-    costume_icon: Optional[:class:`str`]
-        The character's costume's icon.
-        Example: https://enka.network/ui/UI_AvatarIcon_Ambor.png
-    costume_art: Optional[:class:`str`]
-        The character's costume's art.
-        Example: https://enka.network/ui/UI_Gacha_AvatarImg_Ambor.png
+    costuime_icon: Optional[:class:`Icon`]
     """
 
     id: int = Field(alias="avatarId")
     level: int
     costume_id: Optional[int] = Field(None, alias="costumeId")
-    costume_side_icon: Optional[str] = Field(None)
+    costuime_icon: Optional[Icon] = Field(None)
 
-    @property
-    def costume_icon(self) -> Optional[str]:
-        if self.costume_side_icon is None:
-            return None
-        return self.costume_side_icon.replace("Side_", "")
-
-    @property
-    def costume_art(self) -> Optional[str]:
-        if self.costume_side_icon is None:
-            return None
-        return self.costume_side_icon.replace("AvatarIcon_Side", "Costume")
+    model_config = {"arbitrary_types_allowed": True}
 
 
 class Player(BaseModel):
@@ -58,8 +42,8 @@ class Player(BaseModel):
         The player's adventure level.
     namecard_id: :class:`int`
         The player's namecard's ID.
-    namecard_icon: :class:`str`
-        The player's namecard's icon.
+    namecard: :class:`Namecard`
+        The player's namecard.
     nickname: :class:`str`
         The player's nickname.
     signature: :class:`str`
@@ -72,7 +56,7 @@ class Player(BaseModel):
         The player's world level.
     profile_picture_id: :class:`int`
         The player's profile picture's ID.
-    profile_picture_icon: :class:`str`
+    profile_picture_icon: :class:`Icon`
         The player's profile picture's icon.
     showcase_characters: List[:class:`ShowcaseCharacter`]
         The player's showcase characters.
@@ -81,16 +65,21 @@ class Player(BaseModel):
     achievements: int = Field(0, alias="finishAchievementNum")
     level: int
     namecard_id: int = Field(alias="nameCardId")
-    namecard_icon: str = Field(None)
+    namecard: Namecard = Field(None)
     nickname: str
     signature: Optional[str] = Field(None)
     abyss_floor: int = Field(0, alias="towerFloorIndex")
     abyss_level: int = Field(0, alias="towerLevelIndex")
     world_level: int = Field(0, alias="worldLevel")
     profile_picture_id: int = Field(alias="profilePicture")
-    profile_picture_icon: str = Field(None)
+    profile_picture_icon: Icon = Field(None)
     showcase_characters: List[ShowcaseCharacter] = Field([], alias="showAvatarInfoList")
+
+    model_config = {"arbitrary_types_allowed": True}
 
     @field_validator("profile_picture_id", mode="before")
     def _extract_avatar_id(cls, v: Dict[str, int]) -> int:
-        return v["avatarId"]
+        avatar_id = v.get("avatarId", v.get("id", None))
+        if avatar_id is None:
+            raise KeyError("Can't find profile picture ID, maybe there is a new format?")
+        return avatar_id

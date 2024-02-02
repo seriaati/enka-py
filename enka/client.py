@@ -9,6 +9,7 @@ from .assets.manager import AssetManager
 from .assets.updater import AssetUpdater
 from .enums import Element, Language
 from .exceptions import raise_for_retcode
+from .models.icon import Icon, Namecard
 from .models.response import ShowcaseResponse
 
 if TYPE_CHECKING:
@@ -90,8 +91,8 @@ class EnkaAPI:
             raise RuntimeError(msg)
 
         # namecard
-        namecard_icon = self._namecard_data[str(player.namecard_id)]["icon"]
-        player.namecard_icon = f"https://enka.network/ui/{namecard_icon}.png"
+        namecard_icon = self._assets.namecard_data[str(player.namecard_id)]["icon"]
+        player.namecard = Namecard(namecard_icon)
 
         # profile picture
         profile_picture_id = str(player.profile_picture_id)
@@ -113,10 +114,11 @@ class EnkaAPI:
         if showcase_character.costume_id is None:
             return showcase_character
 
-        costume_data = self._character_data[str(showcase_character.id)]["Costumes"]
-        if costume_data is None:
-            return showcase_character
-        showcase_character.costume_side_icon = f"https://enka.network/ui/{costume_data[str(showcase_character.costume_id)]['sideIconName']}.png"
+        costume_data = self._assets.character_data[str(showcase_character.id)]["Costumes"]
+        if costume_data is not None:
+            showcase_character.costuime_icon = Icon(
+                costume_data[str(showcase_character.costume_id)]["sideIconName"]
+            )
 
         return showcase_character
 
@@ -125,43 +127,49 @@ class EnkaAPI:
             msg = "Client is not started, call `EnkaNetworkAPI.start` first"
             raise RuntimeError(msg)
 
-        character_data = self._character_data[characer_id]
+        characer_id = (
+            f"{character.id}-{character.skill_depot_id}"
+            if character.id in {10000005, 10000007}
+            else str(character.id)
+        )
+
+        character_data = self._assets.character_data[characer_id]
         # name
         character_name_text_map_hash = character_data["NameTextMapHash"]
-        character.name = self._text_map[character_name_text_map_hash]
+        character.name = self._assets.text_map[character_name_text_map_hash]
 
         # icon
         side_icon_name = character_data["SideIconName"]
-        character.side_icon = f"https://enka.network/ui/{side_icon_name}.png"
+        character.icon = Icon(side_icon_name)
 
         # weapon
         weapon = character.weapon
-        weapon.name = self._text_map[weapon.name]
+        weapon.name = self._assets.text_map[weapon.name]
         for stat in weapon.stats:
-            stat.name = self._text_map[stat.type.value]
+            stat.name = self._assets.text_map[stat.type.value]
 
         # artifacts
         for artifact in character.artifacts:
-            artifact.name = self._text_map[artifact.name]
-            artifact.set_name = self._text_map[artifact.set_name]
-            artifact.main_stat.name = self._text_map[artifact.main_stat.type.value]
+            artifact.name = self._assets.text_map[artifact.name]
+            artifact.set_name = self._assets.text_map[artifact.set_name]
+            artifact.main_stat.name = self._assets.text_map[artifact.main_stat.type.value]
             for stat in artifact.sub_stats:
-                stat.name = self._text_map[stat.type.value]
+                stat.name = self._assets.text_map[stat.type.value]
 
         # stats
         for stat in character.stats:
-            stat.name = self._text_map.get(stat.type.name)
+            stat.name = self._assets.text_map.get(stat.type.name)
 
         # constellations
         for constellation in character.constellations:
-            const_data = self._consts_data[str(constellation.id)]
-            constellation.name = self._text_map[const_data["nameTextMapHash"]]
+            const_data = self._assets.consts_data[str(constellation.id)]
+            constellation.name = self._assets.text_map[const_data["nameTextMapHash"]]
             constellation.icon = f"https://enka.network/ui/{const_data['icon']}.png"
 
         # talents
         for talent in character.talents:
-            talent_data = self._talents_data[str(talent.id)]
-            talent.name = self._text_map[talent_data["nameTextMapHash"]]
+            talent_data = self._assets.talents_data[str(talent.id)]
+            talent.name = self._assets.text_map[talent_data["nameTextMapHash"]]
             talent.icon = f"https://enka.network/ui/{talent_data['icon']}.png"
             if character.talent_extra_level_map:
                 proud_map: dict[str, int] = character_data["ProudMap"]
@@ -180,7 +188,7 @@ class EnkaAPI:
         return character
 
     def _post_process_showcase(self, showcase: ShowcaseResponse) -> ShowcaseResponse:
-        showcase.player = self._post_process_showcase_player(showcase.player)
+        showcase.player = self._post_process_player(showcase.player)
 
         # costume
         showcase_characters: list[ShowcaseCharacter] = []

@@ -2,6 +2,8 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from .icon import Icon
+
 from ..exceptions import InvalidItemTypeError
 from ..enums import Element, EquipmentType, FightProp, ItemType, StatType
 
@@ -258,15 +260,10 @@ class Character(BaseModel):
         The character's skill depot ID.
     name: :class:`str`
         The character's name.
-    side_icon: :class:`str`
-        The character's side icon.
-        Example: https://enka.network/ui/UI_AvatarIcon_Side_Ambor.png
-    icon: :class:`str`
+    talent_extra_level_map: Optional[Dict[:class:`str`, :class:`int`]]
+        The map of character's extra talent levels, this is only used internally, the wrapper will handle this.
+    icon: :class:`Icon`
         The character's icon.
-        Example: https://enka.network/ui/UI_AvatarIcon_Ambor.png
-    art: :class:`str`
-        The character's art.
-        Example: https://enka.network/ui/UI_Gacha_AvatarImg_Ambor.png
     friendship_level: :class:`int`
         The character's friendship level (1~10).
     element: :class:`Element`
@@ -288,19 +285,13 @@ class Character(BaseModel):
     level: int
     skill_depot_id: int = Field(alias="skillDepotId")
     name: str = Field(None)
-    side_icon: str = Field(None)
+    icon: Icon = Field(None)
     talent_extra_level_map: Optional[Dict[str, int]] = Field(None, alias="proudSkillExtraLevelMap")
     friendship_level: int = Field(alias="friendshipLevel")
     element: Element = Field(None)
     talent_order: list[int] = Field(None)
 
-    @property
-    def icon(self) -> str:
-        return self.side_icon.replace("Side_", "")
-
-    @property
-    def art(self) -> str:
-        return self.side_icon.replace("AvatarIcon_Side", "Gacha_AvatarImg")
+    model_config = {"arbitrary_types_allowed": True}
 
     @field_validator("stats", mode="before")
     def _convert_stats(cls, v: Dict[str, float]):
