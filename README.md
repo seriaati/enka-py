@@ -149,10 +149,14 @@ Namecards are now `Namecard` objects:
 *Available after v1.4.0*  
   
 Stats refer to character, weapon, and artifact stats.  
-Internally, stats for characters are `FightProp` classes, while the others are `Stat` classes; they can be accessed in the same way, except their `type`s are different (`FightPropType` and `StatType`).  
-For your convenience, there are `stat.is_percentage` and `stat.formatted_value`, for exmple:  
-- If `stat.type` is `StatType.FIGHT_PROP_CUR_ATTACK`, then `stat.is_percentage` is `False`, and `stat.formatted_value` could be 2300.
-- If `stat.type` is `StatType.FIGHT_PROP_CRITICAL`, then `stat.is_percentage` is `True`, and `stat.formatted_value` could be 23.1%.
+Internally, stats for characters are `FightProp` classes, while the others are `Stat` classes; they can be accessed in the same way, but their `type`s are different (`FightPropType` and `StatType`).  
+For your convenience, there are `stat.is_percentage` and `stat.formatted_value` to use, for exmple:  
+- If `stat.type` is `StatType.FIGHT_PROP_CUR_ATTACK`
+  - `stat.is_percentage = False`
+  - `stat.formatted_value = '2300'`
+- If `stat.type` is `StatType.FIGHT_PROP_CRITICAL`
+  - `stat.is_percentage = True`
+  - `stat.formatted_value = '23.1%'`
 
 # Questions, issues, contributions
 For questions, you can contact me on [Discord](https://discord.com/users/410036441129943050) or open an [issue](https://github.com/seriaati/enka-py/issues).  
