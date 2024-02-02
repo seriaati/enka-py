@@ -10,6 +10,7 @@ from .file_paths import (
     CHARACTER_DATA_PATH,
     CONSTS_DATA_PATH,
     NAMECARD_DATA_PATH,
+    PFPS_DATA_PATH,
     TALENTS_DATA_PATH,
     TEXT_MAP_PATH,
 )
@@ -25,6 +26,7 @@ SOURCE_TO_PATH: Final[dict[str, str]] = {
     "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/namecards.json": NAMECARD_DATA_PATH,
     "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/consts.json": CONSTS_DATA_PATH,
     "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/talents.json": TALENTS_DATA_PATH,
+    "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/pfps.json": PFPS_DATA_PATH,
 }
 
 LOGGER_ = logging.getLogger("enka.assets.updater")

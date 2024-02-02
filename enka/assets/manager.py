@@ -8,6 +8,7 @@ from .file_paths import (
     CHARACTER_DATA_PATH,
     CONSTS_DATA_PATH,
     NAMECARD_DATA_PATH,
+    PFPS_DATA_PATH,
     TALENTS_DATA_PATH,
     TEXT_MAP_PATH,
 )
@@ -26,6 +27,7 @@ class AssetManager:
         self.namecard_data = NamecardData()
         self.consts_data = ConstsData()
         self.talents_data = TalentsData()
+        self.pfps_data = PfpsData()
 
     async def load(self) -> bool:
         text_map_loaded = await self.text_map.load()
@@ -33,6 +35,7 @@ class AssetManager:
         namecard_data_loaded = await self.namecard_data.load()
         consts_data_loaded = await self.consts_data.load()
         talents_data_loaded = await self.talents_data.load()
+        pfp_data_loaded = await self.pfps_data.load()
 
         return (
             text_map_loaded
@@ -40,6 +43,7 @@ class AssetManager:
             and namecard_data_loaded
             and consts_data_loaded
             and talents_data_loaded
+            and pfp_data_loaded
         )
 
 
@@ -110,4 +114,10 @@ class ConstsData(AssetData):
 class TalentsData(AssetData):
     async def load(self) -> bool:
         self._data = await self._open_json(TALENTS_DATA_PATH)
+        return self._data is not None
+
+
+class PfpsData(AssetData):
+    async def load(self) -> bool:
+        self._data = await self._open_json(PFPS_DATA_PATH)
         return self._data is not None
