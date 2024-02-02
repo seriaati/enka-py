@@ -13,6 +13,7 @@
    - [Finding models' attributes](#finding-models-attributes)
    - [Catching exceptions](#catching-exceptions)
    - [Namecards and Icons](#namecards-and-icons)
+   - [Stats](#stats)
 
 3. [Questions, issues, contributions](#questions-issues-contributions)
 
@@ -128,6 +129,7 @@ Example can be found in [example.py](https://github.com/seriaati/enka-py/blob/ma
 
 ## Namecards and icons
 *Available after v1.2.0*  
+  
 Character icons are now `Icon` objects, you can access all types of icons from it:
 - `icon.side`: https://enka.network/ui/UI_AvatarIcon_Side_Ambor.png
 - `icon.circle`: https://enka.network/ui/UI_AvatarIcon_Ambor_Circle.png
@@ -142,6 +144,15 @@ Namecards are now `Namecard` objects:
 
 > [!WARNING]
 > `Player.namecard_icon` is renamed to `Player.namecard`. Also, `Character.side_icon`, `Character.art` are removed as they are merged into the `Icon` class, same for `ShowcaseCharacter.costume_art` and `ShowcaseCharacter.costume_side_icon`.
+
+## Stats
+*Available after v1.4.0*  
+  
+Stats refer to character, weapon, and artifact stats.  
+Internally, stats for characters are `FightProp` classes, while the others are `Stat` classes; they can be accessed in the same way, except their `type`s are different (`FightPropType` and `StatType`).  
+For your convenience, there are `stat.is_percentage` and `stat.formatted_value`, for exmple:  
+- If `stat.type` is `StatType.FIGHT_PROP_CUR_ATTACK`, then `stat.is_percentage` is `False`, and `stat.formatted_value` could be 2300.
+- If `stat.type` is `StatType.FIGHT_PROP_CRITICAL`, then `stat.is_percentage` is `True`, and `stat.formatted_value` could be 23.1%.
 
 # Questions, issues, contributions
 For questions, you can contact me on [Discord](https://discord.com/users/410036441129943050) or open an [issue](https://github.com/seriaati/enka-py/issues).  
