@@ -84,7 +84,11 @@ class EnkaAPI:
             self._cache[url] = data
             return data
 
-    def _post_process_showcase_player(self, player: "Player") -> "Player":
+    def _post_process_player(self, player: "Player") -> "Player":
+        if self._assets is None:
+            msg = "Client is not started, call `EnkaNetworkAPI.start` first"
+            raise RuntimeError(msg)
+
         # namecard
         namecard_icon = self._namecard_data[str(player.namecard_id)]["icon"]
         player.namecard_icon = f"https://enka.network/ui/{namecard_icon}.png"
@@ -102,6 +106,10 @@ class EnkaAPI:
     def _post_process_showcase_character(
         self, showcase_character: "ShowcaseCharacter"
     ) -> "ShowcaseCharacter":
+        if self._assets is None:
+            msg = "Client is not started, call `EnkaNetworkAPI.start` first"
+            raise RuntimeError(msg)
+
         if showcase_character.costume_id is None:
             return showcase_character
 
@@ -113,10 +121,9 @@ class EnkaAPI:
         return showcase_character
 
     def _post_process_character(self, character: "Character") -> "Character":
-        if character.id in {10000005, 10000007}:
-            characer_id = f"{character.id}-{character.skill_depot_id}"
-        else:
-            characer_id = str(character.id)
+        if self._assets is None:
+            msg = "Client is not started, call `EnkaNetworkAPI.start` first"
+            raise RuntimeError(msg)
 
         character_data = self._character_data[characer_id]
         # name
@@ -197,12 +204,6 @@ class EnkaAPI:
         loaded = await self._assets.load()
         if not loaded:
             await self.update_assets()
-
-        self._text_map = self._assets.text_map
-        self._character_data = self._assets.character_data
-        self._namecard_data = self._assets.namecard_data
-        self._consts_data = self._assets.consts_data
-        self._talents_data = self._assets.talents_data
 
     async def close(self) -> None:
         if self._session is None:
