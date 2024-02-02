@@ -25,7 +25,7 @@ class Icon:
         The circle (round) icon of the character.
         e.g. https://enka.network/ui/UI_AvatarIcon_Ambor_Circle.png
         """
-        return self._side_icon.replace("Side_", "") + "_Circle"
+        return self._side_icon.replace("Side_", "").replace(".png", "_Circle.png")
 
     @property
     def gacha(self) -> str:
