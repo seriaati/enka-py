@@ -11,6 +11,8 @@
    - [Updating assets](#updating-assets)
    - [Client parameters](#client-parameters)
    - [Finding models' attributes](#finding-models-attributes)
+   - [Catching exceptions](#catching-exceptions)
+   - [Namecards and Icons](#namecards-and-icons)
 
 3. [Questions, issues, contributions](#questions-issues-contributions)
 
@@ -109,18 +111,37 @@ This will affect the languages of names of weapon, character, constellations, et
 ### Headers
 Custom headers used when requesting the Enka API, it is recommended to set a user agent, the default is `None`. 
 ### Cache max size
-Internally, `cachetools.TTLCache` is used, which uses the LRU strategy. Upon requesting, the client will cache the response with the request URL as key. This means that you should reuse the same client throughout your program so cache can be shared between operations. When the cache max size (default is 100) is reached, the least recently used cache is evicted.
+Internally, `cachetools.TTLCache` is used, which uses the LRU strategy. Upon requesting, the client will cache the response with the request URL as key. When the cache max size (default is 100) is reached, the least recently used cache is evicted.
 ### Cache TTL
 Default is 60 seconds, the cache is evicted when this time expires. Note that setting longer TTL might result in inconsistent data.
+> [!TIP]
+> You should reuse the same `EnkaAPI` client throughout your program so cache can be shared between operations.
 
 ## Finding models' attributes
 If you're using an IDE like VSCode, then you can see all the attributes and methods the model has in the autocomplete.
 > [!TIP]
-> If you're using VSCode, `alt + left click` on the attribute, then the IDE will bring you to the source code of this wrapper, most classes and methods have docstrings.
+> If you're using VSCode, `alt` + `left click` on the attribute, then the IDE will bring you to the source code of this wrapper, most classes and methods have docstrings.
 
 ## Catching exceptions
 All exception classes can be found in [enka/exceptions.py](https://github.com/seriaati/enka-py/blob/main/enka/exceptions.py), catch them with `try-except`.  
 Example can be found in [example.py](https://github.com/seriaati/enka-py/blob/main/example.py)
+
+## Namecards and icons
+*Available after v1.2.0*  
+Character icons are now `Icon` objects, you can access all types of icons from it:
+- `icon.side`: https://enka.network/ui/UI_AvatarIcon_Side_Ambor.png
+- `icon.circle`: https://enka.network/ui/UI_AvatarIcon_Ambor_Circle.png
+- `icon.gacha`:  https://enka.network/ui/UI_Gacha_AvatarImg_Ambor.png
+- `icon.front`: https://enka.network/ui/UI_AvatarIcon_Ambor.png
+
+The same goes for `ShowcaseCharacter.costume_icon` and `Player.profile_picture_icon`.
+
+Namecards are now `Namecard` objects:
+- `Namecard.icon`: https://enka.network/ui/UI_NameCardIcon_0.png
+- `Namecard.full`: https://enka.network/ui/UI_NameCardPic_0_P.png
+
+> [!WARNING]
+> `Player.namecard_icon` is renamed to `Player.namecard`. Also, `Character.side_icon`, `Character.art` are removed as they are merged into the `Icon` class, same for `ShowcaseCharacter.costume_art` and `ShowcaseCharacter.costume_side_icon`.
 
 # Questions, issues, contributions
 For questions, you can contact me on [Discord](https://discord.com/users/410036441129943050) or open an [issue](https://github.com/seriaati/enka-py/issues).  
