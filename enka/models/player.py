@@ -18,8 +18,9 @@ class ShowcaseCharacter(BaseModel):
     level: :class:`int`
         The character's level.
     costume_id: Optional[:class:`int`]
-        The character's costume's ID.
+        The character's costume's ID, if any.
     costuime_icon: Optional[:class:`Icon`]
+        The character's costume's icon, if any.
     """
 
     id: int = Field(alias="avatarId")
