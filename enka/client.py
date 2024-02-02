@@ -7,6 +7,7 @@ import cachetools
 
 from .assets.manager import AssetManager
 from .assets.updater import AssetUpdater
+from .constants import CHARACTER_RARITY_MAP
 from .enums import Element, Language
 from .exceptions import raise_for_retcode
 from .models.icon import Icon, Namecard
@@ -185,6 +186,9 @@ class EnkaAPI:
         # element
         element = character_data["Element"]
         character.element = Element(element)
+
+        # rarity
+        character.rarity = CHARACTER_RARITY_MAP[character_data["QualityType"]]
 
         return character
 

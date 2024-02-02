@@ -272,6 +272,8 @@ class Character(BaseModel):
         1. Normal attack
         2. Elemental skill
         3. Elemental burst
+    rarity: :class:`int`
+        The character's rarity (4~5).
     """
 
     id: int = Field(alias="avatarId")
@@ -289,6 +291,7 @@ class Character(BaseModel):
     friendship_level: int = Field(alias="friendshipLevel")
     element: Element = Field(None)
     talent_order: list[int] = Field(None)
+    rarity: int = Field(None)
 
     model_config = {"arbitrary_types_allowed": True}
 
