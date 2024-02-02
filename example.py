@@ -34,6 +34,10 @@ async def main() -> None:
                 "Defense:",
                 round(character.stats[FightProp.FIGHT_PROP_CUR_DEFENSE].value),
             )
+            print(
+                "Energy recharge:",
+                f"{round(character.stats[FightProp.FIGHT_PROP_CHARGE_EFFICIENCY].value, 1)}%",
+            )
 
 
 asyncio.run(main())
