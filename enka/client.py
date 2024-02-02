@@ -114,6 +114,7 @@ class EnkaAPI:
         if showcase_character.costume_id is None:
             return showcase_character
 
+        # costume
         costume_data = self._assets.character_data[str(showcase_character.id)]["Costumes"]
         if costume_data is not None:
             showcase_character.costuime_icon = Icon(
@@ -188,9 +189,10 @@ class EnkaAPI:
         return character
 
     def _post_process_showcase(self, showcase: ShowcaseResponse) -> ShowcaseResponse:
+        # player
         showcase.player = self._post_process_player(showcase.player)
 
-        # costume
+        # showcase characters
         showcase_characters: list[ShowcaseCharacter] = []
         for character in showcase.player.showcase_characters:
             showcase_characters.append(self._post_process_showcase_character(character))
