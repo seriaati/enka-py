@@ -74,7 +74,7 @@ class FightProp(BaseModel):
     def formatted_value(self) -> str:
         if self.is_percentage:
             return f"{round(self.value * 100, 1)}%"
-        return str(round(self.value))
+        return f"{round(self.value):,}"
 
 
 class Artifact(BaseModel):
