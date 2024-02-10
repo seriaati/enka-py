@@ -1,4 +1,9 @@
-from enum import IntEnum, StrEnum
+import sys
+from enum import Enum as StrEnum
+from enum import IntEnum
+
+if sys.version_info < (3, 11):
+    from enum import Enum as StrEnum
 
 __all__ = (
     "Language",
