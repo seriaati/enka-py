@@ -52,12 +52,12 @@ class Namecard:
         self._ui_path = ui_path
 
     @property
-    def icon_ui_path(self) -> str:
+    def ui_path(self) -> str:
         """
         The namecard UI path.
-        e.g. UI_NameCardPic_Feiyan_P
+        e.g. UI_NameCardPic_Bp1_P
         """
-        return self._ui_path.replace("NamrCardIcon", "NameCardPic").replace("_P", "0")
+        return self._ui_path
 
     @property
     def icon(self) -> str:
@@ -65,7 +65,7 @@ class Namecard:
         The namecard's icon.
         e.g. https://enka.network/ui/UI_NameCardIcon_0.png
         """
-        return f"https://enka.network/ui/{self.icon_ui_path}.png"
+        return f"https://enka.network/ui/{self.ui_path.replace('NameCardPic', 'NameCardIcon').replace('_P','')}.png"
 
     @property
     def full(self) -> str:
@@ -73,4 +73,4 @@ class Namecard:
         The full namecard.
         e.g. https://enka.network/ui/UI_NameCardPic_0_P.png
         """
-        return f"https://enka.network/ui/UI_NameCardPic_{self._ui_path}_P.png"
+        return f"https://enka.network/ui/{self.ui_path}.png"
