@@ -51,7 +51,7 @@ preview = true
 [tool.ruff.lint.per-file-ignores]
 "**/__init__.py" = ["F403"]
 "enka/models/*.py" = ["ALL"]
-"example.py" = ["T201"]
+"example.py" = ["T201", "ERA001"]
 
 
 [tool.ruff.lint.flake8-type-checking]
