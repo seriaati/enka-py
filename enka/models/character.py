@@ -283,8 +283,8 @@ class Character(BaseModel):
         The character's max level.
     highest_dmg_bonus_stat: :class:`FightProp`
         The character's highest damage bonus stat.
-    namecard: :class:`Namecard`
-        The character's namecard.
+    namecard: Optional[:class:`Namecard`]
+        The character's namecard. Travelers don't have namecards.
     """
 
     id: int = Field(alias="avatarId")

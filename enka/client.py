@@ -191,7 +191,7 @@ class EnkaAPI:
         character.rarity = CHARACTER_RARITY_MAP[character_data["QualityType"]]
 
         # namecard
-        character.namecard = Namecard(character_data["NamecardIcon"])
+        character.namecard = Namecard(character_data.get("NamecardIcon"))
 
         return character
 
