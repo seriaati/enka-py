@@ -2,8 +2,7 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from .icon import Icon
-
+from .icon import Icon, Namecard
 from ..exceptions import InvalidItemTypeError
 from ..enums import Element, EquipmentType, ItemType, StatType, FightPropType
 from ..constants import ASCENSION_TO_MAX_LEVEL, DMG_BONUS_FIGHT_PROPS, PERCENT_STAT_TYPES
@@ -284,6 +283,8 @@ class Character(BaseModel):
         The character's max level.
     highest_dmg_bonus_stat: :class:`FightProp`
         The character's highest damage bonus stat.
+    namecard: :class:`Namecard`
+        The character's namecard.
     """
 
     id: int = Field(alias="avatarId")
@@ -302,6 +303,7 @@ class Character(BaseModel):
     element: Element = Field(None)
     talent_order: list[int] = Field(None)
     rarity: int = Field(None)
+    namecard: Namecard = Field(None)
 
     model_config = {"arbitrary_types_allowed": True}
 

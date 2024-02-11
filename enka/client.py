@@ -190,6 +190,9 @@ class EnkaAPI:
         # rarity
         character.rarity = CHARACTER_RARITY_MAP[character_data["QualityType"]]
 
+        # namecard
+        character.namecard = Namecard(character_data["NamecardIcon"])
+
         return character
 
     def _post_process_showcase(self, showcase: ShowcaseResponse) -> ShowcaseResponse:

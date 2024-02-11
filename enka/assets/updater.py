@@ -22,7 +22,7 @@ __all__ = ("AssetUpdater",)
 
 SOURCE_TO_PATH: Final[dict[str, str]] = {
     "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/text_map.json": TEXT_MAP_PATH,
-    "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/characters.json": CHARACTER_DATA_PATH,
+    "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/characters.json": CHARACTER_DATA_PATH,
     "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/namecards.json": NAMECARD_DATA_PATH,
     "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/consts.json": CONSTS_DATA_PATH,
     "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/talents.json": TALENTS_DATA_PATH,
