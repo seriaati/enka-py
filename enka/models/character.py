@@ -110,7 +110,7 @@ class Artifact(BaseModel):
 
     item_id: int = Field(alias="itemId")
     main_stat_id: int = Field(alias="mainPropId")
-    sub_stat_ids: List[int] = Field(alias="appendPropIdList")
+    sub_stat_ids: List[int] = Field(alias="appendPropIdList", default_factory=list)
     level: int
     equip_type: EquipmentType = Field(alias="equipType")
     icon: str
@@ -118,7 +118,7 @@ class Artifact(BaseModel):
     name: str = Field(alias="nameTextMapHash")
     rarity: int = Field(alias="rankLevel")
     main_stat: Stat = Field(alias="reliquaryMainstat")
-    sub_stats: List[Stat] = Field(alias="reliquarySubstats")
+    sub_stats: List[Stat] = Field(alias="reliquarySubstats", default_factory=list)
     set_name: str = Field(alias="setNameTextMapHash")
 
     @field_validator("level", mode="before")
@@ -303,7 +303,7 @@ class Character(BaseModel):
     element: Element = Field(None)
     talent_order: list[int] = Field(None)
     rarity: int = Field(None)
-    namecard: Namecard = Field(None)
+    namecard: Optional[Namecard] = Field(None)
 
     model_config = {"arbitrary_types_allowed": True}
 
