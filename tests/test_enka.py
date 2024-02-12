@@ -49,4 +49,4 @@ async def test_new_profile_picture_format() -> None:
 async def test_costume() -> None:
     async with EnkaAPI() as api:
         showcase = await api.fetch_showcase("738081787")
-        assert showcase.player.showcase_characters[3].costuime_icon is not None
+        assert showcase.player.showcase_characters[3].costume is not None
