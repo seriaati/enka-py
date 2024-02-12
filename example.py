@@ -14,13 +14,13 @@ FIGHT_PROPS_TO_SHOW = (
 )
 
 
-async def main() -> None:
+async def main() -> None:  # noqa: C901
     async with enka.EnkaAPI() as api:
         # Update assets
         # await api.update_assets()
 
         try:
-            response = await api.fetch_showcase(738081787)
+            response = await api.fetch_showcase(831335713)
         except enka.exceptions.PlayerDoesNotExistError:
             return print("Player does not exist.")
         except enka.exceptions.GameMaintenanceError:
@@ -40,7 +40,10 @@ async def main() -> None:
             print("Element:", character.element.name.title())
             print("Side icon:", character.icon.side)
             print(f"Talent levels: {'/'.join(str(talent.level) for talent in character.talents)}")
-            print("Namecard:", character.namecard.full)
+            if character.namecard is not None:
+                print("Namecard:", character.namecard.full)
+            if character.costume is not None:
+                print("Costume:", character.costume.icon.gacha)
 
             weapon = character.weapon
             print("\nWeapon:")
