@@ -10,6 +10,7 @@ from .assets.updater import AssetUpdater
 from .constants import CHARACTER_RARITY_MAP
 from .enums import Element, Language
 from .exceptions import raise_for_retcode
+from .models.costume import Costume
 from .models.icon import Icon, Namecard
 from .models.response import ShowcaseResponse
 
@@ -118,13 +119,13 @@ class EnkaAPI:
         # costume
         costume_data = self._assets.character_data[str(showcase_character.id)]["Costumes"]
         if costume_data is not None:
-            showcase_character.costuime_icon = Icon(
-                costume_data[str(showcase_character.costume_id)]["sideIconName"], is_costume=True
+            showcase_character.costume = Costume(
+                showcase_character.costume_id, costume_data[str(showcase_character.costume_id)]
             )
 
         return showcase_character
 
-    def _post_process_character(self, character: "Character") -> "Character":
+    def _post_process_character(self, character: "Character") -> "Character":  # noqa: C901
         if self._assets is None:
             msg = "Client is not started, call `EnkaNetworkAPI.start` first"
             raise RuntimeError(msg)
@@ -192,6 +193,14 @@ class EnkaAPI:
 
         # namecard
         character.namecard = Namecard(character_data.get("NamecardIcon"))
+
+        # costume
+        if character.costume_id is not None:
+            costume_data = character_data.get("Costumes")
+            if costume_data is not None:
+                character.costume = Costume(
+                    character.costume_id, costume_data[str(character.costume_id)]
+                )
 
         return character
 

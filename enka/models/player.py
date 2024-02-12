@@ -2,6 +2,8 @@ from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field, field_validator
 
+from .costume import Costume
+
 from .icon import Icon, Namecard
 
 __all__ = ("Player", "ShowcaseCharacter")
@@ -17,16 +19,16 @@ class ShowcaseCharacter(BaseModel):
         The character's ID.
     level: :class:`int`
         The character's level.
+    costume: Optional[:class:`Costume`]
+        The character's costume, if any.
     costume_id: Optional[:class:`int`]
         The character's costume's ID, if any.
-    costuime_icon: Optional[:class:`Icon`]
-        The character's costume's icon, if any.
     """
 
     id: int = Field(alias="avatarId")
     level: int
+    costume: Optional[Costume] = Field(None)
     costume_id: Optional[int] = Field(None, alias="costumeId")
-    costuime_icon: Optional[Icon] = Field(None)
 
     model_config = {"arbitrary_types_allowed": True}
 

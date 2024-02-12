@@ -2,6 +2,8 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from .costume import Costume
+
 from .icon import Icon, Namecard
 from ..exceptions import InvalidItemTypeError
 from ..enums import Element, EquipmentType, ItemType, StatType, FightPropType
@@ -285,6 +287,10 @@ class Character(BaseModel):
         The character's highest damage bonus stat.
     namecard: Optional[:class:`Namecard`]
         The character's namecard. Travelers don't have namecards.
+    costume: Optional[:class:`Costume`]
+        The character's costume, if any.
+    costume_id: Optional[:class:`int`]
+        The character's costume's ID, if any.
     """
 
     id: int = Field(alias="avatarId")
@@ -304,6 +310,8 @@ class Character(BaseModel):
     talent_order: list[int] = Field(None)
     rarity: int = Field(None)
     namecard: Optional[Namecard] = Field(None)
+    costume: Optional[Costume] = Field(None)
+    costume_id: Optional[int] = Field(None, alias="costumeId")
 
     model_config = {"arbitrary_types_allowed": True}
 
