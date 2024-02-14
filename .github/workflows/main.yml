@@ -1,4 +1,4 @@
-name: Main
+name: Run tests
 
 on:
   push:
@@ -29,9 +29,3 @@ jobs:
 
       - name: Run pytest
         run: poetry run pytest
-        
-      - name: Update dependencies & pre-commits
-        uses: seriaati/update-deps@main
-        
-      - name: Create release
-        uses: seriaati/create-release@main
