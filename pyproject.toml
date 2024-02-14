@@ -24,7 +24,6 @@ optional = true
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.2.1"
-git-cliff = "^1.4.0"
 pre-commit = "^3.6.0"
 pytest = "^7.4.4"
 pytest-asyncio = "^0.23.3"
