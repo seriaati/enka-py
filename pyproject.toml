@@ -6,7 +6,7 @@ name = "enka-py"
 version = "1.4.0"
 description = "An async API wrapper for enka.network written in Python."
 authors = ["seriaati <seria.ati@gmail.com>"]
-license = "GNU GPL v3.0"
+license = "GPL-3.0-only"
 readme = "README.md"
 repository = "https://github.com/seriaati/enka-py"
 packages = [{include = "enka"}]
