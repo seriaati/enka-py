@@ -38,12 +38,20 @@ async def main() -> None:  # noqa: C901
             )
             print(f"Rarity: {character.rarity} ★")
             print("Element:", character.element.name.title())
-            print("Side icon:", character.icon.side)
             print(f"Talent levels: {'/'.join(str(talent.level) for talent in character.talents)}")
             if character.namecard is not None:
                 print("Namecard:", character.namecard.full)
+
+            print("\nSide icon:", character.icon.side)
+            print("Circle icon:", character.icon.circle)
+            print("Gacha icon:", character.icon.gacha)
+            print("Front icon:", character.icon.front)
+
             if character.costume is not None:
-                print("Costume:", character.costume.icon.gacha)
+                print("\nCostume side icon:", character.costume.icon.side)
+                print("Costume circle icon:", character.costume.icon.circle)
+                print("Costume gacha icon:", character.costume.icon.gacha)
+                print("Costume front icon:", character.costume.icon.front)
 
             weapon = character.weapon
             print("\nWeapon:")
