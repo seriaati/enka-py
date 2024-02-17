@@ -46,7 +46,7 @@ class EnkaAPI:
         cache_ttl: int = 60,
     ) -> None:
         self._lang = lang
-        self._headers = headers
+        self._headers = headers or {"User-Agent": "enka-py"}
 
         self._session: CachedSession | None = None
         self._cache = SQLiteBackend(cache_name=".enka_py/cache", expire_after=cache_ttl)
