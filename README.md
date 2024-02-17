@@ -29,7 +29,7 @@ enka.py is an async API wrapper for [enka.network](https://enka.network/) writte
  - Fully typed.
  - Provides direct icon URLs.
  - Fully asynchronous by using `aiofiles`, `aiohttp`, and `asyncio`.
- - Supports in-memory caching with [cachetools](https://github.com/tkem/cachetools/).
+ - Supports persistent caching using SQLite.
  - Supports [Pydantic V2](https://github.com/pydantic/pydantic).
  - Seamlessly integrates with [GenshinData](https://gitlab.com/Dimbreath/AnimeGameData).
 
@@ -86,7 +86,7 @@ async def main() -> None:
 asyncio.run(main())
 ```
 > [!IMPORTANT]  
-> You ***need*** to call `start()` or the api client will not function properly; the `close()` method releases resources by closing the session and removing cache from memory.
+> You ***need*** to call `start()` or the api client will not function properly; the `close()` method closes the request session and database properly.
 
 ## Updating assets
 In your first use, enka.py will download all the necessary data files to a directory named `.enka_py` (if you're using git, you should add it to `.gitignore`). However, sometimes (often after a game update), the local data will be outdated, and you'd need to update them.  
@@ -110,16 +110,12 @@ Currently, the `EnkaAPI` class allows you to pass in 4 parameters:
 ### Language
 This will affect the languages of names of weapon, character, constellations, etc. You can find all the languages [here](https://github.com/seriaati/enka-py/blob/890e4b21d46763203fba7a5542a2becab723ea21/enka/enums.py#L12).
 ### Headers
-Custom headers used when requesting the Enka API, it is recommended to set a user agent, the default is `None`. 
-### Cache max size
-Internally, `cachetools.TTLCache` is used, which uses the LRU strategy. Upon requesting, the client will cache the response with the request URL as key. When the cache max size (default is 100) is reached, the least recently used cache is evicted.
+Custom headers used when requesting the Enka API, it is recommended to set a user agent, the default is `{"User-Agent": "enka-py"}`.
 ### Cache TTL
 Default is 60 seconds, the cache is evicted when this time expires. Note that setting longer TTL might result in inconsistent data.
-> [!TIP]
-> You should reuse the same `EnkaAPI` client throughout your program so cache can be shared between operations.
 
 ## Finding models' attributes
-If you're using an IDE like VSCode, then you can see all the attributes and methods the model has in the autocomplete.
+If you're using an IDE like VSCode or Pycharm, then you can see all the attributes and methods the model has in the autocomplete.
 > [!TIP]
 > If you're using VSCode, `alt` + `left click` on the attribute, then the IDE will bring you to the source code of this wrapper, most classes and methods have docstrings.
 
@@ -161,4 +157,4 @@ For your convenience, there are `stat.is_percentage` and `stat.formatted_value` 
 # Questions, issues, contributions
 For questions, you can contact me on [Discord](https://discord.com/users/410036441129943050) or open an [issue](https://github.com/seriaati/enka-py/issues).  
 To report issues with this wrapper, open an [issue](https://github.com/seriaati/enka-py/issues).  
-To contribute, fork this repo and open a [pull request](https://github.com/seriaati/enka-py/pulls).
+To contribute, fork this repo and submit a [pull request](https://github.com/seriaati/enka-py/pulls).
