@@ -2,8 +2,8 @@ import copy
 import logging
 from typing import TYPE_CHECKING, Any, Final
 
-import aiohttp
-import cachetools
+from aiohttp_client_cache.backends.sqlite import SQLiteBackend
+from aiohttp_client_cache.session import CachedSession
 
 from .assets.manager import AssetManager
 from .assets.updater import AssetUpdater
@@ -43,18 +43,13 @@ class EnkaAPI:
         self,
         lang: Language = Language.ENGLISH,
         headers: dict[str, Any] | None = None,
-        cache_maxsize: int = 100,
         cache_ttl: int = 60,
     ) -> None:
         self._lang = lang
         self._headers = headers
-        self._cache_maxsize = cache_maxsize
-        self._cache_ttl = cache_ttl
 
-        self._session: aiohttp.ClientSession | None = None
-        self._cache: cachetools.TTLCache[str, dict[str, Any]] = cachetools.TTLCache(
-            maxsize=self._cache_maxsize, ttl=self._cache_ttl
-        )
+        self._session: CachedSession | None = None
+        self._cache = SQLiteBackend(cache_name=".enka_py/cache", expire_after=cache_ttl)
         self._assets: AssetManager | None = None
         self._asset_updater: AssetUpdater | None = None
 
@@ -75,16 +70,11 @@ class EnkaAPI:
 
         LOGGER_.debug("Requesting %s", url)
 
-        if url in self._cache:
-            LOGGER_.debug("Using cache for %s", url)
-            return self._cache[url]
-
         async with self._session.get(url) as resp:
             if resp.status != 200:
                 raise_for_retcode(resp.status)
 
             data: dict[str, Any] = await resp.json()
-            self._cache[url] = data
             return data
 
     def _post_process_player(self, player: "Player") -> "Player":
@@ -229,7 +219,7 @@ class EnkaAPI:
         return showcase
 
     async def start(self) -> None:
-        self._session = aiohttp.ClientSession(headers=self._headers)
+        self._session = CachedSession(headers=self._headers, cache=self._cache)
 
         self._assets = AssetManager(self._lang)
         self._asset_updater = AssetUpdater(self._session)
@@ -244,7 +234,6 @@ class EnkaAPI:
             raise RuntimeError(msg)
 
         await self._session.close()
-        self._cache.clear()
 
     async def update_assets(self) -> None:
         if self._asset_updater is None or self._assets is None:
