@@ -13,8 +13,6 @@ packages = [{include = "enka"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-aiohttp = "^3.9.1"
-cachetools = "^5.3.2"
 pydantic = "^2.5.3"
 orjson = "^3.9.10"
 aiofiles = "^23.2.1"
