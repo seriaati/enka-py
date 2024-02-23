@@ -55,7 +55,7 @@ class FightProp(BaseModel):
 
     Attributes
     ----------
-    type: :class:`FightProp`
+    type: :class:`FightPropType`
         The fight prop's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.)
     value: :class:`float`
         The fight prop's value.
