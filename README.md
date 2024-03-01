@@ -14,6 +14,7 @@
    - [Catching exceptions](#catching-exceptions)
    - [Namecards and Icons](#namecards-and-icons)
    - [Stats](#stats)
+   - [Constellations](#constellations)
 
 3. [Questions, issues, contributions](#questions-issues-contributions)
 
