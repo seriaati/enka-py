@@ -154,6 +154,11 @@ For your convenience, there are `stat.is_percentage` and `stat.formatted_value` 
   - `stat.is_percentage = True`
   - `stat.formatted_value = '23.1%'`
 
+## Constellations
+*Available after v1.7.0*  
+  
+After v1.7.0, all constellations that belong to a character will appear in `Character.constellations`, the `Constellation.unlocked` attribute will indicate whether the constellation is unlocked. Also, there is a new attribute `Character.constellations_unlocked` that indicates how many constellations the character has unlocked.
+
 # Questions, issues, contributions
 For questions, you can contact me on [Discord](https://discord.com/users/410036441129943050) or open an [issue](https://github.com/seriaati/enka-py/issues).  
 To report issues with this wrapper, open an [issue](https://github.com/seriaati/enka-py/issues).  
