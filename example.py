@@ -35,7 +35,7 @@ async def main() -> None:  # noqa: C901
         for character in response.characters:
             print("\n===============================\n")
             print(
-                f"Lv. {character.level}/{character.max_level} {character.name} (C{len(character.constellations)})"
+                f"Lv. {character.level}/{character.max_level} {character.name} (C{character.constellations_unlocked})"
             )
             print(f"Rarity: {character.rarity} ★")
             print("Element:", character.element.name.title())
