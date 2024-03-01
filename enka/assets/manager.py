@@ -63,6 +63,27 @@ class AssetData:
 
         return text
 
+    def __iter__(self) -> Any:
+        if self._data is None:
+            msg = f"{self.__class__.__name__} not loaded"
+            raise RuntimeError(msg)
+
+        return iter(self._data)
+
+    def values(self) -> Any:
+        if self._data is None:
+            msg = f"{self.__class__.__name__} not loaded"
+            raise RuntimeError(msg)
+
+        return self._data.values()
+
+    def items(self) -> Any:
+        if self._data is None:
+            msg = f"{self.__class__.__name__} not loaded"
+            raise RuntimeError(msg)
+
+        return self._data.items()
+
     async def _open_json(self, path: str) -> dict[str, Any] | None:
         with contextlib.suppress(FileNotFoundError):
             async with aiofiles.open(path, encoding="utf-8") as f:
