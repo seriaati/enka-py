@@ -211,11 +211,14 @@ class Constellation(BaseModel):
         The constellation's name.
     icon: :class:`str`
         The constellation's icon.
+    unlocked: :class:`bool`
+        Whether the constellation is unlocked.
     """
 
     id: int
     name: str = Field(None)
     icon: str = Field(None)
+    unlocked: bool
 
 
 class Talent(BaseModel):
@@ -291,6 +294,8 @@ class Character(BaseModel):
         The character's costume, if any.
     costume_id: Optional[:class:`int`]
         The character's costume's ID, if any.
+    constellations_unlocked: :class:`int`
+        The number of constellations unlocked.
     """
 
     id: int = Field(alias="avatarId")
@@ -317,14 +322,21 @@ class Character(BaseModel):
 
     @property
     def max_level(self) -> int:
+        """The character's max level."""
         return ASCENSION_TO_MAX_LEVEL[self.ascension]
 
     @property
     def highest_dmg_bonus_stat(self) -> FightProp:
+        """The character's highest damage bonus stat."""
         return max(
             (stat for stat in self.stats.values() if stat.type in DMG_BONUS_FIGHT_PROPS),
             key=lambda stat: stat.value,
         )
+
+    @property
+    def constellations_unlocked(self) -> int:
+        """The number of constellations unlocked."""
+        return len([c for c in self.constellations if c.unlocked])
 
     @field_validator("stats", mode="before")
     def _convert_stats(cls, v: Dict[str, float]) -> Dict[FightPropType, FightProp]:
@@ -335,7 +347,10 @@ class Character(BaseModel):
 
     @field_validator("constellations", mode="before")
     def _convert_constellations(cls, v: List[int]) -> List[Constellation]:
-        return [Constellation(id=constellation_id, name="", icon="") for constellation_id in v]
+        return [
+            Constellation(id=constellation_id, name="", icon="", unlocked=True)
+            for constellation_id in v
+        ]
 
     @field_validator("talents", mode="before")
     def _convert_talents(cls, v: Dict[str, int]) -> List[Talent]:

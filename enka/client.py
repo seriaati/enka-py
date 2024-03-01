@@ -10,6 +10,7 @@ from .assets.updater import AssetUpdater
 from .constants import CHARACTER_RARITY_MAP
 from .enums import Element, Language
 from .exceptions import raise_for_retcode
+from .models.character import Constellation
 from .models.costume import Costume
 from .models.icon import Icon, Namecard
 from .models.response import ShowcaseResponse
@@ -122,7 +123,7 @@ class EnkaAPI:
 
         return showcase_character
 
-    def _post_process_character(self, character: "Character") -> "Character":  # noqa: C901
+    def _post_process_character(self, character: "Character") -> "Character":  # noqa: C901, PLR0914, PLR0912
         if self._assets is None:
             msg = "Client is not started, call `EnkaNetworkAPI.start` first"
             raise RuntimeError(msg)
@@ -161,10 +162,24 @@ class EnkaAPI:
             stat.name = self._assets.text_map.get(stat_type.name)
 
         # constellations
-        for constellation in character.constellations:
-            const_data = self._assets.consts_data[str(constellation.id)]
-            constellation.name = self._assets.text_map[const_data["nameTextMapHash"]]
-            constellation.icon = f"https://enka.network/ui/{const_data['icon']}.png"
+        all_consts: list[dict[str, str]] = []
+        for const_id, const in self._assets.consts_data.items():
+            if const["icon"] not in character_data["Consts"]:
+                continue
+            const["id"] = const_id
+            all_consts.append(const)
+
+        consts: list[Constellation] = []
+        for const in all_consts:
+            consts.append(
+                Constellation(
+                    id=int(const["id"]),
+                    name=self._assets.text_map[const["nameTextMapHash"]],
+                    icon=f"https://enka.network/ui/{const['icon']}.png",
+                    unlocked=any(const["id"] == str(c.id) for c in character.constellations),
+                )
+            )
+        character.constellations = consts
 
         # talents
         for talent in character.talents:
