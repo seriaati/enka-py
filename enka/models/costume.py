@@ -20,10 +20,10 @@ class Costume:
         self._data = data
 
     def __str__(self) -> str:
-        return self._data["name"]
+        return self._data["sideIconName"]
 
     def __repr__(self) -> str:
-        return f"<Costume {self._data['name']}>"
+        return f"<Costume {self._data['sideIconName']}>"
 
     @property
     def icon(self) -> Icon:
