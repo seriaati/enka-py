@@ -19,6 +19,12 @@ class Costume:
         self.id = id
         self._data = data
 
+    def __str__(self) -> str:
+        return self._data["name"]
+
+    def __repr__(self) -> str:
+        return f"<Costume {self._data['name']}>"
+
     @property
     def icon(self) -> Icon:
         """The costume's icon."""

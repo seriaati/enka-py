@@ -4,6 +4,12 @@ class Icon:
         self._side_icon = f"https://enka.network/ui/{side_icon_ui_path}.png"
         self._is_costume = is_costume
 
+    def __str__(self) -> str:
+        return self.icon_ui_path
+
+    def __repr__(self) -> str:
+        return f"<Icon {self.icon_ui_path}>"
+
     @property
     def icon_ui_path(self) -> str:
         """
