@@ -26,8 +26,8 @@ class Language(StrEnum):
     FRENCH = "fr"
     SPANISH = "es"
     GERMAN = "de"
-    TRADITIONAL_CHINESE = "zh-TW"
-    SIMPLIFIED_CHINESE = "zh-CN"
+    TRADITIONAL_CHINESE = "zh-tw"
+    SIMPLIFIED_CHINESE = "zh-cn"
     ITALIAN = "it"
     TURKISH = "tr"
 
