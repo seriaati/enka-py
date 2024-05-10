@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import copy
 import logging
 from typing import TYPE_CHECKING, Any, Final
@@ -5,19 +7,17 @@ from typing import TYPE_CHECKING, Any, Final
 from aiohttp_client_cache.backends.sqlite import SQLiteBackend
 from aiohttp_client_cache.session import CachedSession
 
-from .assets.manager import AssetManager
-from .assets.updater import AssetUpdater
+from .assets.gi.manager import AssetManager
+from .assets.gi.updater import AssetUpdater
 from .constants import CHARACTER_RARITY_MAP
-from .enums.enums import Element, Language
+from .enums.gi import Element, Language
 from .exceptions import raise_for_retcode
-from .models.character import Constellation
-from .models.costume import Costume
-from .models.icon import Icon, Namecard
-from .models.response import ShowcaseResponse
+from .models.gi.character import Constellation, Costume, Icon, Namecard
+from .models.gi.response import ShowcaseResponse
 
 if TYPE_CHECKING:
-    from .models.character import Character
-    from .models.player import Player, ShowcaseCharacter
+    from .models.gi.character import Character
+    from .models.gi.player import Player, ShowcaseCharacter
 
 __all__ = ("EnkaAPI",)
 
@@ -27,16 +27,11 @@ LOGGER_ = logging.getLogger("enka.client")
 class EnkaAPI:
     """The main client for interacting with the Enka Network API.
 
-    Parameters
-    ----------
-    lang: :class:`Language`
-        The language to use for the client, defaults to :attr:`Language.ENGLISH`.
-    headers: :class:`dict`[:class:`str`, :class:`Any`] | :class:`None`
-        The headers to use for the client, defaults to ``None``.
-    cache_maxsize: :class:`int`
-        The maximum size of the cache, defaults to ``100``.
-    cache_ttl: :class:`int`
-        The time to live of the cache, defaults to ``60``.
+    Args:
+        lang (Language): The language to use for the client, defaults to Language.ENGLISH.
+        headers (dict[str, Any] | None): The headers to use for the client, defaults to None.
+        cache_maxsize (int): The maximum size of the cache, defaults to 100.
+        cache_ttl (int): The time to live of the cache, defaults to 60.
     """
 
     def __init__(
@@ -56,7 +51,7 @@ class EnkaAPI:
         self.GENSHIN_API_URL: Final[str] = "https://enka.network/api/uid/{uid}"
         self.HSR_API_URL: Final[str] = "https://enka.network/api/hsr/uid/{uid}"
 
-    async def __aenter__(self) -> "EnkaAPI":
+    async def __aenter__(self) -> EnkaAPI:
         await self.start()
         return self
 
@@ -77,7 +72,7 @@ class EnkaAPI:
             data: dict[str, Any] = await resp.json()
             return data
 
-    def _post_process_player(self, player: "Player") -> "Player":
+    def _post_process_player(self, player: Player) -> Player:
         if self._assets is None:
             msg = "Client is not started, call `EnkaNetworkAPI.start` first"
             raise RuntimeError(msg)
@@ -104,8 +99,8 @@ class EnkaAPI:
         return player
 
     def _post_process_showcase_character(
-        self, showcase_character: "ShowcaseCharacter"
-    ) -> "ShowcaseCharacter":
+        self, showcase_character: ShowcaseCharacter
+    ) -> ShowcaseCharacter:
         if self._assets is None:
             msg = "Client is not started, call `EnkaNetworkAPI.start` first"
             raise RuntimeError(msg)
@@ -122,7 +117,7 @@ class EnkaAPI:
 
         return showcase_character
 
-    def _post_process_character(self, character: "Character") -> "Character":  # noqa: C901, PLR0914, PLR0912
+    def _post_process_character(self, character: Character) -> Character:  # noqa: C901, PLR0914, PLR0912
         if self._assets is None:
             msg = "Client is not started, call `EnkaNetworkAPI.start` first"
             raise RuntimeError(msg)
@@ -233,6 +228,7 @@ class EnkaAPI:
         return showcase
 
     async def start(self) -> None:
+        """Start the client."""
         self._session = CachedSession(headers=self._headers, cache=self._cache)
 
         self._assets = AssetManager(self._lang)
@@ -243,6 +239,7 @@ class EnkaAPI:
             await self.update_assets()
 
     async def close(self) -> None:
+        """Close the client."""
         if self._session is None:
             msg = "Client is not started, call `EnkaNetworkAPI.start` first"
             raise RuntimeError(msg)
@@ -250,6 +247,7 @@ class EnkaAPI:
         await self._session.close()
 
     async def update_assets(self) -> None:
+        """Update game assets."""
         if self._asset_updater is None or self._assets is None:
             msg = "Client is not started, call `EnkaNetworkAPI.start` first"
             raise RuntimeError(msg)
@@ -261,22 +259,15 @@ class EnkaAPI:
 
         LOGGER_.info("Assets updated")
 
-    async def fetch_showcase(  # noqa: C901, PLR0912
-        self, uid: str | int, *, info_only: bool = False
-    ) -> ShowcaseResponse:
-        """Fetches the  Impact character showcase of the given UID.
+    async def fetch_showcase(self, uid: str | int, *, info_only: bool = False) -> ShowcaseResponse:
+        """Fetches the Impact character showcase of the given UID.
 
-        Parameters
-        ----------
-        uid: :class:`str` | :class:`int`
-            The UID of the user.
-        info_only: :class:`bool`
-            Whether to only fetch player info, defaults to ``False``.
+        Args:
+            uid (str | int): The UID of the user.
+            info_only (bool): Whether to only fetch player info, defaults to False.
 
         Returns:
-        -------
-        :class:`ShowcaseResponse`
-            The response of the showcase.
+            ShowcaseResponse: The response of the showcase.
         """
         url = self.GENSHIN_API_URL.format(uid=uid)
         if info_only:
