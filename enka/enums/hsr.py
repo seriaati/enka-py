@@ -78,3 +78,27 @@ class PropType(StrEnum):
     IMAGINARY_RES_DELTA = "ImaginaryResistanceDelta"
 
     SPEED_DELTA = "SpeedDelta"
+
+
+class Element(StrEnum):
+    """HSR elements."""
+
+    ICE = "Ice"
+    FIRE = "Fire"
+    WIND = "Wind"
+    LIGHTNING = "Thunder"
+    PHYSICAL = "Physical"
+    QUANTUM = "Quantum"
+    IMAGINARY = "Imaginary"
+
+
+class Path(StrEnum):
+    """HSR paths."""
+
+    PRESERVATION = "Knight"
+    THE_HUNT = "Rogue"
+    ERUDITION = "Mage"
+    NIHILITY = "Warlock"
+    DESTRUCTION = "Warrior"
+    HARMONY = "Shaman"
+    ABUNDANCE = "Priest"
