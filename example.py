@@ -1,20 +1,19 @@
 import asyncio
 
 import enka
-from enka.enums.enums import FightPropType
 
 FIGHT_PROPS_TO_SHOW = (
-    FightPropType.FIGHT_PROP_MAX_HP,
-    FightPropType.FIGHT_PROP_CUR_ATTACK,
-    FightPropType.FIGHT_PROP_CUR_DEFENSE,
-    FightPropType.FIGHT_PROP_ELEMENT_MASTERY,
-    FightPropType.FIGHT_PROP_CRITICAL,
-    FightPropType.FIGHT_PROP_CRITICAL_HURT,
-    FightPropType.FIGHT_PROP_CHARGE_EFFICIENCY,
+    enka.enums.gi.FightPropType.FIGHT_PROP_MAX_HP,
+    enka.enums.gi.FightPropType.FIGHT_PROP_CUR_ATTACK,
+    enka.enums.gi.FightPropType.FIGHT_PROP_CUR_DEFENSE,
+    enka.enums.gi.FightPropType.FIGHT_PROP_ELEMENT_MASTERY,
+    enka.enums.gi.FightPropType.FIGHT_PROP_CRITICAL,
+    enka.enums.gi.FightPropType.FIGHT_PROP_CRITICAL_HURT,
+    enka.enums.gi.FightPropType.FIGHT_PROP_CHARGE_EFFICIENCY,
 )
 
 
-async def main() -> None:  # noqa: C901
+async def main() -> None:  # noqa: C901, D103
     async with enka.EnkaAPI() as api:
         # Update assets
         # await api.update_assets()

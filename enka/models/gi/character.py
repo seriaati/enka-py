@@ -3,11 +3,10 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from .costume import Costume
-
 from .icon import Icon, Namecard
-from ..exceptions import InvalidItemTypeError
-from ..enums import Element, EquipmentType, ItemType, StatType, FightPropType
-from ..constants import ASCENSION_TO_MAX_LEVEL, DMG_BONUS_FIGHT_PROPS, PERCENT_STAT_TYPES
+from ...exceptions import InvalidItemTypeError
+from ...enums.gi import Element, EquipmentType, ItemType, StatType, FightPropType
+from ...constants import ASCENSION_TO_MAX_LEVEL, DMG_BONUS_FIGHT_PROPS, PERCENT_STAT_TYPES
 
 __all__ = (
     "Stat",

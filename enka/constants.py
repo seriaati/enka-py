@@ -1,7 +1,7 @@
 __all__ = ("CHARACTER_RARITY_MAP", "PERCENT_STAT_TYPES")
 
 
-from .enums.enums import FightPropType
+from .enums.gi import FightPropType
 
 PERCENT_STAT_TYPES = (
     "FIGHT_PROP_HP_PERCENT",
