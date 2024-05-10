@@ -40,11 +40,17 @@ ignore = [
   "ANN401",
   "ANN101",
   "ANN102",
-  "ANN003",
   "PLR0913",
   "PLR2004",
   "PLR0917",
   "PLR6301",
+  "ANN002",
+  "ERA001",
+  "RUF100",
+  "D100",
+  "D104",
+  "D105",
+  "D107",
 ]
 preview = true
 select = [
@@ -73,12 +79,18 @@ select = [
   "LOG",
   "PL",
   "TRY",
+  "D",
+  "RUF",
 ]
 
 [tool.ruff.lint.per-file-ignores]
 "**/__init__.py" = ["F403"]
 "enka/models/*.py" = ["ALL"]
 "example.py" = ["T201", "ERA001"]
+"test.py" = ["D", "T201"]
 
 [tool.ruff.lint.flake8-type-checking]
 quote-annotations = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
