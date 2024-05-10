@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import os
 from typing import TYPE_CHECKING, Any, Final
@@ -5,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Final
 import aiofiles
 import orjson
 
-from ..exceptions import AssetUpdateError
+from ...exceptions import AssetUpdateError
 from .file_paths import (
     CHARACTER_DATA_PATH,
     CONSTS_DATA_PATH,
@@ -33,7 +35,7 @@ LOGGER_ = logging.getLogger("enka.assets.updater")
 
 
 class AssetUpdater:
-    def __init__(self, session: "aiohttp.ClientSession") -> None:
+    def __init__(self, session: aiohttp.ClientSession) -> None:
         self._session = session
 
     async def _fetch_json(self, url: str) -> Any:

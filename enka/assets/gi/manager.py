@@ -14,7 +14,7 @@ from .file_paths import (
 )
 
 if TYPE_CHECKING:
-    from ..client import Language
+    from ...client import Language
 
 __all__ = ("AssetManager",)
 
