@@ -84,7 +84,7 @@ select = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"**/__init__.py" = ["F403"]
+"**/__init__.py" = ["F403", "F401"]
 "enka/models/*.py" = ["ALL"]
 "example.py" = ["T201", "ERA001"]
 "test.py" = ["D", "T201"]
