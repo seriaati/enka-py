@@ -1,7 +1,7 @@
 import asyncio
 
 import enka
-from enka.enums import FightPropType
+from enka.enums.enums import FightPropType
 
 FIGHT_PROPS_TO_SHOW = (
     FightPropType.FIGHT_PROP_MAX_HP,

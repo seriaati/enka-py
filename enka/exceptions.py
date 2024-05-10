@@ -1,15 +1,15 @@
 __all__ = (
-    "EnkaAPIError",
-    "WrongUIDFormatError",
-    "PlayerDoesNotExistError",
-    "GameMaintenanceError",
-    "RateLimitedError",
-    "GeneralServerError",
     "AlgoScrewedUpMassivelyError",
-    "raise_for_retcode",
-    "EnkaPyError",
-    "InvalidItemTypeError",
     "AssetUpdateError",
+    "EnkaAPIError",
+    "EnkaPyError",
+    "GameMaintenanceError",
+    "GeneralServerError",
+    "InvalidItemTypeError",
+    "PlayerDoesNotExistError",
+    "RateLimitedError",
+    "WrongUIDFormatError",
+    "raise_for_retcode",
 )
 
 
@@ -49,9 +49,7 @@ class AlgoScrewedUpMassivelyError(EnkaAPIError):
 
 
 def raise_for_retcode(retcode: int) -> None:
-    """
-    Raises an exception based on the retcode
-    """
+    """Raises an exception based on the retcode."""
     match retcode:
         case 400:
             raise WrongUIDFormatError

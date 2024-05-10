@@ -8,7 +8,7 @@ from aiohttp_client_cache.session import CachedSession
 from .assets.manager import AssetManager
 from .assets.updater import AssetUpdater
 from .constants import CHARACTER_RARITY_MAP
-from .enums import Element, Language
+from .enums.enums import Element, Language
 from .exceptions import raise_for_retcode
 from .models.character import Constellation
 from .models.costume import Costume
@@ -25,8 +25,7 @@ LOGGER_ = logging.getLogger("enka.client")
 
 
 class EnkaAPI:
-    """
-    The main client for interacting with the Enka Network API.
+    """The main client for interacting with the Enka Network API.
 
     Parameters
     ----------
@@ -265,8 +264,7 @@ class EnkaAPI:
     async def fetch_showcase(  # noqa: C901, PLR0912
         self, uid: str | int, *, info_only: bool = False
     ) -> ShowcaseResponse:
-        """
-        Fetches the  Impact character showcase of the given UID.
+        """Fetches the  Impact character showcase of the given UID.
 
         Parameters
         ----------
@@ -275,12 +273,11 @@ class EnkaAPI:
         info_only: :class:`bool`
             Whether to only fetch player info, defaults to ``False``.
 
-        Returns
+        Returns:
         -------
         :class:`ShowcaseResponse`
             The response of the showcase.
         """
-
         url = self.GENSHIN_API_URL.format(uid=uid)
         if info_only:
             url += "?info"
