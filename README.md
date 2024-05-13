@@ -20,6 +20,7 @@ enka.py is an async API wrapper for [enka.network](https://enka.network/) writte
 - Fully typed.
 - Fully asynchronous by using `aiofiles`, `aiohttp`, and `asyncio`, suitable for Discord bots.
 - Provides direct icon URLs.
+- Supports Python 3.10+.
 - Supports all game languages.
 - Supports both Genshin Impact and Honkai Star Rail.
 - Supports persistent caching using SQLite.
