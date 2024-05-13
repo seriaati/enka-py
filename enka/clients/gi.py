@@ -46,6 +46,9 @@ class GenshinClient(BaseClient):
         await self.start()
         return self
 
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        return await super().__aexit__(exc_type, exc_val, exc_tb)
+
     def _check_assets(self) -> None:
         if self._assets is None:
             msg = f"Client is not started, call `{self.__class__.__name__}.start` first"
