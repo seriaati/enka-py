@@ -184,7 +184,9 @@ class GenshinClient(BaseClient):
         character.rarity = CHARACTER_RARITY_MAP[character_data["QualityType"]]
 
         # namecard
-        character.namecard = Namecard(ui_path=character_data.get("NamecardIcon"))
+        ui_path = character_data.get("NamecardIcon")
+        if ui_path is not None:
+            character.namecard = Namecard(ui_path=ui_path)
 
         # costume
         if character.costume_id is not None:
