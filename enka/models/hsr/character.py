@@ -1,5 +1,5 @@
 from typing import Any, Literal
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator, model_validator
 
 from ...utils import round_down
 
@@ -37,11 +37,13 @@ class Stat(BaseModel):
     name: str = Field(None)
     icon: str = Field(None)
 
+    @computed_field
     @property
     def is_percentage(self) -> bool:
         """Whether the stat is a percentage stat."""
         return self.type.value in PERCENT_STAT_TYPES
 
+    @computed_field
     @property
     def formatted_value(self) -> str:
         """Returns the formatted value of the stat."""
@@ -67,6 +69,7 @@ class LightCone(BaseModel):
     icon: LightConeIcon = Field(None)
     rarity: Literal[3, 4, 5] = Field(None)
 
+    @computed_field
     @property
     def max_level(self) -> Literal[20, 30, 40, 50, 60, 70, 80]:
         """Light Cone's max level."""
@@ -113,10 +116,12 @@ class Relic(BaseModel):
         values.update(flat_)
         return values
 
+    @computed_field
     @property
     def main_stat(self) -> Stat:
         return self.stats[0]
 
+    @computed_field
     @property
     def sub_stats(self) -> list[Stat]:
         return self.stats[1:]
@@ -142,11 +147,13 @@ class Character(BaseModel):
     path: Path = Field(None)
     stats: list[Stat] = Field(list)
 
+    @computed_field
     @property
     def max_level(self) -> Literal[20, 30, 40, 50, 60, 70, 80]:
         """Character's max level."""
         return ASCENSION_TO_MAX_LEVEL[self.ascension]
 
+    @computed_field
     @property
     def highest_dmg_bonus_stat(self) -> Stat:
         """Character's highest damage bonus stat."""

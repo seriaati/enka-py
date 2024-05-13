@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import BaseModel, Field, computed_field, field_validator, model_validator
 
 from .costume import Costume
 from .icon import Icon, Namecard
@@ -33,10 +33,12 @@ class Stat(BaseModel):
     value: float
     name: str = Field(None)
 
+    @computed_field
     @property
     def is_percentage(self) -> bool:
         return self.type.name in PERCENT_STAT_TYPES
 
+    @computed_field
     @property
     def formatted_value(self) -> str:
         if self.is_percentage:
@@ -58,10 +60,12 @@ class FightProp(BaseModel):
     value: float
     name: str = Field(None)
 
+    @computed_field
     @property
     def is_percentage(self) -> bool:
         return self.type.name in PERCENT_STAT_TYPES
 
+    @computed_field
     @property
     def formatted_value(self) -> str:
         if self.is_percentage:
@@ -101,6 +105,7 @@ class Artifact(BaseModel):
     sub_stats: List[Stat] = Field(alias="reliquarySubstats", default_factory=list)
     set_name: str = Field(alias="setNameTextMapHash")
 
+    @computed_field
     @property
     def item_id(self) -> None:
         raise DeprecationWarning("`Artifact.item_id` is deprecated, use `Artifact.id` instead.")
@@ -150,6 +155,7 @@ class Weapon(BaseModel):
     rarity: int = Field(alias="rankLevel")
     stats: List[Stat] = Field(alias="weaponStats")
 
+    @computed_field
     @property
     def max_level(self) -> int:
         return ASCENSION_TO_MAX_LEVEL[self.ascension]
@@ -258,11 +264,13 @@ class Character(BaseModel):
 
     model_config = {"arbitrary_types_allowed": True}
 
+    @computed_field
     @property
     def max_level(self) -> Literal[20, 40, 50, 60, 70, 80, 90]:
         """The character's max level."""
         return ASCENSION_TO_MAX_LEVEL[self.ascension]
 
+    @computed_field
     @property
     def highest_dmg_bonus_stat(self) -> FightProp:
         """The character's highest damage bonus stat."""
@@ -271,6 +279,7 @@ class Character(BaseModel):
             key=lambda stat: stat.value,
         )
 
+    @computed_field
     @property
     def constellations_unlocked(self) -> int:
         """The number of constellations unlocked."""

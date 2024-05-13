@@ -59,7 +59,7 @@ class GenshinClient(BaseClient):
 
         # namecard
         namecard_icon = self._assets.namecard_data[str(player.namecard_id)]["icon"]
-        player.namecard = Namecard(namecard_icon)
+        player.namecard = Namecard(ui_path=namecard_icon)
 
         # profile picture
         profile_picture_id = str(player.profile_picture_id)
@@ -73,7 +73,7 @@ class GenshinClient(BaseClient):
                 .replace("_Circle", "")
             )
         player.profile_picture_icon = Icon(
-            profile_picture_icon, is_costume="Costume" in profile_picture_icon
+            side_icon_ui_path=profile_picture_icon, is_costume="Costume" in profile_picture_icon
         )
 
         return player
@@ -90,7 +90,8 @@ class GenshinClient(BaseClient):
         costume_data = self._assets.character_data[str(showcase_character.id)]["Costumes"]
         if costume_data is not None:
             showcase_character.costume = Costume(
-                showcase_character.costume_id, costume_data[str(showcase_character.costume_id)]
+                id=showcase_character.costume_id,
+                data=costume_data[str(showcase_character.costume_id)],
             )
 
         return showcase_character
@@ -111,7 +112,7 @@ class GenshinClient(BaseClient):
 
         # icon
         side_icon_name = character_data["SideIconName"]
-        character.icon = Icon(side_icon_name)
+        character.icon = Icon(side_icon_ui_path=side_icon_name)
 
         # weapon
         weapon = character.weapon
@@ -174,14 +175,14 @@ class GenshinClient(BaseClient):
         character.rarity = CHARACTER_RARITY_MAP[character_data["QualityType"]]
 
         # namecard
-        character.namecard = Namecard(character_data.get("NamecardIcon"))
+        character.namecard = Namecard(ui_path=character_data.get("NamecardIcon"))
 
         # costume
         if character.costume_id is not None:
             costume_data = character_data.get("Costumes")
             if costume_data is not None:
                 character.costume = Costume(
-                    character.costume_id, costume_data[str(character.costume_id)]
+                    id=character.costume_id, data=costume_data[str(character.costume_id)]
                 )
 
         return character

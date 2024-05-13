@@ -71,7 +71,7 @@ class HSRClient(BaseClient):
         text_map = self._assets.text_map
         light_cone.name = text_map[light_cone.name]
         light_cone.rarity = self._assets.light_cones_data[str(light_cone.id)]["Rarity"]
-        light_cone.icon = LightConeIcon(light_cone.id)
+        light_cone.icon = LightConeIcon(light_cone_id=light_cone.id)
 
         for stat in light_cone.stats:
             stat.name = text_map[stat.type.value]
@@ -96,7 +96,7 @@ class HSRClient(BaseClient):
         if character.light_cone is not None:
             self._post_process_light_cone(character.light_cone)
 
-        character.icon = CharacterIcon(character.id)
+        character.icon = CharacterIcon(character_id=character.id)
 
         character_data = self._assets.character_data[str(character.id)]
         text_map_hash: int = character_data["AvatarName"]["Hash"]

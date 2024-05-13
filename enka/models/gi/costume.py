@@ -1,11 +1,13 @@
 from typing import Any
 
+from pydantic import BaseModel, computed_field
+
 from .icon import Icon
 
 __all__ = ("Costume",)
 
 
-class Costume:
+class Costume(BaseModel):
     """
     Represents a character's costume.
 
@@ -14,17 +16,11 @@ class Costume:
        icon (Icon): The costume's icon.
     """
 
-    def __init__(self, id: int, data: dict[str, Any]) -> None:
-        self.id = id
-        self._data = data
+    id: int
+    data: dict[str, Any]
 
-    def __str__(self) -> str:
-        return self._data["sideIconName"]
-
-    def __repr__(self) -> str:
-        return f"<Costume {self._data['sideIconName']}>"
-
+    @computed_field
     @property
     def icon(self) -> Icon:
         """The costume's icon."""
-        return Icon(self._data["sideIconName"], is_costume=True)
+        return Icon(side_icon_ui_path=self.data["sideIconName"], is_costume=True)

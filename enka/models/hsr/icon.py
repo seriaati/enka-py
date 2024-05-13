@@ -1,28 +1,33 @@
 __all__ = ("CharacterIcon", "LightConeIcon")
 
 
-class CharacterIcon:
+from pydantic import BaseModel, computed_field
+
+
+class CharacterIcon(BaseModel):
     """HSR character icon."""
 
-    def __init__(self, character_id: int) -> None:
-        self._id = character_id
+    character_id: int
 
+    @computed_field
     @property
     def round(self) -> str:
         """Character icon in round shape.
 
         e.g. https://enka.network/ui/hsr/SpriteOutput/AvatarRoundIcon/1001.png
         """
-        return f"https://enka.network/ui/hsr/SpriteOutput/AvatarRoundIcon/{self._id}.png"
+        return f"https://enka.network/ui/hsr/SpriteOutput/AvatarRoundIcon/{self.character_id}.png"
 
+    @computed_field
     @property
     def gacha(self) -> str:
         """Character gacha splash art.
 
         e.g. https://enka.network/ui/hsr/SpriteOutput/AvatarDrawCard/1001.png
         """
-        return f"https://enka.network/ui/hsr/SpriteOutput/AvatarDrawCard/{self._id}.png"
+        return f"https://enka.network/ui/hsr/SpriteOutput/AvatarDrawCard/{self.character_id}.png"
 
+    @computed_field
     @property
     def card(self) -> str:
         """Character icon in card shape.
@@ -30,23 +35,24 @@ class CharacterIcon:
         Provided by Project Yatta.
         e.g. https://api.yatta.top/hsr/assets/UI//avatar/medium/1001.png
         """
-        return f"https://api.yatta.top/hsr/assets/UI//avatar/medium/{self._id}.png"
+        return f"https://api.yatta.top/hsr/assets/UI//avatar/medium/{self.character_id}.png"
 
 
-class LightConeIcon:
+class LightConeIcon(BaseModel):
     """HSR light cone icon."""
 
-    def __init__(self, light_cone_id: int) -> None:
-        self._id = light_cone_id
+    light_cone_id: int
 
+    @computed_field
     @property
     def image(self) -> str:
         """Light cone icon image.
 
         e.g. https://enka.network/ui/hsr/SpriteOutput/LightConeFigures/20000.png
         """
-        return f"https://enka.network/ui/hsr/SpriteOutput/LightConeFigures/{self._id}.png"
+        return f"https://enka.network/ui/hsr/SpriteOutput/LightConeFigures/{self.light_cone_id}.png"
 
+    @computed_field
     @property
     def item(self) -> str:
         """Light cone icon item.
@@ -54,4 +60,4 @@ class LightConeIcon:
         Provided by Project Yatta.
         e.g. https://api.yatta.top/hsr/assets/UI//equipment/medium/20000.png
         """
-        return f"https://api.yatta.top/hsr/assets/UI//equipment/medium/{self._id}.png"
+        return f"https://api.yatta.top/hsr/assets/UI//equipment/medium/{self.light_cone_id}.png"
