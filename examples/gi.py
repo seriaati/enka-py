@@ -14,7 +14,7 @@ FIGHT_PROPS_TO_SHOW = (
 
 
 async def main() -> None:  # noqa: C901, D103
-    async with enka.GenshinClient() as api:
+    async with enka.GenshinClient(enka.gi.Language.TRADITIONAL_CHINESE) as api:
         # Update assets
         await api.update_assets()
 
@@ -62,7 +62,6 @@ async def main() -> None:  # noqa: C901, D103
 
             print("\nArtifacts:")
             for artifact in character.artifacts:
-                print(artifact.item_id)
                 main_stat = artifact.main_stat
                 print(
                     f"Lv. {artifact.level} {artifact.name}: {main_stat.name} {main_stat.formatted_value}"
@@ -72,4 +71,5 @@ async def main() -> None:  # noqa: C901, D103
                 print("")
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

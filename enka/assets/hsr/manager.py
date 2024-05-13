@@ -2,9 +2,11 @@ from typing import TYPE_CHECKING
 
 from ..data import AssetData
 from .file_paths import (
+    AVATAR_DATA_PATH,
     CHARACTER_DATA_PATH,
     LIGHT_CONE_DATA_PATH,
     META_DATA_PATH,
+    PROPERTY_CONFIG_PATH,
     RELIC_DATA_PATH,
     SKILL_TREE_DATA_PATH,
     TEXT_MAP_PATH,
@@ -28,6 +30,8 @@ class AssetManager:
         self.light_cones_data = LightConesData()
         self.relic_data = RelicData()
         self.meta_data = MetaData()
+        self.avatar_data = AvatarData()
+        self.property_config_data = PropertyConfigData()
 
     async def load(self) -> bool:
         """Load all assets.
@@ -42,6 +46,8 @@ class AssetManager:
             and await self.light_cones_data.load()
             and await self.relic_data.load()
             and await self.meta_data.load()
+            and await self.avatar_data.load()
+            and await self.property_config_data.load()
         )
 
 
@@ -84,4 +90,16 @@ class RelicData(AssetData):
 class MetaData(AssetData):
     async def load(self) -> bool:
         self._data = await self._open_json(META_DATA_PATH)
+        return self._data is not None
+
+
+class AvatarData(AssetData):
+    async def load(self) -> bool:
+        self._data = await self._open_json(AVATAR_DATA_PATH)
+        return self._data is not None
+
+
+class PropertyConfigData(AssetData):
+    async def load(self) -> bool:
+        self._data = await self._open_json(PROPERTY_CONFIG_PATH)
         return self._data is not None

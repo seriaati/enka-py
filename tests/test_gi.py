@@ -1,6 +1,7 @@
 import pytest
 
 from enka import GenshinClient
+from enka.gi import Language
 
 
 @pytest.mark.asyncio
@@ -50,3 +51,10 @@ async def test_costume() -> None:
     async with GenshinClient() as api:
         showcase = await api.fetch_showcase("738081787")
         assert showcase.player.showcase_characters[3].costume is not None
+
+
+@pytest.mark.asyncio
+async def test_langs() -> None:
+    for lang in Language:
+        async with GenshinClient(lang) as api:
+            await api.fetch_showcase("809162009")

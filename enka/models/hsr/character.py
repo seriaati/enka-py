@@ -3,7 +3,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from ...utils import round_down
 
-from ...constants.hsr import ASCENSION_TO_MAX_LEVEL
+from ...constants.hsr import ASCENSION_TO_MAX_LEVEL, DMG_BONUS_PROPS
 from ...constants.hsr import PERCENT_STAT_TYPES
 from .icon import CharacterIcon, LightConeIcon
 from ...enums.hsr import Element, Path, StatType, RelicType
@@ -35,13 +35,16 @@ class Stat(BaseModel):
 
     # Following fields are added in post-processing
     name: str = Field(None)
+    icon: str = Field(None)
 
     @property
     def is_percentage(self) -> bool:
+        """Whether the stat is a percentage stat."""
         return self.type.value in PERCENT_STAT_TYPES
 
     @property
     def formatted_value(self) -> str:
+        """Returns the formatted value of the stat."""
         if self.is_percentage:
             return f"{round_down(self.value * 100, 1)}%"
         else:
@@ -55,14 +58,19 @@ class LightCone(BaseModel):
 
     id: int = Field(alias="tid")
     level: int
-    ascension: int = Field(alias="promotion")
-    superimpose: int = Field(alias="rank")
+    ascension: Literal[0, 1, 2, 3, 4, 5, 6] = Field(alias="promotion")
+    superimpose: Literal[1, 2, 3, 4, 5] = Field(alias="rank")
     name: str  # Returned as text map hash in the API response
     stats: list[Stat] = Field(alias="props")
 
     # Following fields are added in post-processing
     icon: LightConeIcon = Field(None)
     rarity: Literal[3, 4, 5] = Field(None)
+
+    @property
+    def max_level(self) -> Literal[20, 30, 40, 50, 60, 70, 80]:
+        """Light Cone's max level."""
+        return ASCENSION_TO_MAX_LEVEL[self.ascension]
 
     @field_validator("name", mode="before")
     def _stringify_name(cls, value: int) -> str:
@@ -138,3 +146,11 @@ class Character(BaseModel):
     def max_level(self) -> Literal[20, 30, 40, 50, 60, 70, 80]:
         """Character's max level."""
         return ASCENSION_TO_MAX_LEVEL[self.ascension]
+
+    @property
+    def highest_dmg_bonus_stat(self) -> Stat:
+        """Character's highest damage bonus stat."""
+        return max(
+            (stat for stat in self.stats if stat.type in DMG_BONUS_PROPS),
+            key=lambda stat: stat.value,
+        )

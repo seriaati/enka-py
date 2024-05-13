@@ -11,8 +11,7 @@ from ..assets.updater import AssetUpdater
 from ..constants.hsr import DEFAULT_STATS
 from ..enums.enum import Game
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
-from ..models.hsr import ShowcaseResponse, Stat
-from ..models.hsr.icon import CharacterIcon, LightConeIcon
+from ..models.hsr import CharacterIcon, LightConeIcon, Player, ShowcaseResponse, Stat
 from ..utils import update_stats
 from .base import BaseClient
 
@@ -57,18 +56,26 @@ class HSRClient(BaseClient):
         relic.icon = self._get_icon(relic_data["Icon"])
         relic.rarity = relic_data["Rarity"]
 
+        for stat in relic.stats:
+            stat.name = text_map[stat.type.value]
+            stat.icon = self._get_icon(self._assets.property_config_data[stat.type.value])
+
     def _post_process_light_cone(self, light_cone: LightCone) -> None:
         text_map = self._assets.text_map
         light_cone.name = text_map[light_cone.name]
         light_cone.rarity = self._assets.light_cones_data[str(light_cone.id)]["Rarity"]
         light_cone.icon = LightConeIcon(light_cone.id)
 
+        for stat in light_cone.stats:
+            stat.name = text_map[stat.type.value]
+            stat.icon = self._get_icon(self._assets.property_config_data[stat.type.value])
+
     def _post_process_trace(self, trace: Trace) -> None:
         skill_tree_data = self._assets.skill_tree_data
         trace_data = skill_tree_data[str(trace.id)]
 
         trace.anchor = trace_data["anchor"]
-        trace.icon = self._get_icon(trace_data["icon"].replace(".png", ""))
+        trace.icon = self._get_icon(trace_data["icon"])
         trace.type = TraceType(trace_data["pointType"])
         trace.max_level = trace_data["maxLevel"]
 
@@ -92,133 +99,71 @@ class HSRClient(BaseClient):
         character.path = Path(character_data["AvatarBaseType"])
 
         # Credits to Algoinde for the following code
-        chara_stats = self._calc_character_stats(character)
+        chara_stats = self._add_up_character_stats(character)
+        final_stats: dict[StatType, float] = {
+            StatType.MAX_HP: (
+                chara_stats["BaseHP"]
+                + chara_stats["HPBase"]
+                + chara_stats["HPAdd"] * (character.level - 1)
+            )
+            * (1 + chara_stats["HPAddedRatio"])
+            + chara_stats["HPDelta"]
+            + chara_stats["HPConvert"],
+            StatType.ATK: (
+                chara_stats["BaseAttack"]
+                + chara_stats["AttackBase"]
+                + chara_stats["AttackAdd"] * (character.level - 1)
+            )
+            * (1 + chara_stats["AttackAddedRatio"])
+            + chara_stats["AttackDelta"]
+            + chara_stats["AttackConvert"],
+            StatType.DEF: (
+                chara_stats["BaseDefence"]
+                + chara_stats["DefenceBase"]
+                + chara_stats["DefenceAdd"] * (character.level - 1)
+            )
+            * (1 + chara_stats["DefenceAddedRatio"])
+            + chara_stats["DefenceDelta"]
+            + chara_stats["DefenceConvert"],
+            StatType.SPD: (chara_stats["BaseSpeed"] + chara_stats["SpeedBase"])
+            * (1 + chara_stats["SpeedAddedRatio"])
+            + chara_stats["SpeedDelta"]
+            + chara_stats["SpeedConvert"],
+            StatType.CRIT_RATE: chara_stats["CriticalChanceBase"] + chara_stats["CriticalChance"],
+            StatType.CRIT_DMG: chara_stats["CriticalDamageBase"] + chara_stats["CriticalDamage"],
+            StatType.BREAK_EFFECT: chara_stats["BreakDamageAddedRatioBase"]
+            + chara_stats["BreakDamageAddedRatio"],
+            StatType.HEALING_BOOST: chara_stats["HealRatioBase"] + chara_stats["HealRatioConvert"],
+            StatType.ENERGY_REGEN_RATE: chara_stats["SPRatioBase"]
+            + chara_stats["SPRatio"]
+            + chara_stats["SPRatioConvert"]
+            + 1,
+            StatType.EFFECT_HIT_RATE: chara_stats["StatusProbabilityBase"]
+            + chara_stats["StatusProbability"]
+            + chara_stats["StatusProbabilityConvert"],
+            StatType.EFFECT_RES: chara_stats["StatusResistanceBase"]
+            + chara_stats["StatusResistance"]
+            + chara_stats["StatusResistanceConvert"],
+            StatType.FIRE_DMG_BOOST: chara_stats["FireAddedRatio"],
+            StatType.ICE_DMG_BOOST: chara_stats["IceAddedRatio"],
+            StatType.LIGHTNING_DMG_BOOST: chara_stats["ThunderAddedRatio"],
+            StatType.WIND_DMG_BOOST: chara_stats["WindAddedRatio"],
+            StatType.QUANTUM_DMG_BOOST: chara_stats["QuantumAddedRatio"],
+            StatType.IMAGINARY_DMG_BOOST: chara_stats["ImaginaryAddedRatio"],
+            StatType.PHYSICAL_DMG_BOOST: chara_stats["PhysicalAddedRatio"],
+        }
+
         character.stats = [
             Stat(
-                type=StatType.MAX_HP,
-                value=(
-                    chara_stats["BaseHP"]
-                    + chara_stats["HPBase"]
-                    + chara_stats["HPAdd"] * (character.level - 1)
-                )
-                * (1 + chara_stats["HPAddedRatio"])
-                + chara_stats["HPDelta"]
-                + chara_stats["HPConvert"],
-                name=self._assets.text_map[StatType.MAX_HP.value],
-            ),
-            Stat(
-                type=StatType.ATK,
-                value=(
-                    chara_stats["BaseAttack"]
-                    + chara_stats["AttackBase"]
-                    + chara_stats["AttackAdd"] * (character.level - 1)
-                )
-                * (1 + chara_stats["AttackAddedRatio"])
-                + chara_stats["AttackDelta"]
-                + chara_stats["AttackConvert"],
-                name=self._assets.text_map[StatType.ATK.value],
-            ),
-            Stat(
-                type=StatType.DEF,
-                value=(
-                    chara_stats["BaseDefence"]
-                    + chara_stats["DefenceBase"]
-                    + chara_stats["DefenceAdd"] * (character.level - 1)
-                )
-                * (1 + chara_stats["DefenceAddedRatio"])
-                + chara_stats["DefenceDelta"]
-                + chara_stats["DefenceConvert"],
-                name=self._assets.text_map[StatType.DEF.value],
-            ),
-            Stat(
-                type=StatType.SPD,
-                value=(chara_stats["BaseSpeed"] + chara_stats["SpeedBase"])
-                * (1 + chara_stats["SpeedAddedRatio"])
-                + chara_stats["SpeedDelta"]
-                + chara_stats["SpeedConvert"],
-                name=self._assets.text_map[StatType.SPD.value],
-            ),
-            Stat(
-                type=StatType.CRIT_RATE,
-                value=chara_stats["CriticalChanceBase"] + chara_stats["CriticalChance"],
-                name=self._assets.text_map[StatType.CRIT_RATE.value],
-            ),
-            Stat(
-                type=StatType.CRIT_DMG,
-                value=chara_stats["CriticalDamageBase"] + chara_stats["CriticalDamage"],
-                name=self._assets.text_map[StatType.CRIT_DMG.value],
-            ),
-            Stat(
-                type=StatType.BREAK_EFFECT,
-                value=chara_stats["BreakDamageAddedRatioBase"]
-                + chara_stats["BreakDamageAddedRatio"],
-                name=self._assets.text_map[StatType.BREAK_EFFECT.value],
-            ),
-            Stat(
-                type=StatType.HEALING_BOOST,
-                value=chara_stats["HealRatioBase"] + chara_stats["HealRatioConvert"],
-                name=self._assets.text_map[StatType.HEALING_BOOST.value],
-            ),
-            Stat(
-                type=StatType.ENERGY_REGEN_RATE,
-                value=chara_stats["SPRatioBase"]
-                + chara_stats["SPRatio"]
-                + chara_stats["SPRatioConvert"]
-                + 1,
-                name=self._assets.text_map[StatType.ENERGY_REGEN_RATE.value],
-            ),
-            Stat(
-                type=StatType.EFFECT_HIT_RATE,
-                value=chara_stats["StatusProbabilityBase"]
-                + chara_stats["StatusProbability"]
-                + chara_stats["StatusProbabilityConvert"],
-                name=self._assets.text_map[StatType.EFFECT_HIT_RATE.value],
-            ),
-            Stat(
-                type=StatType.EFFECT_RES,
-                value=chara_stats["StatusResistanceBase"]
-                + chara_stats["StatusResistance"]
-                + chara_stats["StatusResistanceConvert"],
-                name=self._assets.text_map[StatType.EFFECT_HIT_RATE.value],
-            ),
-            Stat(
-                type=StatType.PHYSICAL_DMG_BOOST,
-                value=chara_stats["PhysicalAddedRatio"],
-                name=self._assets.text_map[StatType.PHYSICAL_DMG_BOOST.value],
-            ),
-            Stat(
-                type=StatType.FIRE_DMG_BOOST,
-                value=chara_stats["FireAddedRatio"],
-                name=self._assets.text_map[StatType.FIRE_DMG_BOOST.value],
-            ),
-            Stat(
-                type=StatType.ICE_DMG_BOOST,
-                value=chara_stats["IceAddedRatio"],
-                name=self._assets.text_map[StatType.ICE_DMG_BOOST.value],
-            ),
-            Stat(
-                type=StatType.LIGHTNING_DMG_BOOST,
-                value=chara_stats["ThunderAddedRatio"],
-                name=self._assets.text_map[StatType.LIGHTNING_DMG_BOOST.value],
-            ),
-            Stat(
-                type=StatType.WIND_DMG_BOOST,
-                value=chara_stats["WindAddedRatio"],
-                name=self._assets.text_map[StatType.WIND_DMG_BOOST.value],
-            ),
-            Stat(
-                type=StatType.QUANTUM_DMG_BOOST,
-                value=chara_stats["QuantumAddedRatio"],
-                name=self._assets.text_map[StatType.QUANTUM_DMG_BOOST.value],
-            ),
-            Stat(
-                type=StatType.IMAGINARY_DMG_BOOST,
-                value=chara_stats["ImaginaryAddedRatio"],
-                name=self._assets.text_map[StatType.IMAGINARY_DMG_BOOST.value],
-            ),
+                type=stat_type,
+                value=value,
+                name=self._assets.text_map[stat_type.value],
+                icon=self._get_icon(self._assets.property_config_data[stat_type.value]),
+            )
+            for stat_type, value in final_stats.items()
         ]
 
-    def _calc_character_stats(self, character: Character) -> dict[str, float]:  # noqa: C901
+    def _add_up_character_stats(self, character: Character) -> dict[str, float]:  # noqa: C901
         chara_stats = DEFAULT_STATS.copy()
 
         # Add base stats
@@ -272,11 +217,18 @@ class HSRClient(BaseClient):
 
         return chara_stats
 
+    def _post_process_player(self, player: Player) -> None:
+        self._check_assets()
+
+        player.icon = self._get_icon(self._assets.avatar_data[player.icon]["Icon"])
+
     def _post_process_showcase(self, showcase: ShowcaseResponse) -> None:
         for character in showcase.characters:
             self._post_process_character(character)
+        self._post_process_player(showcase.player)
 
     def _get_icon(self, icon: str) -> str:
+        icon = icon.replace(".png", "")
         return f"https://enka.network/ui/hsr/{icon}.png"
 
     async def start(self) -> None:

@@ -2,24 +2,17 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import TYPE_CHECKING, Any, Final
+from typing import TYPE_CHECKING, Any
 
 import aiofiles
 import orjson
 
 from ..errors import AssetUpdateError
-from .hsr.file_paths import CHARACTER_DATA_PATH, SKILL_TREE_DATA_PATH, TEXT_MAP_PATH
 
 if TYPE_CHECKING:
     import aiohttp
 
 __all__ = ("AssetUpdater",)
-
-SOURCE_TO_PATH: Final[dict[str, str]] = {
-    "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/hsr/hsr.json": TEXT_MAP_PATH,
-    "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/hsr/honker_characters.json": CHARACTER_DATA_PATH,
-    "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/hsr/skill_tree.json": SKILL_TREE_DATA_PATH,
-}
 
 LOGGER_ = logging.getLogger(__name__)
 

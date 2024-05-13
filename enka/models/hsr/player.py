@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 __all__ = ("Player", "PlayerStats")
 
@@ -49,3 +49,10 @@ class Player(BaseModel):
     friend_count: int = Field(0, alias="friendCount")
     stats: PlayerStats = Field(alias="recordInfo")
     chara_data_is_public: bool = Field(alias="isDisplayAvatar")
+
+    # The following fields are added in post-processing
+    icon: str = Field(None, alias="headIcon")
+
+    @field_validator("icon", mode="before")
+    def _stringify_icon(cls, value: int) -> str:
+        return str(value)

@@ -34,20 +34,13 @@ class AssetManager:
         Returns:
             bool: Whether all assets were loaded successfully.
         """
-        text_map_loaded = await self.text_map.load()
-        character_data_loaded = await self.character_data.load()
-        namecard_data_loaded = await self.namecard_data.load()
-        consts_data_loaded = await self.consts_data.load()
-        talents_data_loaded = await self.talents_data.load()
-        pfp_data_loaded = await self.pfps_data.load()
-
         return (
-            text_map_loaded
-            and character_data_loaded
-            and namecard_data_loaded
-            and consts_data_loaded
-            and talents_data_loaded
-            and pfp_data_loaded
+            await self.text_map.load()
+            and await self.character_data.load()
+            and await self.namecard_data.load()
+            and await self.consts_data.load()
+            and await self.talents_data.load()
+            and await self.pfps_data.load()
         )
 
 
