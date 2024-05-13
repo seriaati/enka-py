@@ -1,5 +1,5 @@
 import sys
-from enum import IntEnum, StrEnum
+from enum import IntEnum
 
 if sys.version_info < (3, 11):
     from enum import Enum as StrEnum
