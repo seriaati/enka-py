@@ -1,4 +1,5 @@
 [project]
+name = "enka-py"
 requires-python = ">=3.10"
 
 [tool.poetry]
@@ -85,9 +86,12 @@ select = [
 
 [tool.ruff.lint.per-file-ignores]
 "**/__init__.py" = ["F403", "F401"]
+"enka/gi.py" = ["F403", "F401"]
+"enka/hsr.py" = ["F403", "F401"]
 "enka/models/*.py" = ["ALL"]
 "example.py" = ["T201", "ERA001"]
 "test.py" = ["D", "T201"]
+"tests/*.py" = ["D"]
 
 [tool.ruff.lint.flake8-type-checking]
 quote-annotations = true

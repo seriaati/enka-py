@@ -12,16 +12,11 @@ class ShowcaseResponse(BaseModel):
     """
     Represents a Genshin Impact showcase response.
 
-    Attributes
-    ----------
-    characters: List[:class:`Character`]
-        The characters in the showcase.
-    player: :class:`Player`
-        The player of the showcase.
-    ttl: :class:`int`
-        The time to live of the response.
-    uid: :class:`str`
-        The UID of the showcase.
+    Attributes:
+        characters (List[Character]): The characters in the showcase.
+        player (Player): The player of the showcase.
+        ttl (int): The time to live of the response.
+        uid (str): The UID of the showcase.
     """
 
     characters: List[Character] = Field(alias="avatarInfoList")

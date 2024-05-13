@@ -6,6 +6,7 @@ if sys.version_info < (3, 11):
     from enum import Enum as StrEnum
 
 __all__ = (
+    "Element",
     "EquipmentType",
     "FightPropType",
     "ItemType",
@@ -15,7 +16,7 @@ __all__ = (
 
 
 class Language(StrEnum):
-    """Language codes."""
+    """Genshin Impact API language codes."""
 
     ENGLISH = "en"
     RUSSIAN = "ru"
@@ -200,6 +201,8 @@ class FightPropType(IntEnum):
 
 
 class Element(StrEnum):
+    """Genshin Impact elements."""
+
     ANEMO = "Wind"
     GEO = "Rock"
     ELECTRO = "Electric"

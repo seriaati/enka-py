@@ -4,78 +4,51 @@ import copy
 import logging
 from typing import TYPE_CHECKING, Any, Final
 
-from aiohttp_client_cache.backends.sqlite import SQLiteBackend
-from aiohttp_client_cache.session import CachedSession
-
-from .assets.gi.manager import AssetManager
-from .assets.gi.updater import AssetUpdater
-from .constants import CHARACTER_RARITY_MAP
-from .enums.gi import Element, Language
-from .exceptions import raise_for_retcode
-from .models.gi.character import Constellation, Costume, Icon, Namecard
-from .models.gi.response import ShowcaseResponse
+from ..assets.gi.file_paths import SOURCE_TO_PATH
+from ..assets.gi.manager import AssetManager
+from ..assets.updater import AssetUpdater
+from ..constants.gi import CHARACTER_RARITY_MAP
+from ..enums.enum import Game
+from ..enums.gi import Element, Language
+from ..models.gi import Constellation, Costume, Icon, Namecard, ShowcaseResponse
+from .base import BaseClient
 
 if TYPE_CHECKING:
-    from .models.gi.character import Character
-    from .models.gi.player import Player, ShowcaseCharacter
+    from ..models.gi.character import Character
+    from ..models.gi.player import Player, ShowcaseCharacter
 
-__all__ = ("EnkaAPI",)
+__all__ = ("GenshinClient",)
 
-LOGGER_ = logging.getLogger("enka.client")
+LOGGER_ = logging.getLogger(__name__)
+API_URL: Final[str] = "https://enka.network/api/uid/{uid}"
 
 
-class EnkaAPI:
-    """The main client for interacting with the Enka Network API.
+class GenshinClient(BaseClient):
+    """The main client to interact with the Enka Network Genshin Impact API.
 
     Args:
         lang (Language): The language to use for the client, defaults to Language.ENGLISH.
         headers (dict[str, Any] | None): The headers to use for the client, defaults to None.
-        cache_maxsize (int): The maximum size of the cache, defaults to 100.
         cache_ttl (int): The time to live of the cache, defaults to 60.
     """
 
     def __init__(
         self,
         lang: Language = Language.ENGLISH,
+        *,
         headers: dict[str, Any] | None = None,
         cache_ttl: int = 60,
     ) -> None:
+        super().__init__(Game.GI, headers=headers, cache_ttl=cache_ttl)
         self._lang = lang
-        self._headers = headers or {"User-Agent": "enka-py"}
 
-        self._session: CachedSession | None = None
-        self._cache = SQLiteBackend(cache_name=".enka_py/cache", expire_after=cache_ttl)
-        self._assets: AssetManager | None = None
-        self._asset_updater: AssetUpdater | None = None
-
-        self.GENSHIN_API_URL: Final[str] = "https://enka.network/api/uid/{uid}"
-        self.HSR_API_URL: Final[str] = "https://enka.network/api/hsr/uid/{uid}"
-
-    async def __aenter__(self) -> EnkaAPI:
-        await self.start()
-        return self
-
-    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
-        await self.close()
-
-    async def _request(self, url: str) -> dict[str, Any]:
-        if self._session is None:
-            msg = "Client is not started, call `EnkaNetworkAPI.start` first"
+    def _check_assets(self) -> None:
+        if self._assets is None:
+            msg = f"Client is not started, call `{self.__class__.__name__}.start` first"
             raise RuntimeError(msg)
-
-        LOGGER_.debug("Requesting %s", url)
-
-        async with self._session.get(url) as resp:
-            if resp.status != 200:
-                raise_for_retcode(resp.status)
-
-            data: dict[str, Any] = await resp.json()
-            return data
 
     def _post_process_player(self, player: Player) -> Player:
-        if self._assets is None:
-            msg = "Client is not started, call `EnkaNetworkAPI.start` first"
-            raise RuntimeError(msg)
+        self._check_assets()
 
         # namecard
         namecard_icon = self._assets.namecard_data[str(player.namecard_id)]["icon"]
@@ -101,9 +74,7 @@ class EnkaAPI:
     def _post_process_showcase_character(
         self, showcase_character: ShowcaseCharacter
     ) -> ShowcaseCharacter:
-        if self._assets is None:
-            msg = "Client is not started, call `EnkaNetworkAPI.start` first"
-            raise RuntimeError(msg)
+        self._check_assets()
 
         if showcase_character.costume_id is None:
             return showcase_character
@@ -118,9 +89,7 @@ class EnkaAPI:
         return showcase_character
 
     def _post_process_character(self, character: Character) -> Character:  # noqa: C901, PLR0914, PLR0912
-        if self._assets is None:
-            msg = "Client is not started, call `EnkaNetworkAPI.start` first"
-            raise RuntimeError(msg)
+        self._check_assets()
 
         characer_id = (
             f"{character.id}-{character.skill_depot_id}"
@@ -229,22 +198,15 @@ class EnkaAPI:
 
     async def start(self) -> None:
         """Start the client."""
-        self._session = CachedSession(headers=self._headers, cache=self._cache)
+        await super().start()
+        assert self._session is not None
 
         self._assets = AssetManager(self._lang)
-        self._asset_updater = AssetUpdater(self._session)
+        self._asset_updater = AssetUpdater(self._session, SOURCE_TO_PATH)
 
         loaded = await self._assets.load()
         if not loaded:
             await self.update_assets()
-
-    async def close(self) -> None:
-        """Close the client."""
-        if self._session is None:
-            msg = "Client is not started, call `EnkaNetworkAPI.start` first"
-            raise RuntimeError(msg)
-
-        await self._session.close()
 
     async def update_assets(self) -> None:
         """Update game assets."""
@@ -269,7 +231,7 @@ class EnkaAPI:
         Returns:
             ShowcaseResponse: The response of the showcase.
         """
-        url = self.GENSHIN_API_URL.format(uid=uid)
+        url = API_URL.format(uid=uid)
         if info_only:
             url += "?info"
 

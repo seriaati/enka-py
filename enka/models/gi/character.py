@@ -1,12 +1,12 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from .costume import Costume
 from .icon import Icon, Namecard
-from ...exceptions import InvalidItemTypeError
+from ...errors import InvalidItemTypeError
 from ...enums.gi import Element, EquipmentType, ItemType, StatType, FightPropType
-from ...constants import ASCENSION_TO_MAX_LEVEL, DMG_BONUS_FIGHT_PROPS, PERCENT_STAT_TYPES
+from ...constants.gi import ASCENSION_TO_MAX_LEVEL, DMG_BONUS_FIGHT_PROPS, PERCENT_STAT_TYPES
 
 __all__ = (
     "Stat",
@@ -23,14 +23,10 @@ class Stat(BaseModel):
     """
     Represents a stat.
 
-    Attributes
-    ----------
-    type: :class:`StatType`
-        The stat's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.)
-    value: :class:`float`
-        The stat's value.
-    name: :class:`str`
-        The stat's name.
+    Attributes:
+        type (StatType): The stat's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.).
+        value (float): The stat's value.
+        name (str): The stat's name.
     """
 
     type: StatType
@@ -52,14 +48,10 @@ class FightProp(BaseModel):
     """
     Represents a fight prop.
 
-    Attributes
-    ----------
-    type: :class:`FightPropType`
-        The fight prop's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.)
-    value: :class:`float`
-        The fight prop's value.
-    name: :class:`str`
-        The fight prop's name.
+    Attributes:
+        type (FightPropType): The fight prop's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.).
+        value (float): The fight prop's value.
+        name (str): The fight prop's name.
     """
 
     type: FightPropType
@@ -81,35 +73,22 @@ class Artifact(BaseModel):
     """
     Represents an artifact.
 
-    Attributes
-    ----------
-    item_id: :class:`int`
-        The artifact's ID.
-    main_stat_id: :class:`int`
-        The main stat's ID.
-    sub_stat_ids: List[:class:`int`]
-        The sub stats' IDs.
-    level: :class:`int`
-        The artifact's level.
-    equip_type: :class:`EquipmentType`
-        The artifact's type (e.g. FLOWER, GOBLET, etc.)
-    icon: :class:`str`
-        The artifact's icon.
-    item_type: :class:`ItemType`
-        The artifact's type.
-    name: :class:`str`
-        The artifact's name.
-    rarity: :class:`int`
-        The artifact's rarity.
-    main_stat: :class:`MainStat`
-        The artifact's main stat.
-    sub_stats: List[:class:`SubStat`]
-        The artifact's sub stats.
-    set_name: :class:`str`
-        The artifact's set name.
+    Attributes:
+        item_id (int): The artifact's ID.
+        main_stat_id (int): The main stat's ID.
+        sub_stat_ids (List[int]): The sub stats' IDs.
+        level (int): The artifact's level.
+        equip_type (EquipmentType): The artifact's type (e.g. FLOWER, GOBLET, etc.).
+        icon (str): The artifact's icon.
+        item_type (ItemType): The artifact's type.
+        name (str): The artifact's name.
+        rarity (int): The artifact's rarity.
+        main_stat (MainStat): The artifact's main stat.
+        sub_stats (List[SubStat]): The artifact's sub stats.
+        set_name (str): The artifact's set name.
     """
 
-    item_id: int = Field(alias="itemId")
+    id: int = Field(alias="itemId")
     main_stat_id: int = Field(alias="mainPropId")
     sub_stat_ids: List[int] = Field(alias="appendPropIdList", default_factory=list)
     level: int
@@ -121,6 +100,10 @@ class Artifact(BaseModel):
     main_stat: Stat = Field(alias="reliquaryMainstat")
     sub_stats: List[Stat] = Field(alias="reliquarySubstats", default_factory=list)
     set_name: str = Field(alias="setNameTextMapHash")
+
+    @property
+    def item_id(self) -> None:
+        raise DeprecationWarning("`Artifact.item_id` is deprecated, use `Artifact.id` instead.")
 
     @field_validator("level", mode="before")
     def _convert_level(cls, v: int) -> int:
@@ -146,32 +129,21 @@ class Weapon(BaseModel):
     """
     Represents a weapon.
 
-    Attributes
-    ----------
-    item_id: :class:`int`
-        The weapon's ID.
-    refinement: :class:`int`
-        The weapon's refinement level (1~5).
-    level: :class:`int`
-        The weapon's level.
-    ascension: :class:`int`
-        The weapon's ascension level.
-    icon: :class:`str`
-        The weapon's icon.
-    name: :class:`str`
-        The weapon's name.
-    rarity: :class:`int`
-        The weapon's rarity.
-    stats: List[:class:`WeaponStat`]
-        The weapon's stats.
-    max_level: :class:`int`
-        The weapon's max level.
+    Args:
+        item_id (int): The weapon's ID.
+        refinement (int): The weapon's refinement level (1~5).
+        level (int): The weapon's level.
+        ascension (int): The weapon's ascension level.
+        icon (str): The weapon's icon.
+        name (str): The weapon's name.
+        rarity (int): The weapon's rarity.
+        stats (List[WeaponStat]): The weapon's stats.
     """
 
     item_id: int = Field(alias="itemId")
-    refinement: int = Field(1, alias="affixMap")
+    refinement: Literal[1, 2, 3, 4, 5] = Field(1, alias="affixMap")
     level: int
-    ascension: int = Field(0, alias="promoteLevel")
+    ascension: Literal[0, 1, 2, 3, 4, 5, 6] = Field(0, alias="promoteLevel")
     icon: str
     item_type: ItemType = Field(alias="itemType")
     name: str = Field(alias="nameTextMapHash")
@@ -202,16 +174,11 @@ class Constellation(BaseModel):
     """
     Represents a character's constellation.
 
-    Attributes
-    ----------
-    id: :class:`int`
-        The constellation's ID.
-    name: :class:`str`
-        The constellation's name.
-    icon: :class:`str`
-        The constellation's icon.
-    unlocked: :class:`bool`
-        Whether the constellation is unlocked.
+    Attributes:
+        id (int): The constellation's ID.
+        name (str): The constellation's name.
+        icon (str): The constellation's icon.
+        unlocked (bool): Whether the constellation is unlocked.
     """
 
     id: int
@@ -224,16 +191,11 @@ class Talent(BaseModel):
     """
     Represents a character's talent.
 
-    Attributes
-    ----------
-    id: :class:`int`
-        The talent's ID.
-    level: :class:`int`
-        The talent's level.
-    name: :class:`str`
-        The talent's name.
-    icon: :class:`str`
-        The talent's icon.
+    Attributes:
+        id (int): The talent's ID.
+        level (int): The talent's level.
+        name (str): The talent's name.
+        icon (str): The talent's icon.
     """
 
     id: int
@@ -243,58 +205,34 @@ class Talent(BaseModel):
 
 
 class Character(BaseModel):
-    """
-    Represents a character.
+    """Represents a character.
 
-    Attributes
-    ----------
-    id: :class:`int`
-        The character's ID.
-    artifacts: List[:class:`Artifact`]
-        The character's artifacts.
-    weapon: :class:`Weapon`
-        The character's weapon.
-    stats: Dict[:class:`CharacterStat`]
-        The character's stats.
-    constellations: List[:class:`Constellation`]
-        The character's unlocked constellations.
-    talents: List[:class:`Talent`]
-        The character's talents.
-    ascension: :class:`int`
-        The character's ascension level.
-    level: :class:`int`
-        The character's level.
-    skill_depot_id: :class:`int`
-        The character's skill depot ID.
-    name: :class:`str`
-        The character's name.
-    talent_extra_level_map: Optional[Dict[:class:`str`, :class:`int`]]
-        The map of character's extra talent levels, this is only used internally, the wrapper will handle this.
-    icon: :class:`Icon`
-        The character's icon.
-    friendship_level: :class:`int`
-        The character's friendship level (1~10).
-    element: :class:`Element`
-        The character's element.
-    talent_order: List[:class:`int`]
-        The character's talent order.
-        1. Normal attack
-        2. Elemental skill
-        3. Elemental burst
-    rarity: :class:`int`
-        The character's rarity (4~5).
-    max_level: :class:`int`
-        The character's max level.
-    highest_dmg_bonus_stat: :class:`FightProp`
-        The character's highest damage bonus stat.
-    namecard: Optional[:class:`Namecard`]
-        The character's namecard. Travelers don't have namecards.
-    costume: Optional[:class:`Costume`]
-        The character's costume, if any.
-    costume_id: Optional[:class:`int`]
-        The character's costume's ID, if any.
-    constellations_unlocked: :class:`int`
-        The number of constellations unlocked.
+    Attributes:
+        id (int): The character's ID.
+        artifacts (List[Artifact]): The character's artifacts.
+        weapon (Weapon): The character's weapon.
+        stats (Dict[FightPropType, FightProp]): The character's stats.
+        constellations (List[Constellation]): The character's unlocked constellations.
+        talents (List[Talent]): The character's talents.
+        ascension (Literal[0, 1, 2, 3, 4, 5, 6]): The character's ascension level.
+        level (int): The character's level.
+        skill_depot_id (int): The character's skill depot ID.
+        name (str): The character's name.
+        talent_extra_level_map (Optional[Dict[str, int]]): The map of character's extra talent levels, this is only used internally, the wrapper will handle this.
+        icon (Icon): The character's icon.
+        friendship_level (int): The character's friendship level (1~10).
+        element (Element): The character's element.
+        talent_order (List[int]): The character's talent order.
+            1. Normal attack
+            2. Elemental skill
+            3. Elemental burst
+        rarity (int): The character's rarity (4~5).
+        max_level (int): The character's max level.
+        highest_dmg_bonus_stat (FightProp): The character's highest damage bonus stat.
+        namecard (Optional[Namecard]): The character's namecard. Travelers don't have namecards.
+        costume (Optional[Costume]): The character's costume, if any.
+        costume_id (Optional[int]): The character's costume's ID, if any.
+        constellations_unlocked (int): The number of constellations unlocked.
     """
 
     id: int = Field(alias="avatarId")
@@ -303,13 +241,14 @@ class Character(BaseModel):
     stats: Dict[FightPropType, FightProp] = Field(alias="fightPropMap")
     constellations: List[Constellation] = Field([], alias="talentIdList")
     talents: List[Talent] = Field(alias="skillLevelMap")
-    ascension: int
+    ascension: Literal[0, 1, 2, 3, 4, 5, 6]
     level: int
     skill_depot_id: int = Field(alias="skillDepotId")
-    name: str = Field(None)
-    icon: Icon = Field(None)
     talent_extra_level_map: Optional[Dict[str, int]] = Field(None, alias="proudSkillExtraLevelMap")
     friendship_level: int = Field(alias="friendshipLevel")
+
+    name: str = Field(None)
+    icon: Icon = Field(None)
     element: Element = Field(None)
     talent_order: list[int] = Field(None)
     rarity: int = Field(None)
@@ -320,7 +259,7 @@ class Character(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
     @property
-    def max_level(self) -> int:
+    def max_level(self) -> Literal[20, 40, 50, 60, 70, 80, 90]:
         """The character's max level."""
         return ASCENSION_TO_MAX_LEVEL[self.ascension]
 
@@ -328,7 +267,7 @@ class Character(BaseModel):
     def highest_dmg_bonus_stat(self) -> FightProp:
         """The character's highest damage bonus stat."""
         return max(
-            (stat for stat in self.stats.values() if stat.type in DMG_BONUS_FIGHT_PROPS),
+            (stat for stat in self.stats.values() if stat.type.name in DMG_BONUS_FIGHT_PROPS),
             key=lambda stat: stat.value,
         )
 
@@ -336,6 +275,10 @@ class Character(BaseModel):
     def constellations_unlocked(self) -> int:
         """The number of constellations unlocked."""
         return len([c for c in self.constellations if c.unlocked])
+
+    @field_validator("ascension", mode="before")
+    def _intify_ascension(cls, v: str) -> int:
+        return int(v)
 
     @field_validator("stats", mode="before")
     def _convert_stats(cls, v: Dict[str, float]) -> Dict[FightPropType, FightProp]:

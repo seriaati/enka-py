@@ -42,10 +42,10 @@ class Player(BaseModel):
     """
 
     nickname: str
-    signature: str
+    signature: str = ""
     uid: int
     level: int
     equilibrium_level: int = Field(alias="worldLevel")
-    friend_count: int = Field(alias="friendCount")
+    friend_count: int = Field(0, alias="friendCount")
     stats: PlayerStats = Field(alias="recordInfo")
     chara_data_is_public: bool = Field(alias="isDisplayAvatar")

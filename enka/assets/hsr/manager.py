@@ -3,30 +3,31 @@ from typing import TYPE_CHECKING
 from ..data import AssetData
 from .file_paths import (
     CHARACTER_DATA_PATH,
-    CONSTS_DATA_PATH,
-    NAMECARD_DATA_PATH,
-    PFPS_DATA_PATH,
-    TALENTS_DATA_PATH,
+    LIGHT_CONE_DATA_PATH,
+    META_DATA_PATH,
+    RELIC_DATA_PATH,
+    SKILL_TREE_DATA_PATH,
     TEXT_MAP_PATH,
 )
 
 if TYPE_CHECKING:
-    from ...enums.gi import Language
+    from ...enums.hsr import Language
 
 __all__ = ("AssetManager",)
 
 
 class AssetManager:
-    """Genshin Impact asset manager."""
+    """Honkai Star Rail asset manager."""
 
     def __init__(self, lang: "Language") -> None:
         self._lang = lang
+
         self.text_map = TextMap(lang)
         self.character_data = CharacterData()
-        self.namecard_data = NamecardData()
-        self.consts_data = ConstsData()
-        self.talents_data = TalentsData()
-        self.pfps_data = PfpsData()
+        self.skill_tree_data = SkillTreeData()
+        self.light_cones_data = LightConesData()
+        self.relic_data = RelicData()
+        self.meta_data = MetaData()
 
     async def load(self) -> bool:
         """Load all assets.
@@ -34,20 +35,13 @@ class AssetManager:
         Returns:
             bool: Whether all assets were loaded successfully.
         """
-        text_map_loaded = await self.text_map.load()
-        character_data_loaded = await self.character_data.load()
-        namecard_data_loaded = await self.namecard_data.load()
-        consts_data_loaded = await self.consts_data.load()
-        talents_data_loaded = await self.talents_data.load()
-        pfp_data_loaded = await self.pfps_data.load()
-
         return (
-            text_map_loaded
-            and character_data_loaded
-            and namecard_data_loaded
-            and consts_data_loaded
-            and talents_data_loaded
-            and pfp_data_loaded
+            await self.text_map.load()
+            and await self.character_data.load()
+            and await self.skill_tree_data.load()
+            and await self.light_cones_data.load()
+            and await self.relic_data.load()
+            and await self.meta_data.load()
         )
 
 
@@ -69,25 +63,25 @@ class CharacterData(AssetData):
         return self._data is not None
 
 
-class NamecardData(AssetData):
+class SkillTreeData(AssetData):
     async def load(self) -> bool:
-        self._data = await self._open_json(NAMECARD_DATA_PATH)
+        self._data = await self._open_json(SKILL_TREE_DATA_PATH)
         return self._data is not None
 
 
-class ConstsData(AssetData):
+class LightConesData(AssetData):
     async def load(self) -> bool:
-        self._data = await self._open_json(CONSTS_DATA_PATH)
+        self._data = await self._open_json(LIGHT_CONE_DATA_PATH)
         return self._data is not None
 
 
-class TalentsData(AssetData):
+class RelicData(AssetData):
     async def load(self) -> bool:
-        self._data = await self._open_json(TALENTS_DATA_PATH)
+        self._data = await self._open_json(RELIC_DATA_PATH)
         return self._data is not None
 
 
-class PfpsData(AssetData):
+class MetaData(AssetData):
     async def load(self) -> bool:
-        self._data = await self._open_json(PFPS_DATA_PATH)
+        self._data = await self._open_json(META_DATA_PATH)
         return self._data is not None

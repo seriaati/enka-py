@@ -4,6 +4,33 @@ from enum import IntEnum, StrEnum
 if sys.version_info < (3, 11):
     from enum import Enum as StrEnum
 
+__all__ = (
+    "Element",
+    "Language",
+    "Path",
+    "RelicType",
+    "StatType",
+    "TraceType",
+)
+
+
+class Language(StrEnum):
+    """Languages supported by the HSR Enka Network API."""
+
+    ENGLISH = "en"
+    RUSSIAN = "ru"
+    VIETNAMESE = "vi"
+    THAI = "th"
+    PORTUGUESE = "pt"
+    KOREAN = "ko"
+    JAPANESE = "ja"
+    INDOENSIAN = "id"
+    FRECH = "fr"
+    ESPANOL = "es"
+    GERMAN = "de"
+    TRADITIONAL_CHINESE = "zh-tw"
+    SIMPLIFIED_CHINESE = "zh-cn"
+
 
 class RelicType(IntEnum):
     """HSR relic types."""
@@ -16,7 +43,7 @@ class RelicType(IntEnum):
     ORBIT = 6  # OBJECT
 
 
-class PropType(StrEnum):
+class StatType(StrEnum):
     """HSR property types."""
 
     MAX_HP = "MaxHP"
@@ -102,3 +129,14 @@ class Path(StrEnum):
     DESTRUCTION = "Warrior"
     HARMONY = "Shaman"
     ABUNDANCE = "Priest"
+
+
+class TraceType(IntEnum):
+    """HSR trace types."""
+
+    SKILL = 2
+    """Basic ATK, Skill, Ultimate, Talent, Technique"""
+    TALENT = 3
+    """Special talents (there are 3 of these)"""
+    STAT = 1
+    """Stat boost traces"""
