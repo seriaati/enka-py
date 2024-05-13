@@ -105,11 +105,6 @@ class Artifact(BaseModel):
     sub_stats: List[Stat] = Field(alias="reliquarySubstats", default_factory=list)
     set_name: str = Field(alias="setNameTextMapHash")
 
-    @computed_field
-    @property
-    def item_id(self) -> None:
-        raise DeprecationWarning("`Artifact.item_id` is deprecated, use `Artifact.id` instead.")
-
     @field_validator("level", mode="before")
     def _convert_level(cls, v: int) -> int:
         return v - 1
