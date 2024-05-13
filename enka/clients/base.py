@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any, Self
+from typing import TYPE_CHECKING, Any
 
 from aiohttp_client_cache.backends.sqlite import SQLiteBackend
 from aiohttp_client_cache.session import CachedSession
@@ -32,7 +32,7 @@ class BaseClient:
             cache_name=f".enka_py/cache/{game.value}", expire_after=cache_ttl
         )
 
-    async def __aenter__(self) -> Self:
+    async def __aenter__(self) -> BaseClient:
         await self.start()
         return self
 

@@ -42,6 +42,10 @@ class GenshinClient(BaseClient):
         super().__init__(Game.GI, headers=headers, cache_ttl=cache_ttl)
         self._lang = lang
 
+    async def __aenter__(self) -> GenshinClient:
+        await self.start()
+        return self
+
     def _check_assets(self) -> None:
         if self._assets is None:
             msg = f"Client is not started, call `{self.__class__.__name__}.start` first"
