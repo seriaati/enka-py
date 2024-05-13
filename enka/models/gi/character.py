@@ -74,7 +74,7 @@ class Artifact(BaseModel):
     Represents an artifact.
 
     Attributes:
-        item_id (int): The artifact's ID.
+        id (int): The artifact's ID.
         main_stat_id (int): The main stat's ID.
         sub_stat_ids (List[int]): The sub stats' IDs.
         level (int): The artifact's level.
