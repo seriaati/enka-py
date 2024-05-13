@@ -18,11 +18,12 @@ enka.py is an async API wrapper for [enka.network](https://enka.network/) writte
 ### Features
 
 - Fully typed.
-- Has direct icon URLs.
 - Fully asynchronous by using `aiofiles`, `aiohttp`, and `asyncio`, suitable for Discord bots.
+- Provides direct icon URLs.
+- Supports all game languages.
 - Supports both Genshin Impact and Honkai Star Rail.
 - Supports persistent caching using SQLite.
-- Supports [Pydantic V2](https://github.com/pydantic/pydantic).
+- Supports [Pydantic V2](https://github.com/pydantic/pydantic), this also means full autocomplete support.
 - Seamlessly integrates with [GenshinData](https://gitlab.com/Dimbreath/AnimeGameData) and [StarRailData](https://github.com/Dimbreath/StarRailData).
 
 ## Installation
