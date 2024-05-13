@@ -28,19 +28,28 @@ class HSRClient(BaseClient):
     """The main client to interact with the Enka Network Honkai Star Rail API.
 
     Args:
-        lang (Language): The language to use for the client, defaults to Language.ENGLISH.
+        lang (Language | str): The language to use for the client, defaults to Language.ENGLISH.
         headers (dict[str, Any] | None): The headers to use for the client, defaults to None.
         cache_ttl (int): The time to live of the cache, defaults to 60.
     """
 
     def __init__(
         self,
-        lang: Language = Language.ENGLISH,
+        lang: Language | str = Language.ENGLISH,
         *,
         headers: dict[str, Any] | None = None,
         cache_ttl: int = 60,
     ) -> None:
         super().__init__(Game.GI, headers=headers, cache_ttl=cache_ttl)
+
+        if isinstance(lang, str):
+            try:
+                lang = Language(lang)
+            except ValueError as e:
+                available_langs = ", ".join(lang.value for lang in Language)
+                msg = f"Invalid language: {lang}, must be one of {available_langs}"
+                raise ValueError(msg) from e
+
         self._lang = lang
 
     async def __aenter__(self) -> HSRClient:
