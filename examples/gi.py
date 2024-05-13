@@ -1,29 +1,28 @@
 import asyncio
 
 import enka
-from enka.enums import FightPropType
 
 FIGHT_PROPS_TO_SHOW = (
-    FightPropType.FIGHT_PROP_MAX_HP,
-    FightPropType.FIGHT_PROP_CUR_ATTACK,
-    FightPropType.FIGHT_PROP_CUR_DEFENSE,
-    FightPropType.FIGHT_PROP_ELEMENT_MASTERY,
-    FightPropType.FIGHT_PROP_CRITICAL,
-    FightPropType.FIGHT_PROP_CRITICAL_HURT,
-    FightPropType.FIGHT_PROP_CHARGE_EFFICIENCY,
+    enka.gi.FightPropType.FIGHT_PROP_MAX_HP,
+    enka.gi.FightPropType.FIGHT_PROP_CUR_ATTACK,
+    enka.gi.FightPropType.FIGHT_PROP_CUR_DEFENSE,
+    enka.gi.FightPropType.FIGHT_PROP_ELEMENT_MASTERY,
+    enka.gi.FightPropType.FIGHT_PROP_CRITICAL,
+    enka.gi.FightPropType.FIGHT_PROP_CRITICAL_HURT,
+    enka.gi.FightPropType.FIGHT_PROP_CHARGE_EFFICIENCY,
 )
 
 
-async def main() -> None:  # noqa: C901
-    async with enka.EnkaAPI() as api:
+async def main() -> None:  # noqa: C901, D103
+    async with enka.GenshinClient(enka.gi.Language.TRADITIONAL_CHINESE) as api:
         # Update assets
-        # await api.update_assets()
+        await api.update_assets()
 
         try:
             response = await api.fetch_showcase(831335713)
-        except enka.exceptions.PlayerDoesNotExistError:
+        except enka.errors.PlayerDoesNotExistError:
             return print("Player does not exist.")
-        except enka.exceptions.GameMaintenanceError:
+        except enka.errors.GameMaintenanceError:
             return print("Game is in maintenance.")
 
         print("Name:", response.player.nickname)
@@ -72,4 +71,5 @@ async def main() -> None:  # noqa: C901
                 print("")
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())

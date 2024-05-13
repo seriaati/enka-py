@@ -1,0 +1,5 @@
+{
+    "python.analysis.typeCheckingMode": "standard",
+    "python.analysis.importFormat": "relative",
+    "python.analysis.diagnosticMode": "workspace"
+}

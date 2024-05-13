@@ -6,15 +6,18 @@ if sys.version_info < (3, 11):
     from enum import Enum as StrEnum
 
 __all__ = (
-    "Language",
+    "Element",
     "EquipmentType",
-    "ItemType",
-    "StatType",
     "FightPropType",
+    "ItemType",
+    "Language",
+    "StatType",
 )
 
 
 class Language(StrEnum):
+    """Genshin Impact API language codes."""
+
     ENGLISH = "en"
     RUSSIAN = "ru"
     VIETNAMESE = "vi"
@@ -33,6 +36,8 @@ class Language(StrEnum):
 
 
 class EquipmentType(StrEnum):
+    """GI artifact types."""
+
     FLOWER = "EQUIP_BRACER"
     FEATHER = "EQUIP_NECKLACE"
     SANDS = "EQUIP_SHOES"
@@ -41,11 +46,15 @@ class EquipmentType(StrEnum):
 
 
 class ItemType(StrEnum):
+    """GI item types."""
+
     WEAPON = "ITEM_WEAPON"
     ARTIFACT = "ITEM_RELIQUARY"
 
 
 class StatType(StrEnum):
+    """GI stat types."""
+
     FIGHT_PROP_BASE_ATTACK = "FIGHT_PROP_BASE_ATTACK"
     FIGHT_PROP_HP = "FIGHT_PROP_HP"
     FIGHT_PROP_ATTACK = "FIGHT_PROP_ATTACK"
@@ -69,6 +78,8 @@ class StatType(StrEnum):
 
 
 class FightPropType(IntEnum):
+    """GI fight property types."""
+
     FIGHT_PROP_NONE = 0
     FIGHT_PROP_BASE_HP = 1
     FIGHT_PROP_HP = 2
@@ -190,6 +201,8 @@ class FightPropType(IntEnum):
 
 
 class Element(StrEnum):
+    """Genshin Impact elements."""
+
     ANEMO = "Wind"
     GEO = "Rock"
     ELECTRO = "Electric"

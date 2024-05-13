@@ -2,17 +2,16 @@ from typing import Any
 
 from .icon import Icon
 
+__all__ = ("Costume",)
+
 
 class Costume:
     """
     Represents a character's costume.
 
-    Attributes
-    ----------
-    id: :class:`int`
-        The costume's ID.
-    icon: :class:`Icon`
-        The costume's icon.
+    Attributes:
+       id (int): The costume's ID.
+       icon (Icon): The costume's icon.
     """
 
     def __init__(self, id: int, data: dict[str, Any]) -> None:
