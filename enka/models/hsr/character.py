@@ -94,7 +94,7 @@ class RelicSubAffix(BaseModel):
 
 class Relic(BaseModel):
     id: int = Field(alias="tid")
-    level: int
+    level: int = 0
     type: RelicType
     main_affix_id: int = Field(alias="mainAffixId")
     set_name: str = Field(alias="setName")  # Returned as text map hash in the API response
