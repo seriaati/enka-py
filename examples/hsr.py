@@ -43,9 +43,10 @@ async def main() -> None:  # noqa: C901, D103
 
             print("\nStats:")
             for stat in character.stats:
-                if stat.value == 0:
+                if stat.value == 0 or stat.type.value in enka.hsr.DMG_BONUS_PROPS.values():
                     continue
                 print(stat.name, stat.formatted_value)
+
             dmg_bonus = character.highest_dmg_bonus_stat
             print(dmg_bonus.name, dmg_bonus.formatted_value)
 
