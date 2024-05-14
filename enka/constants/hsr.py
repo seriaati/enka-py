@@ -1,5 +1,7 @@
 from typing import Literal
 
+from ..enums.hsr import Element
+
 __all__ = (
     "ASCENSION_TO_MAX_LEVEL",
     "DEFAULT_STATS",
@@ -53,13 +55,13 @@ ASCENSION_TO_MAX_LEVEL: dict[Literal[0, 1, 2, 3, 4, 5, 6], Literal[20, 30, 40, 5
 }
 
 DMG_BONUS_PROPS = {
-    "PhysicalAddedRatio",
-    "FireAddedRatio",
-    "ThunderAddedRatio",
-    "IceAddedRatio",
-    "QuantumAddedRatio",
-    "WindAddedRatio",
-    "ImaginaryAddedRatio",
+    Element.PHYSICAL: "PhysicalAddedRatio",
+    Element.FIRE: "FireAddedRatio",
+    Element.LIGHTNING: "ThunderAddedRatio",
+    Element.ICE: "IceAddedRatio",
+    Element.QUANTUM: "QuantumAddedRatio",
+    Element.WIND: "WindAddedRatio",
+    Element.IMAGINARY: "ImaginaryAddedRatio",
 }
 
 DEFAULT_STATS: dict[str, float] = {

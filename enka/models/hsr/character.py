@@ -158,6 +158,9 @@ class Character(BaseModel):
     def highest_dmg_bonus_stat(self) -> Stat:
         """Character's highest damage bonus stat."""
         return max(
-            (stat for stat in self.stats if stat.type in DMG_BONUS_PROPS),
+            (stat for stat in self.stats if stat.type in DMG_BONUS_PROPS.values()),
             key=lambda stat: stat.value,
+            default=next(
+                (stat for stat in self.stats if stat.type.value == DMG_BONUS_PROPS[self.element])
+            ),
         )
