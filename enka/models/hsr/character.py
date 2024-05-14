@@ -135,7 +135,7 @@ class Character(BaseModel):
     id: int = Field(alias="avatarId")
     traces: list[Trace] = Field(alias="skillTreeList")
     light_cone: LightCone | None = Field(None, alias="equipment")
-    relics: list[Relic] = Field(alias="relicList")
+    relics: list[Relic] = Field(list, alias="relicList")
     eidolons_unlocked: int = Field(0, alias="rank")
     is_assist: bool = Field(False, alias="_assist")
 
