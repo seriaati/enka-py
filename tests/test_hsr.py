@@ -27,3 +27,9 @@ async def test_langs() -> None:
     for lang in Language:
         async with HSRClient(lang) as api:
             await api.fetch_showcase("809162009")
+
+
+@pytest.mark.asyncio
+async def test_low_level_acc() -> None:
+    async with HSRClient() as api:
+        await api.fetch_showcase("829702635")
