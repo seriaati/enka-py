@@ -131,7 +131,7 @@ class Character(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     level: int
-    ascension: Literal[0, 1, 2, 3, 4, 5, 6] = Field(alias="promotion")
+    ascension: Literal[0, 1, 2, 3, 4, 5, 6] = Field(0, alias="promotion")
     id: int = Field(alias="avatarId")
     traces: list[Trace] = Field(alias="skillTreeList")
     light_cone: LightCone | None = Field(None, alias="equipment")
