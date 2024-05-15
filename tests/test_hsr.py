@@ -41,3 +41,10 @@ async def test_owner_and_builds() -> None:
         showcase = await api.fetch_showcase("809162009")
         assert showcase.owner is not None
         await api.fetch_builds(showcase.owner)
+
+
+@pytest.mark.asyncio
+async def test_raw_and_parse() -> None:
+    async with HSRClient() as api:
+        raw = await api.fetch_showcase("809162009", raw=True)
+        api.parse_showcase(raw)

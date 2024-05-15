@@ -66,3 +66,10 @@ async def test_owner_and_builds() -> None:
         showcase = await api.fetch_showcase("618285856")
         assert showcase.owner is not None
         await api.fetch_builds(showcase.owner)
+
+
+@pytest.mark.asyncio
+async def test_raw_and_parse() -> None:
+    async with GenshinClient() as api:
+        raw = await api.fetch_showcase("901211014", raw=True)
+        api.parse_showcase(raw)
