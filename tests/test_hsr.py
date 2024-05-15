@@ -33,3 +33,11 @@ async def test_langs() -> None:
 async def test_low_level_acc() -> None:
     async with HSRClient() as api:
         await api.fetch_showcase("829702635")
+
+
+@pytest.mark.asyncio
+async def test_owner_and_builds() -> None:
+    async with HSRClient() as api:
+        showcase = await api.fetch_showcase("809162009")
+        assert showcase.owner is not None
+        await api.fetch_builds(showcase.owner)

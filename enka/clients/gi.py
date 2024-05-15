@@ -11,9 +11,11 @@ from ..constants.gi import CHARACTER_RARITY_MAP
 from ..enums.enum import Game
 from ..enums.gi import Element, Language
 from ..models.gi import Constellation, Costume, Icon, Namecard, ShowcaseResponse
+from ..models.gi.build import Build
 from .base import BaseClient
 
 if TYPE_CHECKING:
+    from ..models.enka.owner import Owner
     from ..models.gi.character import Character
     from ..models.gi.player import Player, ShowcaseCharacter
 
@@ -63,7 +65,7 @@ class GenshinClient(BaseClient):
             msg = f"Client is not started, call `{self.__class__.__name__}.start` first"
             raise RuntimeError(msg)
 
-    def _post_process_player(self, player: Player) -> Player:
+    def _post_process_player(self, player: Player) -> None:
         self._check_assets()
 
         # namecard
@@ -85,15 +87,11 @@ class GenshinClient(BaseClient):
             side_icon_ui_path=profile_picture_icon, is_costume="Costume" in profile_picture_icon
         )
 
-        return player
-
-    def _post_process_showcase_character(
-        self, showcase_character: ShowcaseCharacter
-    ) -> ShowcaseCharacter:
+    def _post_process_showcase_character(self, showcase_character: ShowcaseCharacter) -> None:
         self._check_assets()
 
         if showcase_character.costume_id is None:
-            return showcase_character
+            return
 
         # costume
         costume_data = self._assets.character_data[str(showcase_character.id)]["Costumes"]
@@ -103,9 +101,7 @@ class GenshinClient(BaseClient):
                 data=costume_data[str(showcase_character.costume_id)],
             )
 
-        return showcase_character
-
-    def _post_process_character(self, character: Character) -> Character:  # noqa: C901, PLR0914, PLR0912
+    def _post_process_character(self, character: Character) -> None:  # noqa: C901, PLR0914, PLR0912
         self._check_assets()
 
         characer_id = (
@@ -196,24 +192,17 @@ class GenshinClient(BaseClient):
                     id=character.costume_id, data=costume_data[str(character.costume_id)]
                 )
 
-        return character
-
-    def _post_process_showcase(self, showcase: ShowcaseResponse) -> ShowcaseResponse:
+    def _post_process_showcase(self, showcase: ShowcaseResponse) -> None:
         # player
-        showcase.player = self._post_process_player(showcase.player)
+        self._post_process_player(showcase.player)
 
         # showcase characters
-        showcase_characters: list[ShowcaseCharacter] = []
         for character in showcase.player.showcase_characters:
-            showcase_characters.append(self._post_process_showcase_character(character))
-        showcase.player.showcase_characters = showcase_characters
+            self._post_process_showcase_character(character)
 
         # characters
-        characters: list[Character] = []
         for character in showcase.characters:
-            characters.append(self._post_process_character(character))
-
-        return showcase
+            self._post_process_character(character)
 
     async def start(self) -> None:
         """Start the client."""
@@ -257,4 +246,27 @@ class GenshinClient(BaseClient):
         data = await self._request(url)
         data = copy.deepcopy(data)
         showcase = ShowcaseResponse(**data)
-        return self._post_process_showcase(showcase)
+        self._post_process_showcase(showcase)
+        return showcase
+
+    async def fetch_builds(self, owner: Owner) -> dict[str, list[Build]]:
+        """Fetches the builds of the given owner.
+
+        Args:
+            owner (Owner): The owner of the builds.
+
+        Returns:
+            dict[str, list[Build]]: Character ID to list of builds mapping.
+        """
+        url = f"https://enka.network/api/profile/{owner.username}/hoyos/{owner.hash}/builds/"
+        data = await self._request(url)
+        result: dict[str, list[Build]] = {}
+
+        for key, builds in data.items():
+            result[key] = []
+            for build in builds:
+                build_ = Build(**build)
+                self._post_process_character(build_.character)
+                result[key].append(build_)
+
+        return result
