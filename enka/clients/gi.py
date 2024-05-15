@@ -268,7 +268,7 @@ class GenshinClient(BaseClient):
             owner (Owner): The owner of the builds.
 
         Returns:
-            list[Build]: The list of builds.
+            dict[str, list[Build]]: Character ID to list of builds mapping.
         """
         url = f"https://enka.network/api/profile/{owner.username}/hoyos/{owner.hash}/builds/"
         data = await self._request(url)
