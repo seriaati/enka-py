@@ -3,7 +3,7 @@ from __future__ import annotations
 import copy
 import logging
 from collections import defaultdict
-from typing import TYPE_CHECKING, Any, Final
+from typing import TYPE_CHECKING, Any, Final, Literal, overload
 
 from ..assets.hsr.file_paths import SOURCE_TO_PATH
 from ..assets.hsr.manager import AssetManager
@@ -274,18 +274,46 @@ class HSRClient(BaseClient):
 
         LOGGER_.info("Assets updated")
 
-    async def fetch_showcase(self, uid: str | int) -> ShowcaseResponse:
+    @overload
+    async def fetch_showcase(
+        self, uid: str | int, *, raw: Literal[False] = False
+    ) -> ShowcaseResponse: ...
+    @overload
+    async def fetch_showcase(
+        self, uid: str | int, *, raw: Literal[True] = True
+    ) -> dict[str, Any]: ...
+    async def fetch_showcase(
+        self, uid: str | int, *, raw: bool = False
+    ) -> ShowcaseResponse | dict[str, Any]:
         """Fetches the Impact character showcase of the given UID.
 
         Args:
             uid (str | int): The UID of the user.
+            raw (bool): Whether to return the raw data or not, defaults to False.
 
         Returns:
-            ShowcaseResponse: The response of the showcase.
+            ShowcaseResponse | dict[str, Any]: The parsed or raw showcase data.
         """
         url = API_URL.format(uid=uid)
 
         data = await self._request(url)
+        if raw:
+            return data
+
+        data = copy.deepcopy(data)
+        showcase = ShowcaseResponse(**data)
+        self._post_process_showcase(showcase)
+        return showcase
+
+    def parse_showcase(self, data: dict[str, Any]) -> ShowcaseResponse:
+        """Parses the given showcase data.
+
+        Args:
+            data (dict[str, Any]): The showcase data.
+
+        Returns:
+            ShowcaseResponse: The parsed showcase data.
+        """
         data = copy.deepcopy(data)
         showcase = ShowcaseResponse(**data)
         self._post_process_showcase(showcase)
