@@ -6,11 +6,11 @@ class OwnerProfile(BaseModel):
 
     Attributes:
         bio (str): The owner's bio.
-        avatar (str): The owner's avatar.
+        avatar (str, optional): The owner's avatar.
     """
 
     bio: str
-    avatar: str
+    avatar: str | None = None
 
 
 class Owner(BaseModel):
