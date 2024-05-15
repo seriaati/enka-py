@@ -11,9 +11,11 @@ from ..constants.gi import CHARACTER_RARITY_MAP
 from ..enums.enum import Game
 from ..enums.gi import Element, Language
 from ..models.gi import Constellation, Costume, Icon, Namecard, ShowcaseResponse
+from ..models.gi.build import Build
 from .base import BaseClient
 
 if TYPE_CHECKING:
+    from ..models.enka.owner import Owner
     from ..models.gi.character import Character
     from ..models.gi.player import Player, ShowcaseCharacter
 
@@ -258,3 +260,25 @@ class GenshinClient(BaseClient):
         data = copy.deepcopy(data)
         showcase = ShowcaseResponse(**data)
         return self._post_process_showcase(showcase)
+
+    async def fetch_builds(self, owner: Owner) -> dict[str, list[Build]]:
+        """Fetches the builds of the given owner.
+
+        Args:
+            owner (Owner): The owner of the builds.
+
+        Returns:
+            list[Build]: The list of builds.
+        """
+        url = f"https://enka.network/api/profile/{owner.username}/hoyos/{owner.hash}/builds/"
+        data = await self._request(url)
+        result: dict[str, list[Build]] = {}
+
+        for key, builds in data.items():
+            result[key] = []
+            for build in builds:
+                build_ = Build(**build)
+                build_.character = self._post_process_character(build_.character)
+                result[key].append(build_)
+
+        return result
