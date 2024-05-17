@@ -60,7 +60,7 @@ class LightCone(BaseModel):
 
     id: int = Field(alias="tid")
     level: int
-    ascension: Literal[0, 1, 2, 3, 4, 5, 6] = Field(alias="promotion")
+    ascension: Literal[0, 1, 2, 3, 4, 5, 6] = Field(0, alias="promotion")
     superimpose: Literal[1, 2, 3, 4, 5] = Field(alias="rank")
     name: str  # Returned as text map hash in the API response
     stats: list[Stat] = Field(alias="props")
