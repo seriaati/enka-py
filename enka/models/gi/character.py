@@ -197,12 +197,14 @@ class Talent(BaseModel):
         level (int): The talent's level.
         name (str): The talent's name.
         icon (str): The talent's icon.
+        is_upgraded (bool): Whether the talent is upgraded by a constellation.
     """
 
     id: int
     level: int
     name: str = Field(None)
     icon: str = Field(None)
+    is_upgraded: bool = Field(False)
 
 
 class Character(BaseModel):
