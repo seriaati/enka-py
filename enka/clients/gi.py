@@ -167,7 +167,9 @@ class GenshinClient(BaseClient):
                 proud_id = proud_map.get(str(talent.id))
                 if proud_id is None:
                     continue
-                talent.level += character.talent_extra_level_map.get(str(proud_id), 0)
+                if extra_level := character.talent_extra_level_map.get(str(proud_id), 0):
+                    talent.level += extra_level
+                    talent.is_upgraded = True
 
         # talent order
         character.talent_order = character_data["SkillOrder"]
