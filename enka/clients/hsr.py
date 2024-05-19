@@ -42,7 +42,7 @@ class HSRClient(BaseClient):
         headers: dict[str, Any] | None = None,
         cache_ttl: int = 60,
     ) -> None:
-        super().__init__(Game.GI, headers=headers, cache_ttl=cache_ttl)
+        super().__init__(Game.HSR, headers=headers, cache_ttl=cache_ttl)
 
         if isinstance(lang, str):
             try:
