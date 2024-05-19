@@ -24,9 +24,9 @@ class BaseClient:
         headers: dict[str, Any] | None = None,
         cache_ttl: int = 60,
     ) -> None:
-        self._game = game
-        self._headers = headers or {"User-Agent": "enka-py"}
+        self.game = game
 
+        self._headers = headers or {"User-Agent": "enka-py"}
         self._session: CachedSession | None = None
         self._cache = SQLiteBackend(
             cache_name=f".enka_py/cache/{game.value}", expire_after=cache_ttl
