@@ -5,6 +5,8 @@ if sys.version_info < (3, 11):
 else:
     from enum import StrEnum
 
+__all__ = ("Game",)
+
 
 class Game(StrEnum):
     """Game."""
