@@ -204,7 +204,7 @@ class Talent(BaseModel):
     level: int
     name: str = Field(None)
     icon: str = Field(None)
-    is_upgraded: bool = Field(False)
+    is_upgraded: bool = False
 
 
 class Character(BaseModel):
