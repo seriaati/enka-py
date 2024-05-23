@@ -27,6 +27,7 @@ PERCENT_STAT_TYPES = {
 
 CHARACTER_RARITY_MAP: dict[str, Literal[4, 5]] = {
     "QUALITY_ORANGE": 5,
+    "QUALITY_ORANGE_SP": 5,
     "QUALITY_PURPLE": 4,
 }
 
