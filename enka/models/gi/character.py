@@ -270,9 +270,25 @@ class Character(BaseModel):
     @computed_field
     @property
     def highest_dmg_bonus_stat(self) -> FightProp:
-        """The character's highest damage bonus stat."""
+        """The character's highest damage bonus stat.
+
+        Returns the highest stat value from the damage bonus stats (elemental damage bonus, physical damage bonus, etc.).
+        """
         return max(
             (stat for stat in self.stats.values() if stat.type.name in DMG_BONUS_FIGHT_PROPS),
+            key=lambda stat: stat.value,
+        )
+
+    @computed_field
+    @property
+    def specialized_stat(self) -> FightProp:
+        """The character's specialized stat
+
+        Returns the highest stat value from the specialized stats (elemental damage bonus and healing bonus).
+        """
+        specialized_stats = list(DMG_BONUS_FIGHT_PROPS) + [FightPropType.FIGHT_PROP_HEAL_ADD.name]
+        return max(
+            (stat for stat in self.stats.values() if stat.type.name in specialized_stats),
             key=lambda stat: stat.value,
         )
 
