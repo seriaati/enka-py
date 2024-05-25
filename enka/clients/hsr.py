@@ -33,6 +33,7 @@ class HSRClient(BaseClient):
         lang (Language | str): The language to use for the client, defaults to Language.ENGLISH.
         headers (dict[str, Any] | None): The headers to use for the client, defaults to None.
         cache_ttl (int): The time to live of the cache, defaults to 60.
+        use_enka_icons (bool): Whether to get stat icons from Enka, defaults to True.
     """
 
     def __init__(
@@ -41,6 +42,7 @@ class HSRClient(BaseClient):
         *,
         headers: dict[str, Any] | None = None,
         cache_ttl: int = 60,
+        use_enka_icons: bool = True,
     ) -> None:
         super().__init__(Game.HSR, headers=headers, cache_ttl=cache_ttl)
 
@@ -53,6 +55,7 @@ class HSRClient(BaseClient):
                 raise ValueError(msg) from e
 
         self._lang = lang
+        self._use_enka_icons = use_enka_icons
 
     async def __aenter__(self) -> HSRClient:
         await self.start()
@@ -76,7 +79,9 @@ class HSRClient(BaseClient):
 
         for stat in relic.stats:
             stat.name = text_map[stat.type.value]
-            stat.icon = self._get_icon(self._assets.property_config_data[stat.type.value])
+            stat.icon = self._get_icon(
+                self._assets.property_config_data[stat.type.value], enka=self._use_enka_icons
+            )
 
     def _post_process_light_cone(self, light_cone: LightCone) -> None:
         text_map = self._assets.text_map
@@ -86,7 +91,9 @@ class HSRClient(BaseClient):
 
         for stat in light_cone.stats:
             stat.name = text_map[stat.type.value]
-            stat.icon = self._get_icon(self._assets.property_config_data[stat.type.value])
+            stat.icon = self._get_icon(
+                self._assets.property_config_data[stat.type.value], enka=self._use_enka_icons
+            )
 
     def _post_process_trace(self, trace: Trace) -> None:
         skill_tree_data = self._assets.skill_tree_data
@@ -176,7 +183,9 @@ class HSRClient(BaseClient):
                 type=stat_type,
                 value=value,
                 name=self._assets.text_map[stat_type.value],
-                icon=self._get_icon(self._assets.property_config_data[stat_type.value]),
+                icon=self._get_icon(
+                    self._assets.property_config_data[stat_type.value], enka=self._use_enka_icons
+                ),
             )
             for stat_type, value in final_stats.items()
         ]
@@ -245,9 +254,13 @@ class HSRClient(BaseClient):
             self._post_process_character(character)
         self._post_process_player(showcase.player)
 
-    def _get_icon(self, icon: str) -> str:
+    def _get_icon(self, icon: str, *, enka: bool = True) -> str:
         icon = icon.replace(".png", "")
-        return f"https://enka.network/ui/hsr/{icon}.png"
+        if enka:
+            return f"https://enka.network/ui/hsr/{icon}.png"
+        return (
+            f"https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/property/{icon}.png"
+        )
 
     async def start(self) -> None:
         """Start the client."""
