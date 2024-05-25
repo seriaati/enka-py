@@ -101,7 +101,7 @@ class HSRClient(BaseClient):
 
         trace.anchor = trace_data["anchor"]
         trace.icon = self._get_icon(
-            trace_data["icon"], enka=self._use_enka_icons and "Icon" in trace_data["icon"]
+            trace_data["icon"], enka=self._use_enka_icons and "SkillIcons" not in trace_data["icon"]
         )
         trace.type = TraceType(trace_data["pointType"])
         trace.max_level = trace_data["maxLevel"]
