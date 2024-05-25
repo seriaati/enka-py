@@ -258,9 +258,7 @@ class HSRClient(BaseClient):
         icon = icon.replace(".png", "")
         if enka:
             return f"https://enka.network/ui/hsr/{icon}.png"
-        return (
-            f"https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/property/{icon}.png"
-        )
+        return f"https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/property/{icon.split('/')[-1]}.png"
 
     async def start(self) -> None:
         """Start the client."""
