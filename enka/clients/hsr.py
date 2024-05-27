@@ -165,8 +165,7 @@ class HSRClient(BaseClient):
             StatType.BASE_DEF: chara_stats["BaseDefence"]
             + chara_stats["DefenceBase"]
             + chara_stats["DefenceAdd"] * (character.level - 1),
-            StatType.BASE_SPEED: chara_stats["BaseSpeed"]
-            + chara_stats["SpeedBase"],
+            StatType.BASE_SPEED: chara_stats["BaseSpeed"] + chara_stats["SpeedBase"],
             StatType.CRIT_RATE: chara_stats["CriticalChanceBase"] + chara_stats["CriticalChance"],
             StatType.CRIT_DMG: chara_stats["CriticalDamageBase"] + chara_stats["CriticalDamage"],
             StatType.BREAK_EFFECT: chara_stats["BreakDamageAddedRatioBase"]
@@ -202,8 +201,6 @@ class HSRClient(BaseClient):
             )
             for stat_type, value in final_stats.items()
         ]
-
-        character.stats[7].name = "Base SPD"
 
     def _add_up_character_stats(self, character: Character) -> dict[str, float]:  # noqa: C901
         chara_stats = DEFAULT_STATS.copy()
