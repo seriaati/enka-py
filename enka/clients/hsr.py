@@ -156,6 +156,16 @@ class HSRClient(BaseClient):
             * (1 + chara_stats["SpeedAddedRatio"])
             + chara_stats["SpeedDelta"]
             + chara_stats["SpeedConvert"],
+            StatType.BASE_HP: chara_stats["BaseHP"]
+            + chara_stats["HPBase"]
+            + chara_stats["HPAdd"] * (character.level - 1),
+            StatType.BASE_ATK: chara_stats["BaseAttack"]
+            + chara_stats["AttackBase"]
+            + chara_stats["AttackAdd"] * (character.level - 1),
+            StatType.BASE_DEF: chara_stats["BaseDefence"]
+            + chara_stats["DefenceBase"]
+            + chara_stats["DefenceAdd"] * (character.level - 1),
+            StatType.BASE_SPEED: chara_stats["BaseSpeed"] + chara_stats["SpeedBase"],
             StatType.CRIT_RATE: chara_stats["CriticalChanceBase"] + chara_stats["CriticalChance"],
             StatType.CRIT_DMG: chara_stats["CriticalDamageBase"] + chara_stats["CriticalDamage"],
             StatType.BREAK_EFFECT: chara_stats["BreakDamageAddedRatioBase"]
@@ -171,13 +181,13 @@ class HSRClient(BaseClient):
             StatType.EFFECT_RES: chara_stats["StatusResistanceBase"]
             + chara_stats["StatusResistance"]
             + chara_stats["StatusResistanceConvert"],
+            StatType.PHYSICAL_DMG_BOOST: chara_stats["PhysicalAddedRatio"],
             StatType.FIRE_DMG_BOOST: chara_stats["FireAddedRatio"],
             StatType.ICE_DMG_BOOST: chara_stats["IceAddedRatio"],
             StatType.LIGHTNING_DMG_BOOST: chara_stats["ThunderAddedRatio"],
             StatType.WIND_DMG_BOOST: chara_stats["WindAddedRatio"],
             StatType.QUANTUM_DMG_BOOST: chara_stats["QuantumAddedRatio"],
             StatType.IMAGINARY_DMG_BOOST: chara_stats["ImaginaryAddedRatio"],
-            StatType.PHYSICAL_DMG_BOOST: chara_stats["PhysicalAddedRatio"],
         }
 
         character.stats = [

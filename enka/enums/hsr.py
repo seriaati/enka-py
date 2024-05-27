@@ -70,7 +70,7 @@ class StatType(StrEnum):
     EFFECT_HIT_RATE_BASE = "StatusProbabilityBase"
     EFFECT_RES_BASE = "StatusResistanceBase"
 
-    # Element dmg boost
+    # Element dmg/resistance boosts
     PHYSICAL_DMG_BOOST = "PhysicalAddedRatio"
     PHYSICAL_RES_BOOST = "PhysicalResistance"
     FIRE_DMG_BOOST = "FireAddedRatio"
@@ -84,7 +84,7 @@ class StatType(StrEnum):
     QUANTUM_DMG_BOOST = "QuantumAddedRatio"
     QUANTUM_RES_BOOST = "QuantumResistance"
     IMAGINARY_DMG_BOOST = "ImaginaryAddedRatio"
-    IMAGINARY_RES = "ImaginaryResistance"
+    IMAGINARY_RES_BOOST = "ImaginaryResistance"
 
     BASE_HP = "BaseHP"
     HP_DELTA = "HPDelta"
