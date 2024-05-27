@@ -70,7 +70,7 @@ class StatType(StrEnum):
     EFFECT_HIT_RATE_BASE = "StatusProbabilityBase"
     EFFECT_RES_BASE = "StatusResistanceBase"
 
-    # Element dmg boost
+    # Element dmg/resistance boosts
     PHYSICAL_DMG_BOOST = "PhysicalAddedRatio"
     PHYSICAL_RES_BOOST = "PhysicalResistance"
     FIRE_DMG_BOOST = "FireAddedRatio"
