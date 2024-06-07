@@ -212,7 +212,7 @@ class GenshinClient(BaseClient):
         assert self._session is not None
 
         self._assets = AssetManager(self._lang)
-        self._asset_updater = AssetUpdater(self._session, SOURCE_TO_PATH)
+        self._asset_updater = AssetUpdater(self._session, SOURCE_TO_PATH, self._lang)
 
         loaded = await self._assets.load()
         if not loaded:

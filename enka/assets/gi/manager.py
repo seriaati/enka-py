@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from ..data import AssetData
@@ -19,7 +21,7 @@ __all__ = ("AssetManager",)
 class AssetManager:
     """Genshin Impact asset manager."""
 
-    def __init__(self, lang: "Language") -> None:
+    def __init__(self, lang: Language) -> None:
         self._lang = lang
         self.text_map = TextMap(lang)
         self.character_data = CharacterData()
@@ -45,14 +47,12 @@ class AssetManager:
 
 
 class TextMap(AssetData):
-    def __init__(self, lang: "Language") -> None:
+    def __init__(self, lang: Language) -> None:
         super().__init__()
         self._lang = lang
 
     async def load(self) -> bool:
-        text_map = await self._open_json(TEXT_MAP_PATH)
-        if text_map is not None:
-            self._data = text_map[self._lang.value]
+        self._data = await self._open_json(TEXT_MAP_PATH.format(lang=self._lang.value))
         return self._data is not None
 
 
