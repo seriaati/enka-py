@@ -42,7 +42,7 @@ async def main() -> None:  # noqa: C901, D103
                     print(stat.name, stat.formatted_value)
 
             print("\nStats:")
-            for stat in character.stats:
+            for stat in character.stats.values():
                 if stat.value == 0 or stat.type.value in enka.hsr.DMG_BONUS_PROPS.values():
                     continue
                 print(stat.name, stat.formatted_value)

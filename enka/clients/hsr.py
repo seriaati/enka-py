@@ -190,8 +190,8 @@ class HSRClient(BaseClient):
             StatType.IMAGINARY_DMG_BOOST: chara_stats["ImaginaryAddedRatio"],
         }
 
-        character.stats = [
-            Stat(
+        character.stats = {
+            stat_type: Stat(
                 type=stat_type,
                 value=value,
                 name=self._assets.text_map[stat_type.value],
@@ -200,7 +200,7 @@ class HSRClient(BaseClient):
                 ),
             )
             for stat_type, value in final_stats.items()
-        ]
+        }
 
     def _add_up_character_stats(self, character: Character) -> dict[str, float]:  # noqa: C901
         chara_stats = DEFAULT_STATS.copy()

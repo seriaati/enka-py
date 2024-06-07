@@ -145,7 +145,7 @@ class Character(BaseModel):
     rarity: Literal[4, 5] = Field(None)
     element: Element = Field(None)
     path: Path = Field(None)
-    stats: list[Stat] = Field(list)
+    stats: dict[StatType, Stat] = Field(default_factory=dict)
 
     @computed_field
     @property
@@ -158,9 +158,13 @@ class Character(BaseModel):
     def highest_dmg_bonus_stat(self) -> Stat:
         """Character's highest damage bonus stat."""
         return max(
-            (stat for stat in self.stats if stat.type in DMG_BONUS_PROPS.values()),
+            (stat for stat in self.stats.values() if stat.type in DMG_BONUS_PROPS.values()),
             key=lambda stat: stat.value,
             default=next(
-                (stat for stat in self.stats if stat.type.value == DMG_BONUS_PROPS[self.element])
+                (
+                    stat
+                    for stat in self.stats.values()
+                    if stat.type.value == DMG_BONUS_PROPS[self.element]
+                )
             ),
         )
