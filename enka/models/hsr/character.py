@@ -100,7 +100,7 @@ class Relic(BaseModel):
     set_name: str = Field(alias="setName")  # Returned as text map hash in the API response
     set_id: int = Field(alias="setID")
     stats: list[Stat] = Field(alias="props")
-    sub_affix_list: list[RelicSubAffix] = Field(alias="subAffixList")
+    sub_affix_list: list[RelicSubAffix] = Field(alias="subAffixList", default_factory=list)
 
     # The following fields are added in post-processing
     icon: str = Field(None)
