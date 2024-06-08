@@ -48,3 +48,9 @@ async def test_raw_and_parse() -> None:
     async with HSRClient() as api:
         raw = await api.fetch_showcase("809162009", raw=True)
         api.parse_showcase(raw)
+
+
+@pytest.mark.asyncio
+async def test_empty_substat_list() -> None:
+    async with HSRClient() as api:
+        await api.fetch_showcase("800724088")
