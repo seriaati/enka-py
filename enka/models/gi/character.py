@@ -124,6 +124,10 @@ class Artifact(BaseModel):
             for stat in v
         ]
 
+    @field_validator("set_name", mode="before")
+    def _stringify_set_name(cls, v: str | int) -> str:
+        return str(v)
+
 
 class Weapon(BaseModel):
     """
