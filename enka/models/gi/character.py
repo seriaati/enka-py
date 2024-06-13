@@ -174,6 +174,10 @@ class Weapon(BaseModel):
             for stat in v
         ]
 
+    @field_validator("name", mode="before")
+    def _stringify_text_map_hash(cls, v: str | int) -> str:
+        return str(v)
+
 
 class Constellation(BaseModel):
     """
