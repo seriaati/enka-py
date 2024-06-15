@@ -44,8 +44,8 @@ import enka
 import asyncio
 
 async def main() -> None:
-    async with enka.GenshinClient(enka.gi.Language.English) as client:
-      response = await api.fetch_showcase(901211014)
+    async with enka.GenshinClient(enka.gi.Language.ENGLISH) as client:
+      response = await client.fetch_showcase(901211014)
       print(response.player.nickname)
       print(response.characters[0].name)
 
