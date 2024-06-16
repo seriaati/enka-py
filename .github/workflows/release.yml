@@ -15,3 +15,6 @@ jobs:
         
       - name: Create release
         uses: seriaati/create-release@main
+        with:
+          pypi_token: ${{ secrets.PYPI_TOKEN }}
+          python_version: "3.11"
