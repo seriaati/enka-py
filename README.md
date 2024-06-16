@@ -29,12 +29,14 @@ enka.py is an async API wrapper for [enka.network](https://enka.network/) writte
 
 ## Installation
 
+I know it's annoying that the project is named enka-py but the package is named enka-api. This is because the package name enka-py was already taken on PyPI.
+
 ```bash
 # poetry
-poetry add git+https://github.com/seriaati/enka-py
+poetry add enka-api
 
 # pip
-pip install git+https://github.com/seriaati/enka-py
+pip install enka-api
 ```
 
 ## Quick Example
