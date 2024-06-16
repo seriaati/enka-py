@@ -5,8 +5,9 @@ requires-python = ">=3.10"
 [tool.poetry]
 authors = ["seriaati <seria.ati@gmail.com>"]
 description = "An async API wrapper for enka.network written in Python."
+documentation = "https://github.com/seriaati/enka-py/wiki"
 license = "GPL-3.0-only"
-name = "enka-py"
+name = "enka-api"
 packages = [{include = "enka"}]
 readme = "README.md"
 repository = "https://github.com/seriaati/enka-py"
