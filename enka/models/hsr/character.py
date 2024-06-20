@@ -21,6 +21,8 @@ __all__ = (
 class Trace(BaseModel):
     id: int = Field(alias="pointId")
     level: int
+    boosted: bool = False
+    """Whether the level of this trace is boosted by an activated eidolon's effect."""
 
     # Following fields are added in post-processing
     icon: str = Field(None)

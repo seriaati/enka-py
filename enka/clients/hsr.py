@@ -96,9 +96,15 @@ class HSRClient(BaseClient):
                 self._assets.property_config_data[stat.type.value], enka=self._use_enka_icons
             )
 
-    def _post_process_trace(self, trace: Trace) -> None:
+    def _post_process_trace(self, trace: Trace, unlocked_eidolon_ids: list[int]) -> None:
         skill_tree_data = self._assets.skill_tree_data
         trace_data = skill_tree_data[str(trace.id)]
+
+        try:
+            skill_ids: list[int] = trace_data["skillIds"]
+        except KeyError as e:
+            msg = "Skill IDs not found in trace data, please update the assets with `update_assets`"
+            raise RuntimeError(msg) from e
 
         trace.anchor = trace_data["anchor"]
         trace.icon = self._get_icon(
@@ -107,15 +113,17 @@ class HSRClient(BaseClient):
         trace.type = TraceType(trace_data["pointType"])
         trace.max_level = trace_data["maxLevel"]
 
+        for eidolon_id in unlocked_eidolon_ids:
+            eidolon_data = self._assets.eidolon_data[str(eidolon_id)]
+
+            for skill_id in skill_ids:
+                if str(skill_id) in eidolon_data["SkillAddLevelList"]:
+                    trace.level += eidolon_data["SkillAddLevelList"][str(skill_id)]
+                    trace.boosted = True
+                    break
+
     def _post_process_character(self, character: Character) -> None:
         self._check_assets()
-
-        for trace in character.traces:
-            self._post_process_trace(trace)
-        for relic in character.relics:
-            self._post_process_relic(relic)
-        if character.light_cone is not None:
-            self._post_process_light_cone(character.light_cone)
 
         character.icon = CharacterIcon(character_id=character.id)
 
@@ -133,6 +141,16 @@ class HSRClient(BaseClient):
             character.eidolons.append(
                 Eidolon(id=eidolon_id, icon=self._get_icon(eidolon_data["IconPath"]))
             )
+
+        for trace in character.traces:
+            self._post_process_trace(
+                trace, [e.id for e in character.eidolons[: character.eidolons_unlocked]]
+            )
+        for relic in character.relics:
+            self._post_process_relic(relic)
+        if character.light_cone is not None:
+            self._post_process_light_cone(character.light_cone)
+
         # Credits to Algoinde for the following code
         chara_stats = self._add_up_character_stats(character)
         final_stats: dict[StatType, float] = {
