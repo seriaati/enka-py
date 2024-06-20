@@ -264,14 +264,12 @@ class HSRClient(BaseClient):
 
         # Add relic set stats
         for relic_set_id, count in relic_sets.items():
-            if count not in {2, 4}:
-                continue
-
-            relic_set_meta: dict[str, float] = self._assets.meta_data["relic"]["setSkill"][
-                str(relic_set_id)
-            ][str(count)]["props"]
-            if relic_set_meta is not None:
-                update_stats(chara_stats, relic_set_meta)
+            for i in range(1, count + 1):
+                relic_set_meta: dict[str, dict[str, float]] = self._assets.meta_data["relic"][
+                    "setSkill"
+                ][str(relic_set_id)].get(str(i))
+                if relic_set_meta is not None:
+                    update_stats(chara_stats, relic_set_meta["props"])
 
         # Add trace stats
         for trace in character.traces:
