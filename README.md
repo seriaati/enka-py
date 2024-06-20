@@ -29,7 +29,7 @@ enka.py is an async API wrapper for [enka.network](https://enka.network/) writte
 
 ## Installation
 
-I know it's annoying that the project is named enka-py but the package is named enka-api. This is because the package name enka-py was already taken on PyPI.
+I know it's annoying that the project is named enka-py but the package is named enka-api, but package name enka-py was already taken on PyPI.
 
 ```bash
 # poetry
