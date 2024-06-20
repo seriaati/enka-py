@@ -4,6 +4,7 @@ from ..data import AssetData
 from .file_paths import (
     AVATAR_DATA_PATH,
     CHARACTER_DATA_PATH,
+    EIDOLON_DATA_PATH,
     LIGHT_CONE_DATA_PATH,
     META_DATA_PATH,
     PROPERTY_CONFIG_PATH,
@@ -32,6 +33,7 @@ class AssetManager:
         self.meta_data = MetaData()
         self.avatar_data = AvatarData()
         self.property_config_data = PropertyConfigData()
+        self.eidolon_data = EidolonData()
 
     async def load(self) -> bool:
         """Load all assets.
@@ -48,6 +50,7 @@ class AssetManager:
             and await self.meta_data.load()
             and await self.avatar_data.load()
             and await self.property_config_data.load()
+            and await self.eidolon_data.load()
         )
 
 
@@ -102,4 +105,10 @@ class AvatarData(AssetData):
 class PropertyConfigData(AssetData):
     async def load(self) -> bool:
         self._data = await self._open_json(PROPERTY_CONFIG_PATH)
+        return self._data is not None
+
+
+class EidolonData(AssetData):
+    async def load(self) -> bool:
+        self._data = await self._open_json(EIDOLON_DATA_PATH)
         return self._data is not None

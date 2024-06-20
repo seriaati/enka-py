@@ -13,6 +13,7 @@ from ..enums.enum import Game
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
 from ..models.hsr import CharacterIcon, LightConeIcon, Player, ShowcaseResponse, Stat
 from ..models.hsr.build import Build
+from ..models.hsr.character import Eidolon
 from ..utils import update_stats
 from .base import BaseClient
 
@@ -125,6 +126,13 @@ class HSRClient(BaseClient):
         character.element = Element(character_data["Element"])
         character.path = Path(character_data["AvatarBaseType"])
 
+        # Eidolons
+        eidolon_ids: list[int] = character_data["RankIDList"]
+        for eidolon_id in eidolon_ids:
+            eidolon_data = self._assets.eidolon_data[str(eidolon_id)]
+            character.eidolons.append(
+                Eidolon(id=eidolon_id, icon=self._get_icon(eidolon_data["IconPath"]))
+            )
         # Credits to Algoinde for the following code
         chara_stats = self._add_up_character_stats(character)
         final_stats: dict[StatType, float] = {

@@ -127,6 +127,11 @@ class Relic(BaseModel):
         return self.stats[1:]
 
 
+class Eidolon(BaseModel):
+    id: int
+    icon: str
+
+
 class Character(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -136,6 +141,7 @@ class Character(BaseModel):
     traces: list[Trace] = Field(alias="skillTreeList")
     light_cone: LightCone | None = Field(None, alias="equipment")
     relics: list[Relic] = Field(alias="relicList", default_factory=list)
+    eidolons: list[Eidolon] = Field(default_factory=list)
     eidolons_unlocked: int = Field(0, alias="rank")
     is_assist: bool = Field(False, alias="_assist")
 
