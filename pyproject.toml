@@ -11,7 +11,7 @@ name = "enka-api"
 packages = [{include = "enka"}]
 readme = "README.md"
 repository = "https://github.com/seriaati/enka-py"
-version = "2.2.4"
+version = "2.2.5"
 
 [tool.poetry.dependencies]
 aiofiles = "^24.0.0"
