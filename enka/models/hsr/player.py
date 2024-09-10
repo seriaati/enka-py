@@ -38,7 +38,6 @@ class Player(BaseModel):
         equilibrium_level (int): The player's equilibrium level.
         friend_count (int): The number of friends the player has.
         stats (:class:`PlayerStats`): The player's statistics.
-        chara_data_is_public (bool): Whether the player's character data is public.
     """
 
     nickname: str
@@ -48,7 +47,6 @@ class Player(BaseModel):
     equilibrium_level: int = Field(0, alias="worldLevel")
     friend_count: int = Field(0, alias="friendCount")
     stats: PlayerStats = Field(alias="recordInfo")
-    chara_data_is_public: bool = Field(alias="isDisplayAvatar")
 
     # The following fields are added in post-processing
     icon: str = Field(None, alias="headIcon")
