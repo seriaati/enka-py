@@ -109,13 +109,13 @@ speedups = ["Brotli", "aiodns", "brotlicffi"]
 
 [[package]]
 name = "aiohttp-client-cache"
-version = "0.12.2"
+version = "0.12.3"
 description = "Persistent cache for aiohttp requests"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "aiohttp_client_cache-0.12.2-py3-none-any.whl", hash = "sha256:1c1bca061149920f39723855590fb9a536f60a68de1ea1b45717cf436c5b77ba"},
-    {file = "aiohttp_client_cache-0.12.2.tar.gz", hash = "sha256:d11f4bc2844860b3e57b679a66f6978158effec72bbc1da5a99f76aac4ed862d"},
+    {file = "aiohttp_client_cache-0.12.3-py3-none-any.whl", hash = "sha256:7bc03d5352714969a180ab7be70c1d02141c22bc759f79f7c8207b7c473c8184"},
+    {file = "aiohttp_client_cache-0.12.3.tar.gz", hash = "sha256:184661458e46773a6b5d5da9e9cd916a11e540c523bff2928dea6d52142b1026"},
 ]
 
 [package.dependencies]
