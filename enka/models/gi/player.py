@@ -1,9 +1,8 @@
-from typing import Dict, List, Optional
+from __future__ import annotations
 
 from pydantic import BaseModel, Field, field_validator
 
 from .costume import Costume
-
 from .icon import Icon, Namecard
 
 __all__ = ("Player", "ShowcaseCharacter")
@@ -22,8 +21,8 @@ class ShowcaseCharacter(BaseModel):
 
     id: int = Field(alias="avatarId")
     level: int
-    costume: Optional[Costume] = Field(None)
-    costume_id: Optional[int] = Field(None, alias="costumeId")
+    costume: Costume | None = Field(None)
+    costume_id: int | None = Field(None, alias="costumeId")
 
     model_config = {"arbitrary_types_allowed": True}
 
@@ -51,19 +50,20 @@ class Player(BaseModel):
     namecard_id: int = Field(alias="nameCardId")
     namecard: Namecard = Field(None)
     nickname: str
-    signature: Optional[str] = Field(None)
+    signature: str | None = Field(None)
     abyss_floor: int = Field(0, alias="towerFloorIndex")
     abyss_level: int = Field(0, alias="towerLevelIndex")
     world_level: int = Field(0, alias="worldLevel")
     profile_picture_id: int = Field(alias="profilePicture")
     profile_picture_icon: Icon = Field(None)
-    showcase_characters: List[ShowcaseCharacter] = Field([], alias="showAvatarInfoList")
+    showcase_characters: list[ShowcaseCharacter] = Field([], alias="showAvatarInfoList")
 
     model_config = {"arbitrary_types_allowed": True}
 
     @field_validator("profile_picture_id", mode="before")
-    def _extract_avatar_id(cls, v: Dict[str, int]) -> int:
-        avatar_id = v.get("avatarId", v.get("id", None))
+    def _extract_avatar_id(cls, v: dict[str, int]) -> int:
+        avatar_id = v.get("avatarId", v.get("id"))
         if avatar_id is None:
-            raise KeyError("Can't find profile picture ID, maybe there is a new format?")
+            msg = "Can't find profile picture ID, maybe there is a new format?"
+            raise KeyError(msg)
         return avatar_id

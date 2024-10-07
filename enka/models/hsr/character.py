@@ -1,21 +1,15 @@
+from __future__ import annotations
+
 from typing import Any, Literal
+
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator, model_validator
 
+from ...constants.hsr import ASCENSION_TO_MAX_LEVEL, DMG_BONUS_PROPS, PERCENT_STAT_TYPES
+from ...enums.hsr import Element, Path, RelicType, StatType
 from ...utils import round_down
-
-from ...constants.hsr import ASCENSION_TO_MAX_LEVEL, DMG_BONUS_PROPS
-from ...constants.hsr import PERCENT_STAT_TYPES
 from .icon import CharacterIcon, LightConeIcon
-from ...enums.hsr import Element, Path, StatType, RelicType
 
-__all__ = (
-    "Trace",
-    "Stat",
-    "LightCone",
-    "RelicSubAffix",
-    "Relic",
-    "Character",
-)
+__all__ = ("Character", "LightCone", "Relic", "RelicSubAffix", "Stat", "Trace")
 
 
 class Trace(BaseModel):
@@ -169,10 +163,8 @@ class Character(BaseModel):
             (stat for stat in self.stats.values() if stat.type in DMG_BONUS_PROPS.values()),
             key=lambda stat: stat.value,
             default=next(
-                (
-                    stat
-                    for stat in self.stats.values()
-                    if stat.type.value == DMG_BONUS_PROPS[self.element]
-                )
+                stat
+                for stat in self.stats.values()
+                if stat.type.value == DMG_BONUS_PROPS[self.element]
             ),
         )

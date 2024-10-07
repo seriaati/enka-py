@@ -1,4 +1,10 @@
-from . import errors, gi, hsr, utils
-from .clients import GenshinClient, HSRClient
-from .enums.enum import Game
+from __future__ import annotations
+
+from . import errors as errors
+from . import gi as gi
+from . import hsr as hsr
+from . import utils as utils
+from .clients import GenshinClient as GenshinClient
+from .clients import HSRClient as HSRClient
+from .enums.enum import Game as Game
 from .models.enka import *

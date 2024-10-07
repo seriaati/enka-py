@@ -1,4 +1,6 @@
-from typing import Any, Dict, List
+from __future__ import annotations
+
+from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -21,14 +23,14 @@ class ShowcaseResponse(BaseModel):
         owner (Owner, optional): The owner of the showcase's account.
     """
 
-    characters: List[Character] = Field(alias="avatarInfoList")
+    characters: list[Character] = Field(alias="avatarInfoList")
     player: Player = Field(alias="playerInfo")
     ttl: int
     uid: str
     owner: Owner | None = None
 
     @model_validator(mode="before")
-    def _handle_no_showcase(cls, v: Dict[str, Any]) -> Dict[str, Any]:
+    def _handle_no_showcase(cls, v: dict[str, Any]) -> dict[str, Any]:
         if "avatarInfoList" not in v or v["avatarInfoList"] is None:
             v["avatarInfoList"] = []
         return v

@@ -1,9 +1,10 @@
-from typing import Any, List
+from __future__ import annotations
+
+from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
 
 from ..enka.owner import Owner
-
 from .character import Character
 from .player import Player
 
@@ -22,7 +23,7 @@ class ShowcaseResponse(BaseModel):
         owner (Owner, optional): The owner of the showcase's account.
     """
 
-    characters: List[Character] = Field(alias="avatarDetailList")
+    characters: list[Character] = Field(alias="avatarDetailList")
     player: Player = Field(alias="detailInfo")
     ttl: int = 0
     uid: str

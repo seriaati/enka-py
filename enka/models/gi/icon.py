@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 __all__ = ("Icon", "Namecard")
 
 
@@ -66,7 +68,7 @@ class Namecard(BaseModel):
 
         e.g. https://enka.network/ui/UI_NameCardIcon_0.png
         """
-        return f"https://enka.network/ui/{self.ui_path.replace('NameCardPic', 'NameCardIcon').replace('_P','')}.png"
+        return f"https://enka.network/ui/{self.ui_path.replace('NameCardPic', 'NameCardIcon').replace('_P', '')}.png"
 
     @computed_field
     @property

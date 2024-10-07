@@ -18,11 +18,7 @@ class BaseClient:
     """Base client with requesting capabilities."""
 
     def __init__(
-        self,
-        game: Game,
-        *,
-        headers: dict[str, Any] | None = None,
-        cache_ttl: int = 60,
+        self, game: Game, *, headers: dict[str, Any] | None = None, cache_ttl: int = 60
     ) -> None:
         self.game = game
 

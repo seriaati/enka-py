@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 from pydantic import BaseModel
 
-__all__ = ("OwnerProfile", "Owner")
+__all__ = ("Owner", "OwnerProfile")
 
 
 class OwnerProfile(BaseModel):

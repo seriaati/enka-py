@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 ASSET_PATH = ".enka_py/assets/hsr"
 
 TEXT_MAP_PATH = f"{ASSET_PATH}/text_map.json"

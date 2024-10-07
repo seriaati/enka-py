@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from ..data import AssetData
@@ -22,7 +24,7 @@ __all__ = ("AssetManager",)
 class AssetManager:
     """Honkai Star Rail asset manager."""
 
-    def __init__(self, lang: "Language") -> None:
+    def __init__(self, lang: Language) -> None:
         self._lang = lang
 
         self.text_map = TextMap(lang)
@@ -55,7 +57,7 @@ class AssetManager:
 
 
 class TextMap(AssetData):
-    def __init__(self, lang: "Language") -> None:
+    def __init__(self, lang: Language) -> None:
         super().__init__()
         self._lang = lang
 

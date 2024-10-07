@@ -1,13 +1,10 @@
+from __future__ import annotations
+
 from typing import Literal
 
 from ..enums.hsr import Element
 
-__all__ = (
-    "ASCENSION_TO_MAX_LEVEL",
-    "DEFAULT_STATS",
-    "DMG_BONUS_PROPS",
-    "PERCENT_STAT_TYPES",
-)
+__all__ = ("ASCENSION_TO_MAX_LEVEL", "DEFAULT_STATS", "DMG_BONUS_PROPS", "PERCENT_STAT_TYPES")
 
 PERCENT_STAT_TYPES = {
     "CriticalChance",

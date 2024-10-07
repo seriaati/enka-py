@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sys
 from enum import IntEnum
 
@@ -6,14 +8,7 @@ if sys.version_info < (3, 11):
 else:
     from enum import StrEnum
 
-__all__ = (
-    "Element",
-    "EquipmentType",
-    "FightPropType",
-    "ItemType",
-    "Language",
-    "StatType",
-)
+__all__ = ("Element", "EquipmentType", "FightPropType", "ItemType", "Language", "StatType")
 
 
 class Language(StrEnum):

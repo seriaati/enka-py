@@ -1,22 +1,16 @@
-from typing import Any, Dict, List, Literal, Optional
+from __future__ import annotations
+
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, computed_field, field_validator, model_validator
 
+from ...constants.gi import ASCENSION_TO_MAX_LEVEL, DMG_BONUS_FIGHT_PROPS, PERCENT_STAT_TYPES
+from ...enums.gi import Element, EquipmentType, FightPropType, ItemType, StatType
+from ...errors import InvalidItemTypeError
 from .costume import Costume
 from .icon import Icon, Namecard
-from ...errors import InvalidItemTypeError
-from ...enums.gi import Element, EquipmentType, ItemType, StatType, FightPropType
-from ...constants.gi import ASCENSION_TO_MAX_LEVEL, DMG_BONUS_FIGHT_PROPS, PERCENT_STAT_TYPES
 
-__all__ = (
-    "Stat",
-    "FightProp",
-    "Artifact",
-    "Character",
-    "Weapon",
-    "Constellation",
-    "Talent",
-)
+__all__ = ("Artifact", "Character", "Constellation", "FightProp", "Stat", "Talent", "Weapon")
 
 
 class Stat(BaseModel):
@@ -94,7 +88,7 @@ class Artifact(BaseModel):
 
     id: int = Field(alias="itemId")
     main_stat_id: int = Field(alias="mainPropId")
-    sub_stat_ids: List[int] = Field(alias="appendPropIdList", default_factory=list)
+    sub_stat_ids: list[int] = Field(alias="appendPropIdList", default_factory=list)
     level: int
     equip_type: EquipmentType = Field(alias="equipType")
     icon: str
@@ -102,7 +96,7 @@ class Artifact(BaseModel):
     name: str = Field(alias="nameTextMapHash")
     rarity: int = Field(alias="rankLevel")
     main_stat: Stat = Field(alias="reliquaryMainstat")
-    sub_stats: List[Stat] = Field(alias="reliquarySubstats", default_factory=list)
+    sub_stats: list[Stat] = Field(alias="reliquarySubstats", default_factory=list)
     set_name: str = Field(alias="setNameTextMapHash")
 
     @field_validator("level", mode="before")
@@ -114,11 +108,11 @@ class Artifact(BaseModel):
         return f"https://enka.network/ui/{v}.png"
 
     @field_validator("main_stat", mode="before")
-    def _convert_main_stat(cls, v: Dict[str, Any]) -> Stat:
+    def _convert_main_stat(cls, v: dict[str, Any]) -> Stat:
         return Stat(type=StatType(v["mainPropId"]), value=v["statValue"], name="")
 
     @field_validator("sub_stats", mode="before")
-    def _convert_sub_stats(cls, v: List[Dict[str, Any]]) -> List[Stat]:
+    def _convert_sub_stats(cls, v: list[dict[str, Any]]) -> list[Stat]:
         return [
             Stat(type=StatType(stat["appendPropId"]), value=stat["statValue"], name="")
             for stat in v
@@ -152,7 +146,7 @@ class Weapon(BaseModel):
     item_type: ItemType = Field(alias="itemType")
     name: str = Field(alias="nameTextMapHash")
     rarity: int = Field(alias="rankLevel")
-    stats: List[Stat] = Field(alias="weaponStats")
+    stats: list[Stat] = Field(alias="weaponStats")
 
     @computed_field
     @property
@@ -160,7 +154,7 @@ class Weapon(BaseModel):
         return ASCENSION_TO_MAX_LEVEL[self.ascension]
 
     @field_validator("refinement", mode="before")
-    def _extract_refinement(cls, v: Dict[str, int]) -> int:
+    def _extract_refinement(cls, v: dict[str, int]) -> int:
         return list(v.values())[0] + 1
 
     @field_validator("icon", mode="before")
@@ -168,7 +162,7 @@ class Weapon(BaseModel):
         return f"https://enka.network/ui/{v}.png"
 
     @field_validator("stats", mode="before")
-    def _convert_stats(cls, v: List[Dict[str, Any]]) -> List[Stat]:
+    def _convert_stats(cls, v: list[dict[str, Any]]) -> list[Stat]:
         return [
             Stat(type=StatType(stat["appendPropId"]), value=stat["statValue"], name="")
             for stat in v
@@ -247,15 +241,15 @@ class Character(BaseModel):
     """
 
     id: int = Field(alias="avatarId")
-    artifacts: List[Artifact]
+    artifacts: list[Artifact]
     weapon: Weapon
-    stats: Dict[FightPropType, FightProp] = Field(alias="fightPropMap")
-    constellations: List[Constellation] = Field([], alias="talentIdList")
-    talents: List[Talent] = Field(alias="skillLevelMap")
+    stats: dict[FightPropType, FightProp] = Field(alias="fightPropMap")
+    constellations: list[Constellation] = Field([], alias="talentIdList")
+    talents: list[Talent] = Field(alias="skillLevelMap")
     ascension: Literal[0, 1, 2, 3, 4, 5, 6]
     level: int
     skill_depot_id: int = Field(alias="skillDepotId")
-    talent_extra_level_map: Optional[Dict[str, int]] = Field(None, alias="proudSkillExtraLevelMap")
+    talent_extra_level_map: dict[str, int] | None = Field(None, alias="proudSkillExtraLevelMap")
     friendship_level: int = Field(alias="friendshipLevel")
 
     name: str = Field(None)
@@ -263,9 +257,9 @@ class Character(BaseModel):
     element: Element = Field(None)
     talent_order: list[int] = Field(None)
     rarity: int = Field(None)
-    namecard: Optional[Namecard] = Field(None)
-    costume: Optional[Costume] = Field(None)
-    costume_id: Optional[int] = Field(None, alias="costumeId")
+    namecard: Namecard | None = Field(None)
+    costume: Costume | None = Field(None)
+    costume_id: int | None = Field(None, alias="costumeId")
 
     model_config = {"arbitrary_types_allowed": True}
 
@@ -311,25 +305,25 @@ class Character(BaseModel):
         return int(v)
 
     @field_validator("stats", mode="before")
-    def _convert_stats(cls, v: Dict[str, float]) -> Dict[FightPropType, FightProp]:
+    def _convert_stats(cls, v: dict[str, float]) -> dict[FightPropType, FightProp]:
         return {
             FightPropType(int(k)): FightProp(type=FightPropType(int(k)), value=v, name="")
             for k, v in v.items()
         }
 
     @field_validator("constellations", mode="before")
-    def _convert_constellations(cls, v: List[int]) -> List[Constellation]:
+    def _convert_constellations(cls, v: list[int]) -> list[Constellation]:
         return [
             Constellation(id=constellation_id, name="", icon="", unlocked=True)
             for constellation_id in v
         ]
 
     @field_validator("talents", mode="before")
-    def _convert_talents(cls, v: Dict[str, int]) -> List[Talent]:
+    def _convert_talents(cls, v: dict[str, int]) -> list[Talent]:
         return [Talent(id=int(k), level=v, name="", icon="") for k, v in v.items()]
 
     @field_validator("weapon", mode="before")
-    def _flatten_weapon_data(cls, v: Dict[str, Any]) -> Dict[str, Any]:
+    def _flatten_weapon_data(cls, v: dict[str, Any]) -> dict[str, Any]:
         v.update(v["weapon"])
         v.update(v["flat"])
         v.pop("weapon")
@@ -337,7 +331,7 @@ class Character(BaseModel):
         return v
 
     @field_validator("artifacts", mode="before")
-    def _flatten_artifacts_data(cls, v: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def _flatten_artifacts_data(cls, v: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for artifact in v:
             artifact.update(artifact["reliquary"])
             artifact.update(artifact["flat"])
@@ -347,7 +341,7 @@ class Character(BaseModel):
         return v
 
     @model_validator(mode="before")
-    def _transform_values(cls, v: Dict[str, Any]) -> Dict[str, Any]:
+    def _transform_values(cls, v: dict[str, Any]) -> dict[str, Any]:
         # convert prop map to level and ascension
         prop_map = v["propMap"]
         try:

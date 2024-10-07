@@ -1,38 +1,37 @@
 [project]
-name = "enka-py"
-requires-python = ">=3.10"
-
-[tool.poetry]
-authors = ["seriaati <seria.ati@gmail.com>"]
-description = "An async API wrapper for enka.network written in Python."
-documentation = "https://github.com/seriaati/enka-py/wiki"
-license = "GPL-3.0-only"
 name = "enka-api"
-packages = [{include = "enka"}]
+description = "Async API wrapper for Enka Network written in Python, supports GI and HSR."
 readme = "README.md"
-repository = "https://github.com/seriaati/enka-py"
 version = "2.2.6"
+requires-python = ">=3.11"
+dependencies = [
+    "aiofiles>=24.1.0",
+    "aiohttp-client-cache[sqlite]>=0.12.3",
+    "aiohttp>=3.10.9",
+    "orjson>=3.10.7",
+    "pydantic>=2.9.2",
+]
+authors = [{ "name" = "seriaati", "email" = "seria.ati@gmail.com" }]
+license = { file = "LICENSE" }
 
-[tool.poetry.dependencies]
-aiofiles = "^24.0.0"
-aiohttp-client-cache = {extras = ["sqlite"], version = "^0.12.0"}
-orjson = "^3.9.10"
-pydantic = "^2.5.3"
-python = "^3.10"
-
-[tool.poetry.group.dev]
-optional = true
-
-[tool.poetry.group.dev.dependencies]
-pre-commit = "^4.0.0"
-
-[tool.poetry.group.test]
-optional = true
-
-[tool.poetry.group.test.dependencies]
-pytest = "^8.2.0"
-pytest-asyncio = "^0.24.0"
+[project.urls]
+Homepage = "https://github.com/seriaati/enka-py"
+Repository = "https://github.com/seriaati/enka-py.git"
+Issues = "https://github.com/seriaati/enka-py/issues"
 
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core"]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["enka"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.pyright]
+typeCheckingMode = "standard"
+
+[tool.uv]
+dev-dependencies = ["pytest-asyncio>=0.24.0", "pytest>=8.3.3"]

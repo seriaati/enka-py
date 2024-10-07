@@ -18,3 +18,4 @@ jobs:
         with:
           pypi_token: ${{ secrets.PYPI_TOKEN }}
           python_version: "3.11"
+          tool: "uv"

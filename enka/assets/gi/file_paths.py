@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 TEXT_MAP_PATH = ".enka_py/assets/text_map_{lang}.json"
 CHARACTER_DATA_PATH = ".enka_py/assets/characters.json"
 NAMECARD_DATA_PATH = ".enka_py/assets/namecards.json"
