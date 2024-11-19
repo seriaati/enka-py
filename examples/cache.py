@@ -7,8 +7,6 @@ import enka
 
 async def main() -> None:
     cache = enka.cache.SQLiteCache()
-    await cache.start()
-
     async with enka.GenshinClient(cache=cache) as client:
         await client.fetch_showcase(901211014)  # Cached
         await client.fetch_showcase(901211014)  # From cache

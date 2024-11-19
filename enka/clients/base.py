@@ -39,6 +39,8 @@ class BaseClient:
     async def start(self) -> None:
         """Start the client."""
         self._session = aiohttp.ClientSession(headers=self._headers)
+        if self._cache is not None:
+            await self._cache.start()
 
     async def close(self) -> None:
         """Close the client."""
@@ -47,6 +49,8 @@ class BaseClient:
             raise RuntimeError(msg)
 
         await self._session.close()
+        if self._cache is not None:
+            await self._cache.close()
 
     async def _request(self, url: str) -> dict[str, Any]:
         if self._session is None:
