@@ -35,7 +35,7 @@ class Player(BaseModel):
         level (int): The player's adventure level.
         namecard_id (int): The player's namecard's ID.
         namecard (Namecard): The player's namecard.
-        nickname (str): The player's nickname.
+        nickname (str, optional): The player's nickname.
         signature (str, optional): The player's signature.
         abyss_floor (int): The player's Spiral Abyss floor.
         abyss_level (int): The player's Spiral Abyss level.
@@ -49,7 +49,7 @@ class Player(BaseModel):
     level: int
     namecard_id: int = Field(alias="nameCardId")
     namecard: Namecard = Field(None)
-    nickname: str
+    nickname: str | None = None
     signature: str | None = Field(None)
     abyss_floor: int = Field(0, alias="towerFloorIndex")
     abyss_level: int = Field(0, alias="towerLevelIndex")
