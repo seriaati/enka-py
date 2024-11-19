@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import copy
-import logging
 from collections import defaultdict
 from typing import TYPE_CHECKING, Any, Final, Literal, overload
+
+from loguru import logger
 
 from ..assets.hsr.file_paths import SOURCE_TO_PATH
 from ..assets.hsr.manager import AssetManager
@@ -24,7 +25,6 @@ if TYPE_CHECKING:
 
 __all__ = ("HSRClient",)
 
-LOGGER_ = logging.getLogger(__name__)
 API_URL: Final[str] = "https://enka.network/api/hsr/uid/{uid}"
 
 
@@ -34,6 +34,7 @@ class HSRClient(BaseClient):
     Args:
         lang (Language | str): The language to use for the client, defaults to Language.ENGLISH.
         headers (dict[str, Any] | None): The headers to use for the client, defaults to None.
+        cache (BaseTTLCache | None): The cache to use for the client, defaults to None.
         use_enka_icons (bool): Whether to get stat icons from Enka, defaults to True.
     """
 
@@ -42,8 +43,10 @@ class HSRClient(BaseClient):
         lang: Language | str = Language.ENGLISH,
         *,
         headers: dict[str, Any] | None = None,
+        cache: BaseTTLCache | None = None,
         use_enka_icons: bool = True,
     ) -> None:
+        super().__init__(Game.HSR, headers=headers, cache=cache)
 
         if isinstance(lang, str):
             try:
@@ -312,12 +315,10 @@ class HSRClient(BaseClient):
             msg = f"Client is not started, call `{self.__class__.__name__}.start` first"
             raise RuntimeError(msg)
 
-        LOGGER_.info("Updating assets...")
-
+        logger.info("Updating HSR assets...")
         await self._asset_updater.update()
         await self._assets.load()
-
-        LOGGER_.info("Assets updated")
+        logger.info("HSR assets updated")
 
     @overload
     async def fetch_showcase(

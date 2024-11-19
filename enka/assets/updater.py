@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import logging
 import os
 from typing import TYPE_CHECKING, Any
 
 import aiofiles
 import orjson
+from loguru import logger
 
 from ..errors import AssetUpdateError
 
@@ -15,8 +15,6 @@ if TYPE_CHECKING:
     from ..enums import gi, hsr
 
 __all__ = ("AssetUpdater",)
-
-LOGGER_ = logging.getLogger(__name__)
 
 
 class AssetUpdater:
@@ -33,7 +31,7 @@ class AssetUpdater:
         self._lang = lang
 
     async def _fetch_json(self, url: str) -> Any:
-        LOGGER_.debug("Fetching %s", url)
+        logger.debug(f"Fetching {url}")
 
         async with self._session.get(url) as resp:
             if resp.status != 200:

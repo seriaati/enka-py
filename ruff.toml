@@ -53,7 +53,7 @@ select = [
 "**/models/*.py" = ["N805", "TCH"]
 "**/tests/*.py" = ["ANN001"]
 "examples/*.py" = ["T201"]
-"playground.*.py" = ["ALL"]
+"test.py" = ["ALL"]
 
 [lint.isort]
 required-imports = ["from __future__ import annotations"]

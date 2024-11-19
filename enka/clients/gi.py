@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import copy
-import logging
 from typing import TYPE_CHECKING, Any, Final, Literal, overload
+
+from loguru import logger
 
 from ..assets.gi.file_paths import SOURCE_TO_PATH
 from ..assets.gi.manager import AssetManager
@@ -22,7 +23,6 @@ if TYPE_CHECKING:
 
 __all__ = ("GenshinClient",)
 
-LOGGER_ = logging.getLogger(__name__)
 API_URL: Final[str] = "https://enka.network/api/uid/{uid}"
 
 
@@ -225,12 +225,10 @@ class GenshinClient(BaseClient):
             msg = "Client is not started, call `EnkaNetworkAPI.start` first"
             raise RuntimeError(msg)
 
-        LOGGER_.info("Updating assets...")
-
+        logger.info("Updating GI assets...")
         await self._asset_updater.update()
         await self._assets.load()
-
-        LOGGER_.info("Assets updated")
+        logger.info("GI assets updated")
 
     @overload
     async def fetch_showcase(
