@@ -20,6 +20,7 @@ from .base import BaseClient
 if TYPE_CHECKING:
     from ..models.enka.owner import Owner
     from ..models.hsr.character import Character, LightCone, Relic, Trace
+    from .cache import BaseTTLCache
 
 __all__ = ("HSRClient",)
 
@@ -33,7 +34,6 @@ class HSRClient(BaseClient):
     Args:
         lang (Language | str): The language to use for the client, defaults to Language.ENGLISH.
         headers (dict[str, Any] | None): The headers to use for the client, defaults to None.
-        cache_ttl (int): The time to live of the cache, defaults to 60.
         use_enka_icons (bool): Whether to get stat icons from Enka, defaults to True.
     """
 
@@ -42,10 +42,8 @@ class HSRClient(BaseClient):
         lang: Language | str = Language.ENGLISH,
         *,
         headers: dict[str, Any] | None = None,
-        cache_ttl: int = 60,
         use_enka_icons: bool = True,
     ) -> None:
-        super().__init__(Game.HSR, headers=headers, cache_ttl=cache_ttl)
 
         if isinstance(lang, str):
             try:

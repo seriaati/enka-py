@@ -6,7 +6,6 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "aiofiles>=24.1.0",
-    "aiohttp-client-cache[sqlite]>=0.12.3",
     "aiohttp>=3.10.9",
     "orjson>=3.10.7",
     "pydantic>=2.9.2",
@@ -18,6 +17,9 @@ license = { file = "LICENSE" }
 Homepage = "https://github.com/seriaati/enka-py"
 Repository = "https://github.com/seriaati/enka-py.git"
 Issues = "https://github.com/seriaati/enka-py/issues"
+
+[project.optional-dependencies]
+sqlite = ["aiosqlite>=0.20.0"]
 
 [build-system]
 requires = ["hatchling"]

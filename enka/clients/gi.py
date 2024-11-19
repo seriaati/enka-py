@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from ..models.enka.owner import Owner
     from ..models.gi.character import Character
     from ..models.gi.player import Player, ShowcaseCharacter
+    from .cache import BaseTTLCache
 
 __all__ = ("GenshinClient",)
 
@@ -31,7 +32,7 @@ class GenshinClient(BaseClient):
     Args:
         lang (Language | str): The language to use for the client, defaults to Language.ENGLISH.
         headers (dict[str, Any] | None): The headers to use for the client, defaults to None.
-        cache_ttl (int): The time to live of the cache, defaults to 60.
+        cache (BaseTTLCache | None): The cache to use for the client, defaults to None.
     """
 
     def __init__(
@@ -39,9 +40,9 @@ class GenshinClient(BaseClient):
         lang: Language | str = Language.ENGLISH,
         *,
         headers: dict[str, Any] | None = None,
-        cache_ttl: int = 60,
+        cache: BaseTTLCache | None = None,
     ) -> None:
-        super().__init__(Game.GI, headers=headers, cache_ttl=cache_ttl)
+        super().__init__(Game.GI, headers=headers, cache=cache)
 
         if isinstance(lang, str):
             try:
