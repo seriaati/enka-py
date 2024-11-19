@@ -67,6 +67,6 @@ class Player(BaseModel):
 
         avatar_id = v.get("avatarId", v.get("id"))
         if avatar_id is None:
-            msg = "Can't find profile picture ID, maybe there is a new format?"
+            msg = f"Cannot find profile picture ID from {v}, maybe there is a new format?"
             raise KeyError(msg)
         return avatar_id
