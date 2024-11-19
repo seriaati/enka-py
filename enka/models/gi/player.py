@@ -62,6 +62,9 @@ class Player(BaseModel):
 
     @field_validator("profile_picture_id", mode="before")
     def _extract_avatar_id(cls, v: dict[str, int]) -> int:
+        if not v:
+            return 10000007
+
         avatar_id = v.get("avatarId", v.get("id"))
         if avatar_id is None:
             msg = "Can't find profile picture ID, maybe there is a new format?"
