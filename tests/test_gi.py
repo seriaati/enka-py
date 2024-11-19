@@ -63,3 +63,8 @@ async def test_raw_and_parse() -> None:
     async with GenshinClient() as api:
         raw = await api.fetch_showcase("901211014", raw=True)
         api.parse_showcase(raw)
+
+
+async def test_invalid_player() -> None:
+    async with GenshinClient() as api:
+        await api.fetch_showcase("901211015")
