@@ -25,7 +25,7 @@ class Stat(BaseModel):
 
     type: StatType
     value: float
-    name: str = Field(None)
+    name: str = Field("")
 
     @computed_field
     @property
@@ -52,7 +52,7 @@ class FightProp(BaseModel):
 
     type: FightPropType
     value: float
-    name: str = Field(None)
+    name: str = Field("")
 
     @computed_field
     @property
@@ -185,8 +185,8 @@ class Constellation(BaseModel):
     """
 
     id: int
-    name: str = Field(None)
-    icon: str = Field(None)
+    name: str = Field("")
+    icon: str = Field("")
     unlocked: bool
 
 
@@ -204,8 +204,8 @@ class Talent(BaseModel):
 
     id: int
     level: int
-    name: str = Field(None)
-    icon: str = Field(None)
+    name: str = Field("")
+    icon: str = Field("")
     is_upgraded: bool = False
 
 
@@ -252,13 +252,13 @@ class Character(BaseModel):
     talent_extra_level_map: dict[str, int] | None = Field(None, alias="proudSkillExtraLevelMap")
     friendship_level: int = Field(alias="friendshipLevel")
 
-    name: str = Field(None)
-    icon: Icon = Field(None)
-    element: Element = Field(None)
-    talent_order: list[int] = Field(None)
-    rarity: int = Field(None)
-    namecard: Namecard | None = Field(None)
-    costume: Costume | None = Field(None)
+    name: str = Field("")
+    icon: Icon = Field("")
+    element: Element = Field("")
+    talent_order: list[int] = Field("")
+    rarity: int = Field("")
+    namecard: Namecard | None = Field("")
+    costume: Costume | None = Field("")
     costume_id: int | None = Field(None, alias="costumeId")
 
     model_config = {"arbitrary_types_allowed": True}

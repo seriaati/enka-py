@@ -21,7 +21,7 @@ class ShowcaseCharacter(BaseModel):
 
     id: int = Field(alias="avatarId")
     level: int
-    costume: Costume | None = Field(None)
+    costume: Costume | None = Field("")
     costume_id: int | None = Field(None, alias="costumeId")
 
     model_config = {"arbitrary_types_allowed": True}
@@ -48,14 +48,14 @@ class Player(BaseModel):
     achievements: int = Field(0, alias="finishAchievementNum")
     level: int
     namecard_id: int = Field(alias="nameCardId")
-    namecard: Namecard = Field(None)
+    namecard: Namecard = Field("")
     nickname: str | None = None
-    signature: str | None = Field(None)
+    signature: str | None = Field("")
     abyss_floor: int = Field(0, alias="towerFloorIndex")
     abyss_level: int = Field(0, alias="towerLevelIndex")
     world_level: int = Field(0, alias="worldLevel")
     profile_picture_id: int = Field(alias="profilePicture")
-    profile_picture_icon: Icon = Field(None)
+    profile_picture_icon: Icon = Field("")
     showcase_characters: list[ShowcaseCharacter] = Field([], alias="showAvatarInfoList")
 
     model_config = {"arbitrary_types_allowed": True}

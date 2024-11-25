@@ -19,10 +19,10 @@ class Trace(BaseModel):
     """Whether the level of this trace is boosted by an activated eidolon's effect."""
 
     # Following fields are added in post-processing
-    icon: str = Field(None)
-    max_level: int = Field(None)
-    anchor: str = Field(None)
-    type: int = Field(None)
+    icon: str = Field("")
+    max_level: int = Field("")
+    anchor: str = Field("")
+    type: int = Field("")
 
 
 class Stat(BaseModel):
@@ -30,8 +30,8 @@ class Stat(BaseModel):
     value: float
 
     # Following fields are added in post-processing
-    name: str = Field(None)
-    icon: str = Field(None)
+    name: str = Field("")
+    icon: str = Field("")
 
     @computed_field
     @property
@@ -62,8 +62,8 @@ class LightCone(BaseModel):
     stats: list[Stat] = Field(alias="props")
 
     # Following fields are added in post-processing
-    icon: LightConeIcon = Field(None)
-    rarity: Literal[3, 4, 5] = Field(None)
+    icon: LightConeIcon = Field("")
+    rarity: Literal[3, 4, 5] = Field("")
 
     @computed_field
     @property
@@ -99,8 +99,8 @@ class Relic(BaseModel):
     sub_affix_list: list[RelicSubAffix] = Field(alias="subAffixList", default_factory=list)
 
     # The following fields are added in post-processing
-    icon: str = Field(None)
-    rarity: Literal[3, 4, 5] = Field(None)
+    icon: str = Field("")
+    rarity: Literal[3, 4, 5] = Field("")
 
     @field_validator("set_name", mode="before")
     def _stringify_set_name(cls, value: int) -> str:
@@ -142,11 +142,11 @@ class Character(BaseModel):
     is_assist: bool = Field(False, alias="_assist")
 
     # Following fields are added in post-processing
-    icon: CharacterIcon = Field(None)
-    name: str = Field(None)
-    rarity: Literal[4, 5] = Field(None)
-    element: Element = Field(None)
-    path: Path = Field(None)
+    icon: CharacterIcon = Field("")
+    name: str = Field("")
+    rarity: Literal[4, 5] = Field("")
+    element: Element = Field("")
+    path: Path = Field("")
     stats: dict[StatType, Stat] = Field(default_factory=dict)
 
     @computed_field
