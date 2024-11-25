@@ -58,6 +58,11 @@ class Player(BaseModel):
     profile_picture_icon: Icon = Icon(side_icon_ui_path="")
     showcase_characters: list[ShowcaseCharacter] = Field([], alias="showAvatarInfoList")
 
+    # New fields after v5.0
+    max_friendship_character_count: int | None = Field(None, alias="fetterCount")
+    abyss_stars: int | None = Field(None, alias="towerStarIndex")
+    theater_stars: int | None = Field(None, alias="theaterStarIndex")
+
     model_config = {"arbitrary_types_allowed": True}
 
     @field_validator("profile_picture_id", mode="before")
