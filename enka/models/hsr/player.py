@@ -51,7 +51,7 @@ class Player(BaseModel):
     stats: PlayerStats = Field(alias="recordInfo")
 
     # The following fields are added in post-processing
-    icon: str = Field(None, alias="headIcon")
+    icon: str = Field("", alias="headIcon")
 
     @field_validator("icon", mode="before")
     def _stringify_icon(cls, value: int) -> str:
