@@ -93,7 +93,7 @@ class SQLiteCache(BaseTTLCache):
     async def set(self, key: str, value: str, ttl: int) -> None:
         await self.conn.execute(
             "INSERT INTO cache (key, value, expires_at) VALUES (?, ?, ?) ON CONFLICT(key) DO UPDATE SET value = ?, expires_at = ?",
-            (key, value, time.time() + ttl),
+            (key, value, time.time() + ttl, value, time.time() + ttl),
         )
         await self.conn.commit()
 
