@@ -64,6 +64,13 @@ class AlgoScrewedUpMassivelyError(EnkaAPIError):
         return "Algo screwed up massively"
 
 
+class GatewayTimeoutError(EnkaAPIError):
+    """Raised when a gateway timeout occurs."""
+
+    def __str__(self) -> str:
+        return "Gateway timeout"
+
+
 def raise_for_retcode(retcode: int) -> None:
     """Raises an exception based on the retcode."""
     match retcode:
@@ -79,6 +86,8 @@ def raise_for_retcode(retcode: int) -> None:
             raise GeneralServerError
         case 503:
             raise AlgoScrewedUpMassivelyError
+        case 504:
+            raise GatewayTimeoutError
         case _:
             raise EnkaAPIError
 
