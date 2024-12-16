@@ -31,5 +31,5 @@ class ShowcaseResponse(BaseModel):
 
     @model_validator(mode="before")
     def _flatten_data(cls, values: dict[str, Any]) -> dict[str, Any]:
-        values["avatarDetailList"] = values["detailInfo"].pop("avatarDetailList")
+        values["avatarDetailList"] = values["detailInfo"].pop("avatarDetailList", [])
         return values
