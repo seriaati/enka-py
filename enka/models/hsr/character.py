@@ -126,6 +126,7 @@ class Relic(BaseModel):
 class Eidolon(BaseModel):
     id: int
     icon: str
+    unlocked: bool
 
 
 class Character(BaseModel):

@@ -137,10 +137,14 @@ class HSRClient(BaseClient):
 
         # Eidolons
         eidolon_ids: list[int] = character_data["RankIDList"]
-        for eidolon_id in eidolon_ids:
+        for i, eidolon_id in enumerate(eidolon_ids, start=1):
             eidolon_data = self._assets.eidolon_data[str(eidolon_id)]
             character.eidolons.append(
-                Eidolon(id=eidolon_id, icon=self._get_icon(eidolon_data["IconPath"]))
+                Eidolon(
+                    id=eidolon_id,
+                    icon=self._get_icon(eidolon_data["IconPath"]),
+                    unlocked=i <= character.eidolons_unlocked,
+                )
             )
 
         for trace in character.traces:
