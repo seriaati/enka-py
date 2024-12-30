@@ -1,5 +1,16 @@
 # enka.py
 
+## ⚠️ Notice: Package Renaming
+
+**Important Announcement:**
+
+The `enka-api` package has been deprecated and is now replaced by the new package named **`enka`**.
+
+### What You Need to Know
+
+- **New Package**: Please install the new package using the following command:
+- **Deprecation Details**: The `enka-api` package will continue to be available for a limited time, but we encourage you to transition to the new package as soon as possible.
+
 ## Introduction
 
 enka.py is an async API wrapper for [enka.network](https://enka.network/) written in Python.  
@@ -20,14 +31,8 @@ Developing something for Hoyoverse games? You might be interested in [other API 
 
 ## Installation
 
-I know it's annoying that the project is named enka-py but the package is named enka-api, but package name enka-py was already taken on PyPI.
-
 ```bash
-# poetry
-poetry add enka-api
-
-# pip
-pip install enka-api
+pip install enka
 ```
 
 ## Quick Example
