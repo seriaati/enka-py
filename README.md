@@ -9,6 +9,9 @@ The `enka-api` package has been deprecated and is now replaced by the new packag
 ### What You Need to Know
 
 - **New Package**: Please install the new package using the following command:
+  ```
+  pip install enka
+  ```
 - **Deprecation Details**: The `enka-api` package will continue to be available for a limited time, but we encourage you to transition to the new package as soon as possible.
 
 ## Introduction
