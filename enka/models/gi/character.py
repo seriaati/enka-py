@@ -45,19 +45,26 @@ class FightProp(BaseModel):
     Represents a fight prop.
 
     Attributes:
-        type (FightPropType): The fight prop's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.).
+        type (FightPropType | int): The fight prop's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.).
         value (float): The fight prop's value.
         name (str): The fight prop's name.
     """
 
-    type: FightPropType
+    type: FightPropType | int
     value: float
     name: str = ""
+
+    @field_validator("type", mode="before")
+    def __convert_type(cls, v: int) -> FightPropType | int:
+        try:
+            return FightPropType(v)
+        except ValueError:
+            return v
 
     @computed_field
     @property
     def is_percentage(self) -> bool:
-        return self.type.name in PERCENT_STAT_TYPES
+        return isinstance(self.type, FightPropType) and self.type.name in PERCENT_STAT_TYPES
 
     @computed_field
     @property
@@ -216,7 +223,7 @@ class Character(BaseModel):
         id (int): The character's ID.
         artifacts (List[Artifact]): The character's artifacts.
         weapon (Weapon): The character's weapon.
-        stats (Dict[FightPropType, FightProp]): The character's stats.
+        stats (Dict[FightPropType | int, FightProp]): The character's stats.
         constellations (List[Constellation]): The character's unlocked constellations.
         talents (List[Talent]): The character's talents.
         ascension (Literal[0, 1, 2, 3, 4, 5, 6]): The character's ascension level.
@@ -243,7 +250,7 @@ class Character(BaseModel):
     id: int = Field(alias="avatarId")
     artifacts: list[Artifact]
     weapon: Weapon
-    stats: dict[FightPropType, FightProp] = Field(alias="fightPropMap")
+    stats: dict[FightPropType | int, FightProp] = Field(alias="fightPropMap")
     constellations: list[Constellation] = Field([], alias="talentIdList")
     talents: list[Talent] = Field(alias="skillLevelMap")
     ascension: Literal[0, 1, 2, 3, 4, 5, 6]
@@ -277,7 +284,11 @@ class Character(BaseModel):
         Returns the highest stat value from the damage bonus stats (elemental damage bonus, physical damage bonus, etc.).
         """
         return max(
-            (stat for stat in self.stats.values() if stat.type.name in DMG_BONUS_FIGHT_PROPS),
+            (
+                stat
+                for stat in self.stats.values()
+                if isinstance(stat.type, FightPropType) and stat.type.name in DMG_BONUS_FIGHT_PROPS
+            ),
             key=lambda stat: stat.value,
         )
 
@@ -290,7 +301,11 @@ class Character(BaseModel):
         """
         specialized_stats = list(DMG_BONUS_FIGHT_PROPS) + [FightPropType.FIGHT_PROP_HEAL_ADD.name]
         return max(
-            (stat for stat in self.stats.values() if stat.type.name in specialized_stats),
+            (
+                stat
+                for stat in self.stats.values()
+                if isinstance(stat.type, FightPropType) and stat.type.name in specialized_stats
+            ),
             key=lambda stat: stat.value,
         )
 
@@ -305,11 +320,16 @@ class Character(BaseModel):
         return int(v)
 
     @field_validator("stats", mode="before")
-    def _convert_stats(cls, v: dict[str, float]) -> dict[FightPropType, FightProp]:
-        return {
-            FightPropType(int(k)): FightProp(type=FightPropType(int(k)), value=v, name="")
-            for k, v in v.items()
-        }
+    def _convert_stats(cls, v: dict[str, float]) -> dict[FightPropType | int, FightProp]:
+        result: dict[FightPropType | int, FightProp] = {}
+        for k, value in v.items():
+            try:
+                result[FightPropType(int(k))] = FightProp(
+                    type=FightPropType(int(k)), value=value, name=""
+                )
+            except ValueError:
+                result[int(k)] = FightProp(type=int(k), value=value, name="")
+        return result
 
     @field_validator("constellations", mode="before")
     def _convert_constellations(cls, v: list[int]) -> list[Constellation]:

@@ -136,6 +136,8 @@ class GenshinClient(BaseClient):
 
         # stats
         for stat_type, stat in character.stats.items():
+            if isinstance(stat_type, int):
+                continue
             stat.name = self._assets.text_map.get(stat_type.name)
 
         # constellations
