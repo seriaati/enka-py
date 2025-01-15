@@ -12,7 +12,7 @@ The `enka-api` package has been deprecated and is now replaced by the new packag
   ```
   pip install enka
   ```
-- **Deprecation Details**: The `enka-api` package will continue to be available for a limited time, but we encourage you to transition to the new package as soon as possible.
+- **Deprecation Details**: The `enka-api` package will continue to be available, but new updates will be released in the `enka` package, so I encourage you to transition to the new package as soon as possible.
 
 ## Introduction
 
