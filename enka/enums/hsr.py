@@ -126,6 +126,7 @@ class Path(StrEnum):
     DESTRUCTION = "Warrior"
     HARMONY = "Shaman"
     ABUNDANCE = "Priest"
+    REMEMBRANCE = "Memory"
 
 
 class TraceType(IntEnum):
@@ -137,3 +138,5 @@ class TraceType(IntEnum):
     """Special talents (there are 3 of these)"""
     STAT = 1
     """Stat boost traces"""
+    MEMOSPRITE = 4
+    """Memosprite traces"""
