@@ -22,7 +22,7 @@ class Language(StrEnum):
     KOREAN = "ko"
     JAPANESE = "ja"
     INDOENSIAN = "id"
-    FRECH = "fr"
+    FRENCH = "fr"
     ESPANOL = "es"
     GERMAN = "de"
     TRADITIONAL_CHINESE = "zh-tw"
