@@ -10,7 +10,7 @@ from ..assets.gi.manager import AssetManager
 from ..assets.updater import AssetUpdater
 from ..constants.gi import CHARACTER_RARITY_MAP
 from ..enums.enum import Game
-from ..enums.gi import Element, Language
+from ..enums.gi import Element, FightPropType, Language
 from ..models.gi import Constellation, Costume, Icon, Namecard, ShowcaseResponse
 from ..models.gi.build import Build
 from .base import BaseClient
@@ -136,7 +136,7 @@ class GenshinClient(BaseClient):
 
         # stats
         for stat_type, stat in character.stats.items():
-            if isinstance(stat_type, int):
+            if not isinstance(stat_type, FightPropType):
                 continue
             stat.name = self._assets.text_map.get(stat_type.name)
 
