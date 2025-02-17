@@ -251,7 +251,7 @@ class Character(BaseModel):
     artifacts: list[Artifact]
     weapon: Weapon
     stats: dict[FightPropType | int, FightProp] = Field(alias="fightPropMap")
-    constellations: list[Constellation] = Field([], alias="talentIdList")
+    constellations: list[Constellation] = Field(alias="talentIdList", default_factory=list)
     talents: list[Talent] = Field(alias="skillLevelMap")
     ascension: Literal[0, 1, 2, 3, 4, 5, 6]
     level: int

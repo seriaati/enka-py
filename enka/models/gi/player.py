@@ -56,7 +56,9 @@ class Player(BaseModel):
     world_level: int = Field(0, alias="worldLevel")
     profile_picture_id: int = Field(alias="profilePicture")
     profile_picture_icon: Icon = Icon(side_icon_ui_path="")
-    showcase_characters: list[ShowcaseCharacter] = Field([], alias="showAvatarInfoList")
+    showcase_characters: list[ShowcaseCharacter] = Field(
+        alias="showAvatarInfoList", default_factory=list
+    )
 
     # New fields after v5.0
     max_friendship_character_count: int | None = Field(None, alias="fetterCount")

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator
 
 from ..enka.owner import Owner
 from .character import Character
@@ -23,14 +23,14 @@ class ShowcaseResponse(BaseModel):
         owner (Owner, optional): The owner of the showcase's account.
     """
 
-    characters: list[Character] = Field(alias="avatarInfoList")
+    characters: list[Character] = Field(alias="avatarInfoList", default_factory=list)
     player: Player = Field(alias="playerInfo")
     ttl: int
     uid: str
     owner: Owner | None = None
 
-    @model_validator(mode="before")
-    def _handle_no_showcase(cls, v: dict[str, Any]) -> dict[str, Any]:
-        if "avatarInfoList" not in v or v["avatarInfoList"] is None:
-            v["avatarInfoList"] = []
+    @field_validator("characters", mode="before")
+    def __handle_none_value(cls, v: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
+        if v is None:
+            return []
         return v
