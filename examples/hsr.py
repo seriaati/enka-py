@@ -5,7 +5,7 @@ import asyncio
 import enka
 
 
-async def main() -> None:  # noqa: C901, D103
+async def main() -> None:
     async with enka.HSRClient(enka.hsr.Language.TRADITIONAL_CHINESE) as api:
         # Update assets
         await api.update_assets()
@@ -60,7 +60,8 @@ async def main() -> None:  # noqa: C901, D103
                 )
                 for substat in relic.sub_stats:
                     print(f"- {substat.name} {substat.formatted_value}")
-                print("")
+                print()
+    return None
 
 
 if __name__ == "__main__":

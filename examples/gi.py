@@ -15,7 +15,7 @@ FIGHT_PROPS_TO_SHOW = (
 )
 
 
-async def main() -> None:  # noqa: C901, D103
+async def main() -> None:
     async with enka.GenshinClient(enka.gi.Language.TRADITIONAL_CHINESE) as api:
         # Update assets
         await api.update_assets()
@@ -70,7 +70,8 @@ async def main() -> None:  # noqa: C901, D103
                 )
                 for substat in artifact.sub_stats:
                     print(f"- {substat.name} {substat.formatted_value}")
-                print("")
+                print()
+    return None
 
 
 if __name__ == "__main__":
