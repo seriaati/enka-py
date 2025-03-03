@@ -132,6 +132,8 @@ class Path(StrEnum):
 class TraceType(IntEnum):
     """HSR trace types."""
 
+    UNKNOWN = 0
+    """Set before post-processing"""
     SKILL = 2
     """Basic ATK, Skill, Ultimate, Talent, Technique"""
     TALENT = 3

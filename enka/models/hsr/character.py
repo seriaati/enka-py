@@ -5,7 +5,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator, model_validator
 
 from ...constants.hsr import ASCENSION_TO_MAX_LEVEL, DMG_BONUS_PROPS, PERCENT_STAT_TYPES
-from ...enums.hsr import Element, Path, RelicType, StatType
+from ...enums.hsr import Element, Path, RelicType, StatType, TraceType
 from ...utils import round_down
 from .icon import CharacterIcon, LightConeIcon
 
@@ -22,7 +22,7 @@ class Trace(BaseModel):
     icon: str = ""
     max_level: int = 0
     anchor: str = ""
-    type: int = 0
+    type: TraceType = TraceType.UNKNOWN
 
 
 class Stat(BaseModel):
