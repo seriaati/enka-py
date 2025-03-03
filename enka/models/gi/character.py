@@ -162,7 +162,7 @@ class Weapon(BaseModel):
 
     @field_validator("refinement", mode="before")
     def _extract_refinement(cls, v: dict[str, int]) -> int:
-        return list(v.values())[0] + 1
+        return next(iter(v.values())) + 1
 
     @field_validator("icon", mode="before")
     def _convert_icon(cls, v: str) -> str:
@@ -299,7 +299,7 @@ class Character(BaseModel):
 
         Returns the highest stat value from the specialized stats (elemental damage bonus and healing bonus).
         """
-        specialized_stats = list(DMG_BONUS_FIGHT_PROPS) + [FightPropType.FIGHT_PROP_HEAL_ADD.name]
+        specialized_stats = [*list(DMG_BONUS_FIGHT_PROPS), FightPropType.FIGHT_PROP_HEAL_ADD.name]
         return max(
             (
                 stat
@@ -323,11 +323,11 @@ class Character(BaseModel):
     def _convert_stats(cls, v: dict[str, float]) -> dict[FightPropType | int, FightProp]:
         result: dict[FightPropType | int, FightProp] = {}
         for k, value in v.items():
-            try:
+            if k.isdigit() and int(k) in FightPropType._value2member_map_:
                 result[FightPropType(int(k))] = FightProp(
                     type=FightPropType(int(k)), value=value, name=""
                 )
-            except ValueError:
+            else:
                 result[int(k)] = FightProp(type=int(k), value=value, name="")
         return result
 

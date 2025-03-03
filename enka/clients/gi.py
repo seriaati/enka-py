@@ -102,7 +102,7 @@ class GenshinClient(BaseClient):
                 data=costume_data[str(showcase_character.costume_id)],
             )
 
-    def _post_process_character(self, character: Character) -> None:  # noqa: C901, PLR0914, PLR0912
+    def _post_process_character(self, character: Character) -> None:  # noqa: PLR0912
         self._check_assets()
 
         characer_id = (
@@ -148,16 +148,15 @@ class GenshinClient(BaseClient):
             const["id"] = const_id
             all_consts.append(const)
 
-        consts: list[Constellation] = []
-        for const in all_consts:
-            consts.append(
-                Constellation(
-                    id=int(const["id"]),
-                    name=self._assets.text_map[const["nameTextMapHash"]],
-                    icon=f"https://enka.network/ui/{const['icon']}.png",
-                    unlocked=any(const["id"] == str(c.id) for c in character.constellations),
-                )
+        consts: list[Constellation] = [
+            Constellation(
+                id=int(const["id"]),
+                name=self._assets.text_map[const["nameTextMapHash"]],
+                icon=f"https://enka.network/ui/{const['icon']}.png",
+                unlocked=any(const["id"] == str(c.id) for c in character.constellations),
             )
+            for const in all_consts
+        ]
         character.constellations = consts
 
         # talents

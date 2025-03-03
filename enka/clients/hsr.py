@@ -233,7 +233,7 @@ class HSRClient(BaseClient):
             for stat_type, value in final_stats.items()
         }
 
-    def _add_up_character_stats(self, character: Character) -> dict[str, float]:  # noqa: C901
+    def _add_up_character_stats(self, character: Character) -> dict[str, float]:
         chara_stats = DEFAULT_STATS.copy()
 
         # Add base stats

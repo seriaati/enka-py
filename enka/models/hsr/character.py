@@ -45,10 +45,9 @@ class Stat(BaseModel):
         """Returns the formatted value of the stat."""
         if self.is_percentage:
             return f"{round_down(self.value * 100, 1)}%"
-        else:
-            if self.type in {StatType.SPD, StatType.SPEED_DELTA}:
-                return str(round_down(self.value, 2))
-            return str(int(round_down(self.value, 0)))
+        if self.type in {StatType.SPD, StatType.SPEED_DELTA}:
+            return str(round_down(self.value, 2))
+        return str(int(round_down(self.value, 0)))
 
 
 class LightCone(BaseModel):
