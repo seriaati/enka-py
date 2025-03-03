@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import os
+import pathlib
 from typing import TYPE_CHECKING, Any
 
 import aiofiles
@@ -42,9 +42,9 @@ class AssetUpdater:
     async def update(self) -> None:
         """Update all assets."""
         for source, path in self._source_to_path.items():
-            path_ = path.format(lang=self._lang.value)
-            if not os.path.exists(os.path.dirname(path_)):
-                os.makedirs(os.path.dirname(path_))
+            path_ = pathlib.Path(path.format(lang=self._lang.value))
+            if not path_.parent.exists():
+                path_.parent.mkdir(parents=True)
 
             data = await self._fetch_json(source.format(lang=self._lang.value))
 

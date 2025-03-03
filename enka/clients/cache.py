@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-import os
 import pathlib
 import time
 
@@ -71,7 +70,7 @@ class SQLiteCache(BaseTTLCache):
         return self._conn
 
     async def start(self) -> None:
-        os.makedirs(self._db_path.parent, exist_ok=True)
+        self._db_path.parent.mkdir(parents=True, exist_ok=True)
         self._conn = await aiosqlite.connect(self._db_path)
         await self.conn.execute(
             "CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value TEXT, expires_at REAL)"
