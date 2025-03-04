@@ -6,9 +6,8 @@ from typing import TYPE_CHECKING, Any, Final, Literal, overload
 
 from loguru import logger
 
-from ..assets.hsr.file_paths import SOURCE_TO_PATH
-from ..assets.hsr.manager import AssetManager
-from ..assets.updater import AssetUpdater
+from ..assets.data import TextMap
+from ..assets.hsr.manager import HSR_ASSETS
 from ..constants.hsr import DEFAULT_STATS
 from ..enums.enum import Game
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
@@ -48,6 +47,11 @@ class HSRClient(BaseClient):
     ) -> None:
         super().__init__(Game.HSR, headers=headers, cache=cache)
 
+        self._lang = self._convert_lang(lang)
+        self._use_enka_icons = use_enka_icons
+        self._assets = HSR_ASSETS
+
+    def _convert_lang(self, lang: Language | str) -> Language:
         if isinstance(lang, str):
             try:
                 lang = Language(lang)
@@ -56,8 +60,16 @@ class HSRClient(BaseClient):
                 msg = f"Invalid language: {lang}, must be one of {available_langs}"
                 raise ValueError(msg) from e
 
-        self._lang = lang
-        self._use_enka_icons = use_enka_icons
+        return lang
+
+    @property
+    def lang(self) -> Language:
+        return self._lang
+
+    @lang.setter
+    def lang(self, lang: Language | str) -> None:
+        self._lang = self._convert_lang(lang)
+        self._text_map = TextMap(self._lang, self._assets.text_map)
 
     async def __aenter__(self) -> HSRClient:
         await self.start()
@@ -66,13 +78,8 @@ class HSRClient(BaseClient):
     async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         return await super().__aexit__(exc_type, exc_val, exc_tb)
 
-    def _check_assets(self) -> None:
-        if self._assets is None:
-            msg = f"Client is not started, call `{self.__class__.__name__}.start` first"
-            raise RuntimeError(msg)
-
     def _post_process_relic(self, relic: Relic) -> None:
-        text_map = self._assets.text_map
+        text_map = self._text_map
         relic.set_name = text_map[relic.set_name]
 
         relic_data = self._assets.relic_data[str(relic.id)]
@@ -86,7 +93,7 @@ class HSRClient(BaseClient):
             )
 
     def _post_process_light_cone(self, light_cone: LightCone) -> None:
-        text_map = self._assets.text_map
+        text_map = self._text_map
         light_cone.name = text_map[light_cone.name]
         light_cone.rarity = self._assets.light_cones_data[str(light_cone.id)]["Rarity"]
         light_cone.icon = LightConeIcon(light_cone_id=light_cone.id)
@@ -124,13 +131,11 @@ class HSRClient(BaseClient):
                     break
 
     def _post_process_character(self, character: Character) -> None:
-        self._check_assets()
-
         character.icon = CharacterIcon(character_id=character.id)
 
         character_data = self._assets.character_data[str(character.id)]
-        text_map_hash: int = character_data["AvatarName"]["Hash"]
-        character.name = self._assets.text_map[str(text_map_hash)]
+        text_map_hash = character_data["AvatarName"]["Hash"]
+        character.name = self._text_map[text_map_hash]
         character.rarity = character_data["Rarity"]
         character.element = Element(character_data["Element"])
         character.path = Path(character_data["AvatarBaseType"])
@@ -225,7 +230,7 @@ class HSRClient(BaseClient):
             stat_type: Stat(
                 type=stat_type,
                 value=value,
-                name=self._assets.text_map[stat_type.value],
+                name=self._text_map[stat_type.value],
                 icon=self._get_icon(
                     self._assets.property_config_data[stat_type.value], enka=self._use_enka_icons
                 ),
@@ -270,9 +275,9 @@ class HSRClient(BaseClient):
         # Add relic set stats
         for relic_set_id, count in relic_sets.items():
             for i in range(1, count + 1):
-                relic_set_meta: dict[str, dict[str, float]] = self._assets.meta_data["relic"][
-                    "setSkill"
-                ][str(relic_set_id)].get(str(i))
+                relic_set_meta: dict[str, dict[str, float]] | None = self._assets.meta_data[
+                    "relic"
+                ]["setSkill"][str(relic_set_id)].get(str(i))
                 if relic_set_meta is not None:
                     update_stats(chara_stats, relic_set_meta["props"])
 
@@ -286,8 +291,6 @@ class HSRClient(BaseClient):
         return chara_stats
 
     def _post_process_player(self, player: Player) -> None:
-        self._check_assets()
-
         player.icon = self._get_icon(self._assets.avatar_data[player.icon]["Icon"])
 
     def _post_process_showcase(self, showcase: ShowcaseResponse) -> None:
@@ -302,26 +305,14 @@ class HSRClient(BaseClient):
         return f"https://raw.githubusercontent.com/Mar-7th/StarRailRes/master/icon/property/{icon.split('/')[-1]}.png"
 
     async def start(self) -> None:
-        """Start the client."""
         await super().start()
-        assert self._session is not None
-
-        self._assets = AssetManager(self._lang)
-        self._asset_updater = AssetUpdater(self._session, SOURCE_TO_PATH, self._lang)
-
-        loaded = await self._assets.load()
-        if not loaded:
-            await self.update_assets()
+        await self._assets.load(self.session)
+        self._text_map = TextMap(self.lang, self._assets.text_map)
 
     async def update_assets(self) -> None:
         """Update game assets."""
-        if self._asset_updater is None or self._assets is None:
-            msg = f"Client is not started, call `{self.__class__.__name__}.start` first"
-            raise RuntimeError(msg)
-
-        logger.info("Updating HSR assets...")
-        await self._asset_updater.update()
-        await self._assets.load()
+        logger.info("Updating HSR assets")
+        await self._assets.load(self.session)
         logger.info("HSR assets updated")
 
     @overload

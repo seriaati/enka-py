@@ -5,9 +5,8 @@ from typing import TYPE_CHECKING, Any, Final, Literal, overload
 
 from loguru import logger
 
-from ..assets.gi.file_paths import SOURCE_TO_PATH
-from ..assets.gi.manager import AssetManager
-from ..assets.updater import AssetUpdater
+from ..assets.data import TextMap
+from ..assets.gi.manager import GI_ASSETS
 from ..constants.gi import CHARACTER_RARITY_MAP
 from ..enums.enum import Game
 from ..enums.gi import Element, FightPropType, Language
@@ -44,6 +43,10 @@ class GenshinClient(BaseClient):
     ) -> None:
         super().__init__(Game.GI, headers=headers, cache=cache)
 
+        self._lang = self._convert_lang(lang)
+        self._assets = GI_ASSETS
+
+    def _convert_lang(self, lang: Language | str) -> Language:
         if isinstance(lang, str):
             try:
                 lang = Language(lang)
@@ -52,7 +55,16 @@ class GenshinClient(BaseClient):
                 msg = f"Invalid language: {lang}, must be one of {available_langs}"
                 raise ValueError(msg) from e
 
-        self._lang = lang
+        return lang
+
+    @property
+    def lang(self) -> Language:
+        return self._lang
+
+    @lang.setter
+    def lang(self, lang: Language | str) -> None:
+        self._lang = self._convert_lang(lang)
+        self._text_map = TextMap(self._lang, self._assets.text_map)
 
     async def __aenter__(self) -> GenshinClient:
         await self.start()
@@ -61,14 +73,7 @@ class GenshinClient(BaseClient):
     async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         return await super().__aexit__(exc_type, exc_val, exc_tb)
 
-    def _check_assets(self) -> None:
-        if self._assets is None:
-            msg = f"Client is not started, call `{self.__class__.__name__}.start` first"
-            raise RuntimeError(msg)
-
     def _post_process_player(self, player: Player) -> None:
-        self._check_assets()
-
         # namecard
         namecard_icon = self._assets.namecard_data[str(player.namecard_id)]["icon"]
         player.namecard = Namecard(ui_path=namecard_icon)
@@ -89,8 +94,6 @@ class GenshinClient(BaseClient):
         )
 
     def _post_process_showcase_character(self, showcase_character: ShowcaseCharacter) -> None:
-        self._check_assets()
-
         if showcase_character.costume_id is None:
             return
 
@@ -103,8 +106,6 @@ class GenshinClient(BaseClient):
             )
 
     def _post_process_character(self, character: Character) -> None:  # noqa: PLR0912
-        self._check_assets()
-
         characer_id = (
             f"{character.id}-{character.skill_depot_id}"
             if character.id in {10000005, 10000007}
@@ -114,7 +115,7 @@ class GenshinClient(BaseClient):
         character_data = self._assets.character_data[characer_id]
         # name
         character_name_text_map_hash = character_data["NameTextMapHash"]
-        character.name = self._assets.text_map[character_name_text_map_hash]
+        character.name = self._text_map[character_name_text_map_hash]
 
         # icon
         side_icon_name = character_data["SideIconName"]
@@ -122,23 +123,23 @@ class GenshinClient(BaseClient):
 
         # weapon
         weapon = character.weapon
-        weapon.name = self._assets.text_map[weapon.name]
+        weapon.name = self._text_map[weapon.name]
         for stat in weapon.stats:
-            stat.name = self._assets.text_map[stat.type.value]
+            stat.name = self._text_map[stat.type.value]
 
         # artifacts
         for artifact in character.artifacts:
-            artifact.name = self._assets.text_map[artifact.name]
-            artifact.set_name = self._assets.text_map[artifact.set_name]
-            artifact.main_stat.name = self._assets.text_map[artifact.main_stat.type.value]
+            artifact.name = self._text_map[artifact.name]
+            artifact.set_name = self._text_map[artifact.set_name]
+            artifact.main_stat.name = self._text_map[artifact.main_stat.type.value]
             for stat in artifact.sub_stats:
-                stat.name = self._assets.text_map[stat.type.value]
+                stat.name = self._text_map[stat.type.value]
 
         # stats
         for stat_type, stat in character.stats.items():
             if not isinstance(stat_type, FightPropType):
                 continue
-            stat.name = self._assets.text_map.get(stat_type.name)
+            stat.name = self._text_map.get(stat_type.name)
 
         # constellations
         all_consts: list[dict[str, str]] = []
@@ -151,7 +152,7 @@ class GenshinClient(BaseClient):
         consts: list[Constellation] = [
             Constellation(
                 id=int(const["id"]),
-                name=self._assets.text_map[const["nameTextMapHash"]],
+                name=self._text_map[const["nameTextMapHash"]],
                 icon=f"https://enka.network/ui/{const['icon']}.png",
                 unlocked=any(const["id"] == str(c.id) for c in character.constellations),
             )
@@ -162,7 +163,7 @@ class GenshinClient(BaseClient):
         # talents
         for talent in character.talents:
             talent_data = self._assets.talents_data[str(talent.id)]
-            talent.name = self._assets.text_map[talent_data["nameTextMapHash"]]
+            talent.name = self._text_map[talent_data["nameTextMapHash"]]
             talent.icon = f"https://enka.network/ui/{talent_data['icon']}.png"
             if character.talent_extra_level_map:
                 proud_map: dict[str, int] = character_data["ProudMap"]
@@ -209,26 +210,14 @@ class GenshinClient(BaseClient):
             self._post_process_character(character)
 
     async def start(self) -> None:
-        """Start the client."""
         await super().start()
-        assert self._session is not None
-
-        self._assets = AssetManager(self._lang)
-        self._asset_updater = AssetUpdater(self._session, SOURCE_TO_PATH, self._lang)
-
-        loaded = await self._assets.load()
-        if not loaded:
-            await self.update_assets()
+        await self._assets.load(self.session)
+        self._text_map = TextMap(self.lang, self._assets.text_map)
 
     async def update_assets(self) -> None:
         """Update game assets."""
-        if self._asset_updater is None or self._assets is None:
-            msg = "Client is not started, call `EnkaNetworkAPI.start` first"
-            raise RuntimeError(msg)
-
-        logger.info("Updating GI assets...")
-        await self._asset_updater.update()
-        await self._assets.load()
+        logger.info("Updating GI assets")
+        await self._assets.load(self.session)
         logger.info("GI assets updated")
 
     @overload

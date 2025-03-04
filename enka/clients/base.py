@@ -29,6 +29,13 @@ class BaseClient:
         self._session: aiohttp.ClientSession | None = None
         self._cache = cache
 
+    @property
+    def session(self) -> aiohttp.ClientSession:
+        if self._session is None:
+            msg = f"ClientSession not found, call `{self.__class__.__name__}.start` first"
+            raise RuntimeError(msg)
+        return self._session
+
     async def __aenter__(self) -> BaseClient:
         await self.start()
         return self
@@ -37,26 +44,16 @@ class BaseClient:
         await self.close()
 
     async def start(self) -> None:
-        """Start the client."""
         self._session = aiohttp.ClientSession(headers=self._headers)
         if self._cache is not None:
             await self._cache.start()
 
     async def close(self) -> None:
-        """Close the client."""
-        if self._session is None:
-            msg = f"Client is not started, call `{self.__class__.__name__}.start` first"
-            raise RuntimeError(msg)
-
-        await self._session.close()
+        await self.session.close()
         if self._cache is not None:
             await self._cache.close()
 
     async def _request(self, url: str) -> dict[str, Any]:
-        if self._session is None:
-            msg = f"Client is not started, call `{self.__class__.__name__}.start` first"
-            raise RuntimeError(msg)
-
         if self._cache is not None:
             await self._cache.clear_expired()
             cached = await self._cache.get(url)
@@ -65,7 +62,7 @@ class BaseClient:
 
         logger.debug(f"Requesting {url}")
 
-        async with self._session.get(url) as resp:
+        async with self.session.get(url) as resp:
             if resp.status != 200:
                 raise_for_retcode(resp.status)
 

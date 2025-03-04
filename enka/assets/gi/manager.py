@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from ..data import AssetData
+from ..manager import AssetManager
 from .file_paths import (
     CHARACTER_DATA_PATH,
     CONSTS_DATA_PATH,
@@ -12,75 +11,26 @@ from .file_paths import (
     TEXT_MAP_PATH,
 )
 
-if TYPE_CHECKING:
-    from ...enums.gi import Language
 
-__all__ = ("AssetManager",)
-
-
-class AssetManager:
+class GIAssetManager(AssetManager):
     """Genshin Impact asset manager."""
 
-    def __init__(self, lang: Language) -> None:
-        self._lang = lang
-        self.text_map = TextMap(lang)
-        self.character_data = CharacterData()
-        self.namecard_data = NamecardData()
-        self.consts_data = ConstsData()
-        self.talents_data = TalentsData()
-        self.pfps_data = PfpsData()
+    def __init__(self) -> None:
+        self.text_map = AssetData(TEXT_MAP_PATH)
+        self.character_data = AssetData(CHARACTER_DATA_PATH)
+        self.namecard_data = AssetData(NAMECARD_DATA_PATH)
+        self.consts_data = AssetData(CONSTS_DATA_PATH)
+        self.talents_data = AssetData(TALENTS_DATA_PATH)
+        self.pfps_data = AssetData(PFPS_DATA_PATH)
 
-    async def load(self) -> bool:
-        """Load all assets.
-
-        Returns:
-            bool: Whether all assets were loaded successfully.
-        """
-        return (
-            await self.text_map.load()
-            and await self.character_data.load()
-            and await self.namecard_data.load()
-            and await self.consts_data.load()
-            and await self.talents_data.load()
-            and await self.pfps_data.load()
+        self._assets = (
+            self.text_map,
+            self.character_data,
+            self.namecard_data,
+            self.consts_data,
+            self.talents_data,
+            self.pfps_data,
         )
 
 
-class TextMap(AssetData):
-    def __init__(self, lang: Language) -> None:
-        super().__init__()
-        self._lang = lang
-
-    async def load(self) -> bool:
-        self._data = await self._open_json(TEXT_MAP_PATH.format(lang=self._lang.value))
-        return self._data is not None
-
-
-class CharacterData(AssetData):
-    async def load(self) -> bool:
-        self._data = await self._open_json(CHARACTER_DATA_PATH)
-        return self._data is not None
-
-
-class NamecardData(AssetData):
-    async def load(self) -> bool:
-        self._data = await self._open_json(NAMECARD_DATA_PATH)
-        return self._data is not None
-
-
-class ConstsData(AssetData):
-    async def load(self) -> bool:
-        self._data = await self._open_json(CONSTS_DATA_PATH)
-        return self._data is not None
-
-
-class TalentsData(AssetData):
-    async def load(self) -> bool:
-        self._data = await self._open_json(TALENTS_DATA_PATH)
-        return self._data is not None
-
-
-class PfpsData(AssetData):
-    async def load(self) -> bool:
-        self._data = await self._open_json(PFPS_DATA_PATH)
-        return self._data is not None
+GI_ASSETS = GIAssetManager()

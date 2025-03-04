@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from typing import Any
+
 __all__ = (
     "AlgoScrewedUpMassivelyError",
-    "AssetUpdateError",
+    "AssetDownloadError",
     "EnkaAPIError",
     "EnkaPyError",
     "GameMaintenanceError",
@@ -106,8 +108,8 @@ class InvalidItemTypeError(EnkaPyError):
         return "Invalid item type"
 
 
-class AssetUpdateError(EnkaPyError):
-    """Raised when the assets fail to update."""
+class AssetDownloadError(EnkaPyError):
+    """Raised when an asset fail to download."""
 
     def __init__(self, status: int, url: str) -> None:
         self.status = status
@@ -115,3 +117,16 @@ class AssetUpdateError(EnkaPyError):
 
     def __str__(self) -> str:
         return f"Failed to update assets, status code: {self.status}, url: {self.url}"
+
+
+class AssetKeyError(EnkaPyError, KeyError):
+    """Raised when the asset key is not found."""
+
+    def __init__(self, key: str, cls: Any) -> None:
+        self.key = key
+        self.cls = cls
+
+    def __str__(self) -> str:
+        return (
+            f"Cannot find {self.key!r} in {self.cls.__name__}, consider calling `update_assets()`"
+        )
