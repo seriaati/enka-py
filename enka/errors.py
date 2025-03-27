@@ -1,6 +1,9 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .assets.data import AssetData
 
 __all__ = (
     "AlgoScrewedUpMassivelyError",
@@ -122,11 +125,9 @@ class AssetDownloadError(EnkaPyError):
 class AssetKeyError(EnkaPyError, KeyError):
     """Raised when the asset key is not found."""
 
-    def __init__(self, key: str, cls: Any) -> None:
+    def __init__(self, key: str, cls: AssetData) -> None:
         self.key = key
         self.cls = cls
 
     def __str__(self) -> str:
-        return (
-            f"Cannot find {self.key!r} in {self.cls.__name__}, consider calling `update_assets()`"
-        )
+        return f"Cannot find {self.key!r} in {self.cls._path}, consider calling `update_assets()`"
