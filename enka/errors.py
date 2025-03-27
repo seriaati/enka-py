@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from .assets.data import AssetData
+
 __all__ = (
     "AlgoScrewedUpMassivelyError",
     "AssetDownloadError",
@@ -127,6 +129,5 @@ class AssetKeyError(EnkaPyError, KeyError):
         self.cls = cls
 
     def __str__(self) -> str:
-        return (
-            f"Cannot find {self.key!r} in {self.cls.__name__}, consider calling `update_assets()`"
-        )
+        identifier = self.cls._path if isinstance(self.cls, AssetData) else self.cls.__name__
+        return f"Cannot find {self.key!r} in {identifier}, consider calling `update_assets()`"

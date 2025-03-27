@@ -25,8 +25,8 @@ PATH_TO_SOURCE = GI_PATH_TO_SOURCE | HSR_PATH_TO_SOURCE
 class BaseAssetData:
     """Base class for asset data, this functions like a dictionary."""
 
-    def __init__(self) -> None:
-        self._data: dict[str, Any] | None = None
+    def __init__(self, data: dict[str, Any] | None = None) -> None:
+        self._data: dict[str, Any] | None = data
 
     @property
     def data(self) -> dict[str, Any]:
@@ -105,8 +105,4 @@ class TextMap(BaseAssetData):
     """Text map asset data."""
 
     def __init__(self, lang: gi.Language | hsr.Language, text_map: AssetData) -> None:
-        if lang.value not in text_map:
-            raise AssetKeyError(lang.value, self.__class__)
-
-        super().__init__()
-        self._data = text_map[lang.value]
+        super().__init__(text_map[lang.value])
