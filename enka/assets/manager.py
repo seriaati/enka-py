@@ -30,5 +30,7 @@ class AssetManager:
             asset._data = None
 
     async def update(self, session: aiohttp.ClientSession) -> None:
-        await self.clear()
-        await self.load(session)
+        tasks: list[asyncio.Task[None]] = [
+            asyncio.create_task(asset.update(session)) for asset in self._assets
+        ]
+        await asyncio.gather(*tasks, return_exceptions=True)
