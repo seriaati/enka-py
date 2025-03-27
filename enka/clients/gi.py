@@ -217,7 +217,7 @@ class GenshinClient(BaseClient):
     async def update_assets(self) -> None:
         """Update game assets."""
         logger.info("Updating GI assets")
-        await self._assets.load(self.session)
+        await self._assets.update(self.session)
         logger.info("GI assets updated")
 
     @overload

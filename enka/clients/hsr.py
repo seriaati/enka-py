@@ -312,7 +312,7 @@ class HSRClient(BaseClient):
     async def update_assets(self) -> None:
         """Update game assets."""
         logger.info("Updating HSR assets")
-        await self._assets.load(self.session)
+        await self._assets.update(self.session)
         logger.info("HSR assets updated")
 
     @overload
