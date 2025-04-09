@@ -48,17 +48,15 @@ ignore = [
     "ANN401",  # typing.Any used
     "DTZ007",  # Naive datetime constructed
     "E501",    # Line too long
+    "S311",    # Standard pseudo-random generators are not suitable for security/cryptographic purposes
 ]
 
 [lint.per-file-ignores]
-"**/__init__.py" = ["F403", "F401"]  # Wildcard imports used
-"enka/hsr.py" = ["F403"]
-"enka/gi.py" = ["F403"]
-"**/client.py" = ["PLR0904", "A002"]
-"**/models/*.py" = ["N805", "TCH"]
-"**/tests/*.py" = ["ANN001"]
-"examples/*.py" = ["T201"]
+"**/__init__.py" = ["F403", "F401"] # Wildcard imports used
+"enka/gi.py" = ["F403", "F401"]
+"enka/hsr.py" = ["F403", "F401"]
 "test.py" = ["ALL"]
+"examples/*.py" = ["T201"]
 
 [lint.flake8-type-checking]
 quote-annotations = true
