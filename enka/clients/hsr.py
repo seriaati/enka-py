@@ -313,6 +313,7 @@ class HSRClient(BaseClient):
         """Update game assets."""
         logger.info("Updating HSR assets")
         await self._assets.update(self.session)
+        self._text_map = TextMap(self.lang, self._assets.text_map)
         logger.info("HSR assets updated")
 
     @overload
