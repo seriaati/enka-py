@@ -35,6 +35,10 @@ class BaseAssetData:
             raise RuntimeError(msg)
         return self._data
 
+    @data.setter
+    def data(self, value: dict[str, Any]) -> None:
+        self._data = value
+
     def __getitem__(self, key: str) -> Any:
         try:
             return self.data[str(key)]
