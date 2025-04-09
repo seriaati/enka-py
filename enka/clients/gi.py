@@ -47,7 +47,7 @@ class GenshinClient(BaseClient):
         self._assets = GI_ASSETS
 
     def _convert_lang(self, lang: Language | str) -> Language:
-        if isinstance(lang, str):
+        if not isinstance(lang, Language):
             try:
                 lang = Language(lang)
             except ValueError as e:

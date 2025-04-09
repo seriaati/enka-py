@@ -52,7 +52,7 @@ class HSRClient(BaseClient):
         self._assets = HSR_ASSETS
 
     def _convert_lang(self, lang: Language | str) -> Language:
-        if isinstance(lang, str):
+        if not isinstance(lang, Language):
             try:
                 lang = Language(lang)
             except ValueError as e:
