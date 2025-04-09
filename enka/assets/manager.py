@@ -25,7 +25,7 @@ class AssetManager:
         ]
         await asyncio.gather(*tasks, return_exceptions=True)
 
-    async def clear(self) -> None:
+    def clear(self) -> None:
         for asset in self._assets:
             asset._data = None
 
