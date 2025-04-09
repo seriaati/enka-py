@@ -54,5 +54,6 @@ class Player(BaseModel):
     icon: str = Field("", alias="headIcon")
 
     @field_validator("icon", mode="before")
+    @classmethod
     def _stringify_icon(cls, value: int) -> str:
         return str(value)

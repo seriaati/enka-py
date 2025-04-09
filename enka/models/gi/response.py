@@ -30,6 +30,7 @@ class ShowcaseResponse(BaseModel):
     owner: Owner | None = None
 
     @field_validator("characters", mode="before")
+    @classmethod
     def __handle_none_value(cls, v: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
         if v is None:
             return []

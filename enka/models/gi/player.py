@@ -68,6 +68,7 @@ class Player(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
     @field_validator("profile_picture_id", mode="before")
+    @classmethod
     def _extract_avatar_id(cls, v: dict[str, int]) -> int:
         if not v:
             return 10000007
