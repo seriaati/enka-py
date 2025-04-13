@@ -47,7 +47,7 @@ class GenshinClient(BaseClient):
         self._assets = GI_ASSETS
 
     def _convert_lang(self, lang: Language | str) -> Language:
-        if isinstance(lang, str):
+        if not isinstance(lang, Language):
             try:
                 lang = Language(lang)
             except ValueError as e:
@@ -217,7 +217,8 @@ class GenshinClient(BaseClient):
     async def update_assets(self) -> None:
         """Update game assets."""
         logger.info("Updating GI assets")
-        await self._assets.load(self.session)
+        await self._assets.update(self.session)
+        self._text_map = TextMap(self.lang, self._assets.text_map)
         logger.info("GI assets updated")
 
     @overload

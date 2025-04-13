@@ -52,7 +52,7 @@ class HSRClient(BaseClient):
         self._assets = HSR_ASSETS
 
     def _convert_lang(self, lang: Language | str) -> Language:
-        if isinstance(lang, str):
+        if not isinstance(lang, Language):
             try:
                 lang = Language(lang)
             except ValueError as e:
@@ -312,7 +312,8 @@ class HSRClient(BaseClient):
     async def update_assets(self) -> None:
         """Update game assets."""
         logger.info("Updating HSR assets")
-        await self._assets.load(self.session)
+        await self._assets.update(self.session)
+        self._text_map = TextMap(self.lang, self._assets.text_map)
         logger.info("HSR assets updated")
 
     @overload

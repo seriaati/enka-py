@@ -30,6 +30,7 @@ class ShowcaseResponse(BaseModel):
     owner: Owner | None = None
 
     @model_validator(mode="before")
+    @classmethod
     def _flatten_data(cls, values: dict[str, Any]) -> dict[str, Any]:
         values["avatarDetailList"] = values["detailInfo"].pop("avatarDetailList", [])
         return values

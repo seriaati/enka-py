@@ -71,10 +71,12 @@ class LightCone(BaseModel):
         return ASCENSION_TO_MAX_LEVEL[self.ascension]
 
     @field_validator("name", mode="before")
+    @classmethod
     def _stringify_name(cls, value: int) -> str:
         return str(value)
 
     @model_validator(mode="before")
+    @classmethod
     def _flatten_flat(cls, values: dict[str, Any]) -> dict[str, Any]:
         flat_ = values.pop("_flat")
         values.update(flat_)
@@ -102,10 +104,12 @@ class Relic(BaseModel):
     rarity: Literal[3, 4, 5] = 3
 
     @field_validator("set_name", mode="before")
+    @classmethod
     def _stringify_set_name(cls, value: int) -> str:
         return str(value)
 
     @model_validator(mode="before")
+    @classmethod
     def _flatten_flat(cls, values: dict[str, Any]) -> dict[str, Any]:
         flat_ = values.pop("_flat")
         values.update(flat_)

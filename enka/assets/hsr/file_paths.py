@@ -15,7 +15,7 @@ AVATAR_DATA_PATH = ASSET_PATH / "avatars.json"
 PROPERTY_CONFIG_PATH = ASSET_PATH / "property_config.json"
 EIDOLON_DATA_PATH = ASSET_PATH / "eidolons.json"
 
-ENKA_API_DOCS = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/hsr"
+ENKA_API_DOCS = "https://raw.githubusercontent.com/pizza-studio/EnkaDBGenerator/main/Sources/EnkaDBFiles/Resources/Specimen/HSR"
 ENKA_PY_ASSETS = "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/hsr"
 
 PATH_TO_SOURCE: Final[dict[Path, str]] = {

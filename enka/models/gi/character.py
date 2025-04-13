@@ -55,6 +55,7 @@ class FightProp(BaseModel):
     name: str = ""
 
     @field_validator("type", mode="before")
+    @classmethod
     def __convert_type(cls, v: int) -> FightPropType | int:
         try:
             return FightPropType(v)
@@ -107,18 +108,22 @@ class Artifact(BaseModel):
     set_name: str = Field(alias="setNameTextMapHash")
 
     @field_validator("level", mode="before")
+    @classmethod
     def _convert_level(cls, v: int) -> int:
         return v - 1
 
     @field_validator("icon", mode="before")
+    @classmethod
     def _convert_icon(cls, v: str) -> str:
         return f"https://enka.network/ui/{v}.png"
 
     @field_validator("main_stat", mode="before")
+    @classmethod
     def _convert_main_stat(cls, v: dict[str, Any]) -> Stat:
         return Stat(type=StatType(v["mainPropId"]), value=v["statValue"], name="")
 
     @field_validator("sub_stats", mode="before")
+    @classmethod
     def _convert_sub_stats(cls, v: list[dict[str, Any]]) -> list[Stat]:
         return [
             Stat(type=StatType(stat["appendPropId"]), value=stat["statValue"], name="")
@@ -126,6 +131,7 @@ class Artifact(BaseModel):
         ]
 
     @field_validator("name", "set_name", mode="before")
+    @classmethod
     def _stringify_text_map_hash(cls, v: str | int) -> str:
         return str(v)
 
@@ -161,14 +167,17 @@ class Weapon(BaseModel):
         return ASCENSION_TO_MAX_LEVEL[self.ascension]
 
     @field_validator("refinement", mode="before")
+    @classmethod
     def _extract_refinement(cls, v: dict[str, int]) -> int:
         return next(iter(v.values())) + 1
 
     @field_validator("icon", mode="before")
+    @classmethod
     def _convert_icon(cls, v: str) -> str:
         return f"https://enka.network/ui/{v}.png"
 
     @field_validator("stats", mode="before")
+    @classmethod
     def _convert_stats(cls, v: list[dict[str, Any]]) -> list[Stat]:
         return [
             Stat(type=StatType(stat["appendPropId"]), value=stat["statValue"], name="")
@@ -176,6 +185,7 @@ class Weapon(BaseModel):
         ]
 
     @field_validator("name", mode="before")
+    @classmethod
     def _stringify_text_map_hash(cls, v: str | int) -> str:
         return str(v)
 
@@ -316,10 +326,12 @@ class Character(BaseModel):
         return len([c for c in self.constellations if c.unlocked])
 
     @field_validator("ascension", mode="before")
+    @classmethod
     def _intify_ascension(cls, v: str) -> int:
         return int(v)
 
     @field_validator("stats", mode="before")
+    @classmethod
     def _convert_stats(cls, v: dict[str, float]) -> dict[FightPropType | int, FightProp]:
         result: dict[FightPropType | int, FightProp] = {}
         for k, value in v.items():
@@ -332,6 +344,7 @@ class Character(BaseModel):
         return result
 
     @field_validator("constellations", mode="before")
+    @classmethod
     def _convert_constellations(cls, v: list[int]) -> list[Constellation]:
         return [
             Constellation(id=constellation_id, name="", icon="", unlocked=True)
@@ -339,10 +352,12 @@ class Character(BaseModel):
         ]
 
     @field_validator("talents", mode="before")
+    @classmethod
     def _convert_talents(cls, v: dict[str, int]) -> list[Talent]:
         return [Talent(id=int(k), level=v, name="", icon="") for k, v in v.items()]
 
     @field_validator("weapon", mode="before")
+    @classmethod
     def _flatten_weapon_data(cls, v: dict[str, Any]) -> dict[str, Any]:
         v.update(v["weapon"])
         v.update(v["flat"])
@@ -351,6 +366,7 @@ class Character(BaseModel):
         return v
 
     @field_validator("artifacts", mode="before")
+    @classmethod
     def _flatten_artifacts_data(cls, v: list[dict[str, Any]]) -> list[dict[str, Any]]:
         for artifact in v:
             artifact.update(artifact["reliquary"])
@@ -361,6 +377,7 @@ class Character(BaseModel):
         return v
 
     @model_validator(mode="before")
+    @classmethod
     def _transform_values(cls, v: dict[str, Any]) -> dict[str, Any]:
         # convert prop map to level and ascension
         prop_map = v["propMap"]
