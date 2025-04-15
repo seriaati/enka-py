@@ -10,6 +10,7 @@ from loguru import logger
 
 from ..assets.gi.file_paths import PATH_TO_SOURCE as GI_PATH_TO_SOURCE
 from ..assets.hsr.file_paths import PATH_TO_SOURCE as HSR_PATH_TO_SOURCE
+from ..assets.zzz.file_paths import PATH_TO_SOURCE as ZZZ_PATH_TO_SOURCE
 from ..errors import AssetDownloadError, AssetKeyError
 
 if TYPE_CHECKING:
@@ -17,9 +18,9 @@ if TYPE_CHECKING:
 
     import aiohttp
 
-    from ..enums import gi, hsr
+    from ..enums import gi, hsr, zzz
 
-PATH_TO_SOURCE = GI_PATH_TO_SOURCE | HSR_PATH_TO_SOURCE
+PATH_TO_SOURCE = GI_PATH_TO_SOURCE | HSR_PATH_TO_SOURCE | ZZZ_PATH_TO_SOURCE
 
 
 class BaseAssetData:
@@ -108,5 +109,7 @@ class AssetData(BaseAssetData):
 class TextMap(BaseAssetData):
     """Text map asset data."""
 
-    def __init__(self, lang: gi.Language | hsr.Language, text_map: AssetData) -> None:
+    def __init__(
+        self, lang: gi.Language | hsr.Language | zzz.Language, text_map: AssetData
+    ) -> None:
         super().__init__(text_map[lang.value])

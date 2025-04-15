@@ -3,6 +3,8 @@ from __future__ import annotations
 import sys
 from enum import IntEnum
 
+from enka.constants.zzz import ELEMENT_ICON
+
 if sys.version_info < (3, 11):
     from enum import Enum as StrEnum
 else:
@@ -90,3 +92,31 @@ class StatType(IntEnum):
     ELECTRIC_DMG_BONUS_FLAT = 31803
     ETHER_DMG_BONUS_BASE = 31901
     ETHER_DMG_BONUS_FLAT = 31903
+
+
+class ProfessionType(StrEnum):
+    """ZZZ agent speciality."""
+
+    STUN = "Stun"
+    ATTACK = "Attack"
+    DEFENSE = "Defense"
+    SUPPORT = "Support"
+    ANOMALY = "Anomaly"
+    UNKNOWN = "Unknown"
+
+
+class Element(StrEnum):
+    """ZZZ element type."""
+
+    PHYSICAL = "Physical"
+    FIRE = "Fire"
+    ICE = "Ice"
+    ELECTRIC = "Elec"
+    ETHER = "Ether"
+    FIRE_FROST = "FireFrost"
+    UNKNOWN = "Unknown"
+
+    @property
+    def icon(self) -> str:
+        """The element's icon."""
+        return ELEMENT_ICON.format(element=self.value)

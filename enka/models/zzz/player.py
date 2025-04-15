@@ -26,7 +26,7 @@ class Player(BaseModel):
     level: int = Field(alias="Level")
     signature: str = Field(alias="Desc")
 
-    title_id: int = Field(alias="TitleId")
+    title_id: int = Field(alias="Title")
     id: int = Field(alias="ProfileId")
     namecard_id: int = Field(alias="CallingCardId")
 
