@@ -36,9 +36,7 @@ class SkillType(IntEnum):
     SPECIAL_ATK = 1
     DASH = 2
     ULTIMATE = 3
-    CORE_SKILl = 5
-    ASSIST = 6
-
+    CORE_SKILL = 5
 
 class StatType(IntEnum):
     """ZZZ stat type."""
