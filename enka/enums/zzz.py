@@ -37,6 +37,7 @@ class SkillType(IntEnum):
     DASH = 2
     ULTIMATE = 3
     CORE_SKILL = 5
+    ASSIST = 6
 
 
 class StatType(IntEnum):
