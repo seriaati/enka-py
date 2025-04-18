@@ -19,3 +19,4 @@ class Game(StrEnum):
 
     GI = "gi"
     HSR = "hsr"
+    ZZZ = "zzz"

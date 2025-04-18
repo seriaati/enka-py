@@ -55,6 +55,7 @@ ignore = [
 "**/__init__.py" = ["F403", "F401"] # Wildcard imports used
 "enka/gi.py" = ["F403", "F401"]
 "enka/hsr.py" = ["F403", "F401"]
+"enka/zzz.py" = ["F403", "F401"]
 "test.py" = ["ALL"]
 "examples/*.py" = ["T201"]
 
