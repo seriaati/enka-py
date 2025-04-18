@@ -23,7 +23,7 @@ API_URL: Final[str] = "https://enka.network/api/zzz/uid/{uid}"
 
 
 class ZZZClient(BaseClient):
-    """The main client to interact with the Enka Network Honkai Star Rail API.
+    """The main client to interact with the Enka Network Zenless Zone Zero API.
 
     Args:
         lang (Language | str): The language to use for the client, defaults to Language.ENGLISH.
