@@ -21,7 +21,7 @@ class Language(StrEnum):
     PORTUGUESE = "pt"
     KOREAN = "ko"
     JAPANESE = "ja"
-    INDOENSIAN = "id"
+    INDONESIAN = "id"
     FRENCH = "fr"
     ESPANOL = "es"
     GERMAN = "de"
