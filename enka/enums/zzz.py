@@ -38,6 +38,7 @@ class SkillType(IntEnum):
     ULTIMATE = 3
     CORE_SKILL = 5
 
+
 class StatType(IntEnum):
     """ZZZ stat type."""
 
