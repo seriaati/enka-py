@@ -30,3 +30,8 @@ class ShowcaseResponse(BaseModel):
         info = value.pop("PlayerInfo")
         value.update(info)
         return value
+
+    @property
+    def url(self) -> str:
+        """The URL of the showcase."""
+        return f"https://enka.network/zzz/{self.uid}"
