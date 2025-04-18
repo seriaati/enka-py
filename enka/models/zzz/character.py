@@ -21,12 +21,12 @@ class Stat(BaseModel):
     @property
     def formatted_value(self) -> str:
         """The formatted value of the stat."""
+        if self.type is StatType.ENERGY_REGEN_BASE:
+            return f"{self.value / 100}"
+
         if "%" in self.format:
             return f"{round(self.value / 100, 1)}%"
         return str(int(self.value))
-
-    def as_dict(self) -> dict[int, int]:
-        return {self.type.value: self.value}
 
 
 class DriveDiscStat(Stat):

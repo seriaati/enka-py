@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 import copy
+from email.policy import default
 import math
 from typing import TYPE_CHECKING, Any, Final, Literal, overload
 
@@ -115,21 +116,44 @@ class ZZZClient(BaseClient):
     def _calc_agent_stats(self, agent: models.Agent) -> None:
         # See https://api.enka.network/#/docs/zzz/api?id=agent-stats for the formula
 
-        data = self._assets.avatars[str(agent.id)]
+        # Prop ID and value
+        stats: defaultdict[int, int] = defaultdict(int)
 
+        data = self._assets.avatars[str(agent.id)]
         base_props: dict[str, int] = data["BaseProps"]
         growth_props: dict[str, int] = data["GrowthProps"]
         promotion_props: list[dict[str, int]] = data["PromotionProps"]
         core_enhancement_props: list[dict[str, int]] = data["CoreEnhancementProps"]
 
-        # Additional stats from engine and discs
+        for prop_id, prop_val in base_props.items():
+            growth_val = (growth_props.get(prop_id, 0) * (agent.level - 1)) / 10000
+            promotion_val = promotion_props[agent.promotion - 1].get(prop_id, 0)
+            core_enhancement_val = core_enhancement_props[agent.core_skill_level_num].get(
+                prop_id, 0
+            )
+            base_total_val = (
+                prop_val + math.floor(growth_val) + promotion_val + core_enhancement_val
+            )
+
+            stats[int(prop_id)] += base_total_val
+
+        # Engine stats
         engine = agent.w_engine
+
+        main_stat = engine.main_stat
+        sub_stat = engine.sub_stat
+
+        stats[main_stat.type.value] += main_stat.value
+        stats[sub_stat.type.value] += sub_stat.value
+
+        # Disc stats
         discs = agent.discs
+        for disc in discs:
+            stats[disc.main_stat.type.value] += disc.main_stat.value
+            for sub in disc.sub_stats:
+                stats[sub.type.value] += sub.value
 
-        stats: list[dict[int, int]] = [engine.main_stat.as_dict(), engine.sub_stat.as_dict()]
-        stats.extend(disc.main_stat.as_dict() for disc in discs)
-
-        # Set bonus
+        # Disc set bonus
         sets: defaultdict[int, int] = defaultdict(int)
         for disc in discs:
             sets[disc.set_id] += 1
@@ -144,42 +168,65 @@ class ZZZClient(BaseClient):
                 continue
 
             set_effect: dict[str, int] = set_data["SetBonusProps"]
-            stats.extend({int(prop_id): prop_val} for prop_id, prop_val in set_effect.items())
+            for prop_id, prop_val in set_effect.items():
+                stats[int(prop_id)] += prop_val
 
-        percent_add_stats = [s for s in add_stats if "%" in s.format]
-        flat_add_stats = [s for s in add_stats if "%" not in s.format]
+        # Initialize final stats
+        final_stats: dict[int, int] = {
+            stat_type.value: 0 for stat_type in enums.StatType if "BASE" in stat_type.name
+        }
 
-        for prop_id, prop_val in base_props.items():
-            growth_val = (growth_props.get(prop_id, 0) * (agent.level - 1)) / 10000
-            promotion_val = promotion_props[agent.promotion - 1].get(prop_id, 0)
-            core_enhancement_val = core_enhancement_props[agent.core_skill_level_num].get(
-                prop_id, 0
-            )
-            base_total_val = (
-                prop_val + math.floor(growth_val) + promotion_val + core_enhancement_val
-            )
+        # Base stats
+        for prop_id, prop_val in stats.items():
+            if not str(prop_id).endswith("01"):
+                continue
 
-            stat_type = enums.StatType(int(prop_id))
+            if prop_id not in final_stats:
+                final_stats[prop_id] = 0
+            final_stats[prop_id] += prop_val
 
-            prop_data = self._assets.property[prop_id]
-            stat = agent.stats[stat_type] = models.Stat(
+        if agent.name == "Ellen":
+            print(final_stats[11101])
+
+        # Percentage stats
+        for prop_id, prop_val in stats.items():
+            if not str(prop_id).endswith("02"):
+                continue
+
+            base_prop_id = prop_id - 1
+            base_stat = final_stats.get(base_prop_id, 0)
+            if agent.name == "Ellen" and base_prop_id == 11101:
+                print(f"{prop_id=}, {prop_val=}")
+            final_stats[base_prop_id] = math.floor(base_stat * (1 + prop_val / 10000))
+
+        if agent.name == "Ellen":
+            print(final_stats[11101])
+
+        # Flat stats
+        for prop_id, prop_val in stats.items():
+            if not str(prop_id).endswith("03"):
+                continue
+
+            base_prop_id = prop_id - 2
+            base_stat = final_stats.get(base_prop_id, 0)
+            if agent.name == "Ellen" and base_prop_id == 11101:
+                print(f"{prop_id=}, {prop_val=}")
+            final_stats[base_prop_id] += prop_val
+
+        if agent.name == "Ellen":
+            print(final_stats[11101])
+
+        # Assign final stats to agent
+        for prop_id, prop_val in final_stats.items():
+            stat_type = enums.StatType(prop_id)
+            prop_data = self._assets.property[str(prop_id)]
+
+            agent.stats[stat_type] = models.Stat(
                 type=stat_type,
-                value=base_total_val,
+                value=prop_val,
                 name=self._text_map[prop_data["Name"]],
                 format=prop_data["Format"],
             )
-
-            total_add_percent = 0
-            for add_stat in percent_add_stats:
-                if str(add_stat.type.value)[:3] == str(stat.type.value)[:3]:
-                    total_add_percent += add_stat.value
-
-            total_add_flat = 0
-            for flat_add_stat in flat_add_stats:
-                if str(flat_add_stat.type.value)[:3] == str(stat.type.value)[:3]:
-                    total_add_flat += flat_add_stat.value
-
-            stat.value = math.floor(stat.value * (1 + total_add_percent / 10000) + total_add_flat)
 
     def _calc_engine_stats(self, engine: models.WEngine) -> None:
         # See https://api.enka.network/#/docs/zzz/api?id=w-engine for the formula
