@@ -1,21 +1,5 @@
 # enka.py
 
-## ⚠️ Notice: Package Renaming
-
-**Important Announcement:**
-
-The `enka-api` package has been deprecated and is now replaced by the new package named **`enka`**.
-
-### What You Need to Know
-
-- **New Package**: Please install the new package using the following command:
-
-  ```bash
-  pip install enka
-  ```
-
-- **Deprecation Details**: The `enka-api` package will continue to be available, but new updates will be released in the `enka` package, so I encourage you to transition to the new package as soon as possible.
-
 ## Introduction
 
 enka.py is an async API wrapper for [enka.network](https://enka.network/) written in Python.  
@@ -32,7 +16,7 @@ Developing something for Hoyoverse games? You might be interested in [other API 
 - Supports both Genshin Impact and Honkai Star Rail.
 - Supports persistent caching using SQLite.
 - Supports [Pydantic V2](https://github.com/pydantic/pydantic), this also means full autocomplete support.
-- Seamlessly integrates with [GenshinData](https://gitlab.com/Dimbreath/AnimeGameData) and [StarRailData](https://github.com/Dimbreath/StarRailData).
+- Seamlessly integrates with [GenshinData](https://gitlab.com/Dimbreath/AnimeGameData), [StarRailData](https://github.com/Dimbreath/StarRailData), and [ZenlessData](https://git.mero.moe/dimbreath/ZenlessData).
 
 ## Installation
 

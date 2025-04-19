@@ -14,13 +14,12 @@ __all__ = ("Artifact", "Character", "Constellation", "FightProp", "Stat", "Talen
 
 
 class Stat(BaseModel):
-    """
-    Represents a stat.
+    """Represents a stat.
 
     Attributes:
-        type (StatType): The stat's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.).
-        value (float): The stat's value.
-        name (str): The stat's name.
+        type: The stat's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK).
+        value: The stat's value.
+        name: The stat's name.
     """
 
     type: StatType
@@ -30,24 +29,25 @@ class Stat(BaseModel):
     @computed_field
     @property
     def is_percentage(self) -> bool:
+        """Whether this stat is a percentage stat."""
         return self.type.name in PERCENT_STAT_TYPES
 
     @computed_field
     @property
     def formatted_value(self) -> str:
+        """ "The formatted value of the stat."""
         if self.is_percentage:
             return f"{round(self.value, 1)}%"
         return str(round(self.value))
 
 
 class FightProp(BaseModel):
-    """
-    Represents a fight prop.
+    """Represents a character's stat (property.)
 
     Attributes:
-        type (FightPropType | int): The fight prop's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK, etc.).
-        value (float): The fight prop's value.
-        name (str): The fight prop's name.
+        type: The fight prop's type (e.g. FIGHT_PROP_HP, FIGHT_PROP_ATTACK).
+        value: The fight prop's value.
+        name: The fight prop's name.
     """
 
     type: FightPropType | int
@@ -65,33 +65,34 @@ class FightProp(BaseModel):
     @computed_field
     @property
     def is_percentage(self) -> bool:
+        """Whether this stat is a percentage stat."""
         return isinstance(self.type, FightPropType) and self.type.name in PERCENT_STAT_TYPES
 
     @computed_field
     @property
     def formatted_value(self) -> str:
+        """The formatted value of the stat."""
         if self.is_percentage:
             return f"{round(self.value * 100, 1)}%"
         return f"{round(self.value):,}"
 
 
 class Artifact(BaseModel):
-    """
-    Represents an artifact.
+    """Represents an artifact.
 
     Attributes:
-        id (int): The artifact's ID.
-        main_stat_id (int): The main stat's ID.
-        sub_stat_ids (List[int]): The sub stats' IDs.
-        level (int): The artifact's level.
-        equip_type (EquipmentType): The artifact's type (e.g. FLOWER, GOBLET, etc.).
-        icon (str): The artifact's icon.
-        item_type (ItemType): The artifact's type.
-        name (str): The artifact's name.
-        rarity (int): The artifact's rarity.
-        main_stat (MainStat): The artifact's main stat.
-        sub_stats (List[SubStat]): The artifact's sub stats.
-        set_name (str): The artifact's set name.
+        id: The artifact's ID.
+        main_stat_id: The main stat's ID.
+        sub_stat_ids: The sub stats' IDs.
+        level: The artifact's level.
+        equip_type: The artifact's type (e.g. FLOWER, GOBLET).
+        icon: The artifact's icon.
+        item_type: The artifact's type.
+        name: The artifact's name.
+        rarity: The artifact's rarity.
+        main_stat: The artifact's main stat.
+        sub_stats: The artifact's sub stats.
+        set_name: The artifact's set name.
     """
 
     id: int = Field(alias="itemId")
@@ -137,18 +138,17 @@ class Artifact(BaseModel):
 
 
 class Weapon(BaseModel):
-    """
-    Represents a weapon.
+    """Represents a weapon.
 
-    Args:
-        item_id (int): The weapon's ID.
-        refinement (int): The weapon's refinement level (1~5).
-        level (int): The weapon's level.
-        ascension (int): The weapon's ascension level.
-        icon (str): The weapon's icon.
-        name (str): The weapon's name.
-        rarity (int): The weapon's rarity.
-        stats (List[WeaponStat]): The weapon's stats.
+    Attributes:
+        item_id: The weapon's ID.
+        refinement: The weapon's refinement level (1~5).
+        level: The weapon's level.
+        ascension: The weapon's ascension level.
+        icon: The weapon's icon.
+        name: The weapon's name.
+        rarity: The weapon's rarity.
+        stats: The weapon's stats.
     """
 
     item_id: int = Field(alias="itemId")
@@ -191,14 +191,13 @@ class Weapon(BaseModel):
 
 
 class Constellation(BaseModel):
-    """
-    Represents a character's constellation.
+    """Represents a character's constellation.
 
     Attributes:
-        id (int): The constellation's ID.
-        name (str): The constellation's name.
-        icon (str): The constellation's icon.
-        unlocked (bool): Whether the constellation is unlocked.
+        id: The constellation's ID.
+        name: The constellation's name.
+        icon: The constellation's icon.
+        unlocked: Whether the constellation is unlocked.
     """
 
     id: int
@@ -208,15 +207,14 @@ class Constellation(BaseModel):
 
 
 class Talent(BaseModel):
-    """
-    Represents a character's talent.
+    """Represents a character's talent.
 
     Attributes:
-        id (int): The talent's ID.
-        level (int): The talent's level.
-        name (str): The talent's name.
-        icon (str): The talent's icon.
-        is_upgraded (bool): Whether the talent is upgraded by a constellation.
+        id: The talent's ID.
+        level: The talent's level.
+        name: The talent's name.
+        icon: The talent's icon.
+        is_upgraded: Whether the talent's level is being upgraded by a constellation.
     """
 
     id: int
@@ -230,31 +228,31 @@ class Character(BaseModel):
     """Represents a character.
 
     Attributes:
-        id (int): The character's ID.
-        artifacts (List[Artifact]): The character's artifacts.
-        weapon (Weapon): The character's weapon.
-        stats (Dict[FightPropType | int, FightProp]): The character's stats.
-        constellations (List[Constellation]): The character's unlocked constellations.
-        talents (List[Talent]): The character's talents.
-        ascension (Literal[0, 1, 2, 3, 4, 5, 6]): The character's ascension level.
-        level (int): The character's level.
-        skill_depot_id (int): The character's skill depot ID.
-        name (str): The character's name.
-        talent_extra_level_map (Optional[Dict[str, int]]): The map of character's extra talent levels, this is only used internally, the wrapper will handle this.
-        icon (Icon): The character's icon.
-        friendship_level (int): The character's friendship level (1~10).
-        element (Element): The character's element.
-        talent_order (List[int]): The character's talent order.
+        id: The character's ID.
+        artifacts: The character's artifacts.
+        weapon: The character's weapon.
+        stats: The character's stats.
+        constellations: The character's unlocked constellations.
+        talents: The character's talents.
+        ascension: The character's ascension level.
+        level: The character's level.
+        skill_depot_id: The character's skill depot ID.
+        name: The character's name.
+        talent_extra_level_map: The map of character's extra talent levels, this is only used internally, the wrapper will handle this.
+        icon: The character's icon.
+        friendship_level: The character's friendship level (1~10).
+        element: The character's element.
+        talent_order: The character's talent order.
             1. Normal attack
             2. Elemental skill
             3. Elemental burst
-        rarity (int): The character's rarity (4~5).
-        max_level (int): The character's max level.
-        highest_dmg_bonus_stat (FightProp): The character's highest damage bonus stat.
-        namecard (Optional[Namecard]): The character's namecard. Travelers don't have namecards.
-        costume (Optional[Costume]): The character's costume, if any.
-        costume_id (Optional[int]): The character's costume's ID, if any.
-        constellations_unlocked (int): The number of constellations unlocked.
+        rarity: The character's rarity (4~5).
+        max_level: The character's max level.
+        highest_dmg_bonus_stat: The character's highest damage bonus stat.
+        namecard: The character's namecard. Travelers don't have namecards.
+        costume: The character's costume, if any.
+        costume_id: The character's costume's ID, if any.
+        constellations_unlocked: The number of constellations unlocked.
     """
 
     id: int = Field(alias="avatarId")

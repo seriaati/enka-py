@@ -12,15 +12,14 @@ __all__ = ("ShowcaseResponse",)
 
 
 class ShowcaseResponse(BaseModel):
-    """
-    Represents a Genshin Impact showcase response.
+    """Represents a Genshin Impact showcase response.
 
     Attributes:
-        characters (List[Character]): The characters in the showcase.
-        player (Player): The player of the showcase.
-        ttl (int): The time to live of the response.
-        uid (str): The UID of the showcase.
-        owner (Owner, optional): The owner of the showcase's account.
+        characters: The characters in the showcase.
+        player: The player of the showcase.
+        ttl: The time to live of the response.
+        uid: The UID of the showcase.
+        owner: The owner of the showcase's account.
     """
 
     characters: list[Character] = Field(alias="avatarInfoList", default_factory=list)

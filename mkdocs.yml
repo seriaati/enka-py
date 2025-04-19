@@ -1,0 +1,91 @@
+# Project information
+site_name: enka-py
+site_url: https://gh.seria.moe/enka-py
+site_author: Seria Ati
+site_description: An async API wrapper for Enka Network written in Python, supports GI, HSR, and ZZZ.
+
+# Repository
+repo_name: seriaati/enka-py
+repo_url: https://github.com/seriaati/enka-py
+
+# Copyright
+copyright: Copyright &copy; 2025 - 2025 Seria Ati
+
+# Configuration
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - content.code.copy
+  palette:
+    # Palette toggle for automatic mode
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+      primary: indigo
+      accent: indigo
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+      primary: indigo
+      accent: indigo
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+      primary: indigo
+      accent: indigo
+
+plugins:
+  - search
+  - social
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_root_toc_entry: false
+            show_symbol_type_heading: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+
+nav:
+  - Home: index.md
+  - Getting Started: getting_started.md
+  - Caching: caching.md
+  - Update Game Assets: update_assets.md
+  - Migration Guide: migration.md
+  - API Reference:
+    - Genshin Impact:
+        - API Client: reference/gi/client.md
+        - Models: reference/gi/models.md
+        - Enums: reference/gi/enums.md
+    - Honkai Star Rail:
+        - API Client: reference/hsr/client.md
+        - Models: reference/hsr/models.md
+        - Enums: reference/hsr/enums.md
+    - Zenless Zone Zero:
+        - API Client: reference/zzz/client.md
+        - Models: reference/zzz/models.md
+        - Enums: reference/zzz/enums.md
+    - Exceptions: reference/errors.md
+    - Cache: reference/cache.md
+  - Legacy: legacy.md
+

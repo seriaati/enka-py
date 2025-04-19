@@ -19,6 +19,10 @@ license = { file = "LICENSE" }
 Homepage = "https://github.com/seriaati/enka-py"
 Repository = "https://github.com/seriaati/enka-py.git"
 Issues = "https://github.com/seriaati/enka-py/issues"
+Documentation = "https://gh.seria.moe/enka-py"
+
+[project.optional-dependencies]
+docs = ["mkdocs-material[imaging]>=9.6.11", "mkdocstrings[python]>=0.29.1"]
 
 [build-system]
 requires = ["hatchling"]

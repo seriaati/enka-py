@@ -8,7 +8,13 @@ __all__ = ("Medal", "Player")
 
 
 class Medal(BaseModel):
-    """ZZZ medal."""
+    """Represents a medal obtained by a player in ZZZ.
+
+    Attributes:
+        value: The value associated with the medal.
+        type: The type identifier of the medal.
+        icon_id: The identifier for the medal's icon.
+    """
 
     value: int = Field(alias="Value")
     type: int = Field(alias="MedalType")
@@ -16,7 +22,19 @@ class Medal(BaseModel):
 
 
 class Player(BaseModel):
-    """ZZZ player."""
+    """Represents a ZZZ player's profile information.
+
+    Attributes:
+        medals: List of medals obtained by the player.
+        nickname: The player's in-game nickname.
+        avatar_id: The ID of the player's selected avatar.
+        uid: The player's unique identifier.
+        level: The player's current level.
+        signature: The player's custom signature or description.
+        title_id: The ID of the player's selected title.
+        id: The player's profile ID.
+        namecard_id: The ID of the player's selected namecard.
+    """
 
     medals: list[Medal] = Field(alias="MedalList")
 

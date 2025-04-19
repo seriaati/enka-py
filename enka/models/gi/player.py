@@ -9,14 +9,13 @@ __all__ = ("Player", "ShowcaseCharacter")
 
 
 class ShowcaseCharacter(BaseModel):
-    """
-    Represents a showcase character.
+    """Represents a showcase character.
 
     Attributes:
-        id (int): The character's ID.
-        level (int): The character's level.
-        costume (Optional[Costume]): The character's costume, if any.
-        costume_id (Optional[int]): The character's costume's ID, if any.
+        id: The character's ID.
+        level: The character's level.
+        costume: The character's costume, if any.
+        costume_id: The character's costume's ID, if any.
     """
 
     id: int = Field(alias="avatarId")
@@ -31,18 +30,21 @@ class Player(BaseModel):
     """Represents a Genshin Impact player.
 
     Attributes:
-        achievements (int): The number of completed achievements.
-        level (int): The player's adventure level.
-        namecard_id (int): The player's namecard's ID.
-        namecard (Namecard): The player's namecard.
-        nickname (str, optional): The player's nickname.
-        signature (str, optional): The player's signature.
-        abyss_floor (int): The player's Spiral Abyss floor.
-        abyss_level (int): The player's Spiral Abyss level.
-        world_level (int): The player's world level.
-        profile_picture_id (int): The player's profile picture's ID.
-        profile_picture_icon (Icon): The player's profile picture's icon.
-        showcase_characters (List[ShowcaseCharacter]): The player's showcase characters.
+        achievements: The number of completed achievements.
+        level: The player's adventure level.
+        namecard_id: The player's namecard's ID.
+        namecard: The player's namecard.
+        nickname: The player's nickname.
+        signature: The player's signature.
+        abyss_floor: The player's Spiral Abyss floor.
+        abyss_level: The player's Spiral Abyss level.
+        world_level: The player's world level.
+        profile_picture_id: The player's profile picture's ID.
+        profile_picture_icon: The player's profile picture's icon.
+        showcase_characters: The player's showcase characters.
+        max_friendship_character_count: The maximum number of characters with friendship level 10.
+        abyss_stars: The number of stars in the Spiral Abyss.
+        theater_stars: The number of stars in the Theater Mechanicus.
     """
 
     achievements: int = Field(0, alias="finishAchievementNum")

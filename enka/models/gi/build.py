@@ -9,12 +9,12 @@ class Build(BaseModel):
     """Represents a Genshin Impact build.
 
     Attributes:
-        id (int): The build's ID.
-        name (str): The build's name.
-        order (int): The build's order.
-        live (bool): Whether the build is live.
-        character_id (int): The build's character ID.
-        character (:class:`Character`): The build's character data.
+        id: The build's ID.
+        name: The build's name.
+        order: The build's order.
+        live: Whether the build is live.
+        character_id: The build's character ID.
+        character: The build's character data.
     """
 
     id: int

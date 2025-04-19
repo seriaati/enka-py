@@ -7,7 +7,11 @@ from pydantic import BaseModel, computed_field
 
 
 class CharacterIcon(BaseModel):
-    """HSR character icon."""
+    """Represents a HSR character icon.
+
+    Attributes:
+        character_id: The character's ID.
+    """
 
     character_id: int
 
@@ -41,7 +45,11 @@ class CharacterIcon(BaseModel):
 
 
 class LightConeIcon(BaseModel):
-    """HSR light cone icon."""
+    """Represents a HSR light cone icon.
+
+    Attributes:
+        light_cone_id: The light cone's ID.
+    """
 
     light_cone_id: int
 

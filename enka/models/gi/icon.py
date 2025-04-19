@@ -7,6 +7,13 @@ from pydantic import BaseModel, computed_field
 
 
 class Icon(BaseModel):
+    """Represents an icon in Genshin Impact.
+
+    Attributes:
+        side_icon_ui_path: The side icon UI path of the character.
+        is_costume: Whether the icon is for a costume.
+    """
+
     side_icon_ui_path: str
     is_costume: bool = False
 
@@ -59,6 +66,12 @@ class Icon(BaseModel):
 
 
 class Namecard(BaseModel):
+    """Represents a namecard in Genshin Impact.
+
+    Attributes:
+        ui_path: The UI path of the namecard.
+    """
+
     ui_path: str
 
     @computed_field

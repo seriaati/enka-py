@@ -12,25 +12,47 @@ from ...models.zzz.icon import AgentIcon
 __all__ = ("Agent", "AgentColor", "AgentSkill", "DriveDisc", "DriveDiscStat", "Stat", "WEngine")
 
 
+def _to_formatted_value(value: int, type_: StatType, format_: str) -> str:
+    if type_ is StatType.ENERGY_REGEN_BASE:
+        return f"{value / 100}"
+
+    if "%" in format_:
+        return f"{round(value / 100, 1)}%"
+    return str(int(value))
+
+
 class Stat(BaseModel):
+    """Represents a agent's or W-Engine's stat.
+
+    Attributes:
+        type: The type of the stat.
+        value: The value of the stat.
+        name: The name of the stat.
+        format: The format specifier.
+    """
+
     type: StatType
     value: int
     name: str
     format: str
 
+    @computed_field
     @property
     def formatted_value(self) -> str:
         """The formatted value of the stat."""
-        if self.type is StatType.ENERGY_REGEN_BASE:
-            return f"{self.value / 100}"
-
-        if "%" in self.format:
-            return f"{round(self.value / 100, 1)}%"
-        return str(int(self.value))
+        return _to_formatted_value(self.value, self.type, self.format)
 
 
 class DriveDiscStat(Stat):
-    """ZZZ drive disc stat."""
+    """Represents a drive disc's stat.
+
+    Attributes:
+        type: The type of the stat.
+        roll_times: The number of times the stat has been rolled.
+        value: The value of the stat.
+        name: The name of the stat.
+        format: The format specifier.
+    """
 
     type: StatType = Field(alias="PropertyId")
     roll_times: int = Field(alias="PropertyLevel")
@@ -40,9 +62,29 @@ class DriveDiscStat(Stat):
     name: str = ""
     format: str = ""
 
+    @computed_field
+    @property
+    def formatted_value(self) -> str:
+        """The formatted value of the stat."""
+        return _to_formatted_value(self.value, self.type, self.format)
+
 
 class DriveDisc(BaseModel):
-    "ZZZ drive disc."
+    """Represents a drive disc.
+
+    Attributes:
+        slot: The slot number of the drive disc.
+        id: The ID of the drive disc.
+        uid: The unique identifier of the drive disc.
+        level: The level of the drive disc.
+        roll_times: The number of times random stats are being rolled.
+        main_stat: The main stat of the drive disc.
+        sub_stats: List of sub-stats of the drive disc.
+        is_locked: Whether the drive disc is marked as locked in-game.
+        is_trash: Whether the drive disc is marked as trash in-game.
+        rarity_num: The rarity number of the drive disc.
+        set_id: The set ID of the drive disc.
+    """
 
     slot: Literal[1, 2, 3, 4, 5, 6] = Field(alias="Slot")
 
@@ -50,14 +92,12 @@ class DriveDisc(BaseModel):
     uid: int = Field(alias="Uid")
     level: int = Field(alias="Level")
     roll_times: int = Field(alias="BreakLevel")
-    """Number of times random stats are being rolled."""
 
     main_stat: DriveDiscStat = Field(alias="MainPropertyList")
     sub_stats: list[DriveDiscStat] = Field(alias="RandomPropertyList")
 
     is_locked: bool = Field(alias="IsLocked")
     is_trash: bool = Field(alias="IsTrash")
-    """Whether the disc is marked as trash in-game."""
 
     # Fields that are not in the API response
     rarity_num: int = Field(default=0)
@@ -83,7 +123,22 @@ class DriveDisc(BaseModel):
 
 
 class WEngine(BaseModel):
-    "ZZZ w-engine."
+    """Represents a W-Engine.
+
+    Attributes:
+        id: The ID of the W-Engine.
+        uid: The unique identifier of the W-Engine.
+        level: The level of the W-Engine.
+        modification: The modification level of the W-Engine.
+        phase: The phase level of the W-Engine.
+        is_locked: Whether the W-Engine is marked as locked in-game.
+        rarity_num: The rarity number of the W-Engine.
+        name: The name of the W-Engine.
+        specialty: The specialty of the W-Engine.
+        icon: The icon of the W-Engine.
+        main_stat: The main stat of the W-Engine.
+        sub_stat: The sub-stat of the W-Engine.
+    """
 
     id: int = Field(alias="Id")
     uid: int = Field(alias="Uid")
@@ -109,19 +164,54 @@ class WEngine(BaseModel):
 
 
 class AgentSkill(BaseModel):
-    """ZZZ agent skill."""
+    """Represents a ZZZ agent's skill.
+
+    Attributes:
+        level: The level of the skill.
+        type: The type of the skill.
+    """
 
     level: int = Field(alias="Level")
     type: SkillType = Field(alias="Index")
 
 
 class AgentColor(BaseModel):
+    """Represents a ZZZ agent's color scheme.
+
+    Attributes:
+        accent: The accent color of the agent.
+        mindscape: The mindscape color of the agent.
+    """
+
     accent: str = Field(alias="Accent")
     mindscape: str = Field(alias="Mindscape")
 
 
 class Agent(BaseModel):
-    """ZZZ agent."""
+    """Represents a ZZZ agent (character).
+
+    Attributes:
+        id: The ID of the agent.
+        uid: The unique identifier of the agent.
+        level: The level of the agent.
+        promotion: The promotion level of the agent.
+        mindscape: The mindscape level of the agent.
+        skin_id: The ID of the agent's skin.
+        core_skill_level_num: The core skill level number of the agent.
+        is_sig_engine_effect_on: Whether the signature engine effect is on.
+        obtained_at: The time when the agent was obtained, in server timezone.
+        skills: List of skills for the agent.
+        discs: List of drive discs equipped by the agent.
+        w_engine: The W-Engine associated with the agent.
+        name: The name of the agent.
+        rarity_num: The rarity number of the agent.
+        elements: List of elements associated with the agent.
+        icon: The icon of the agent.
+        sig_engine_id: The ID of the signature W-Engine.
+        color: The color scheme of the agent.
+        highlight_stats: List of stats that are highlighted in the agent menu.
+        stats: Dictionary of stats for the agent.
+    """
 
     id: int = Field(alias="Id")
     level: int = Field(alias="Level")
@@ -132,7 +222,6 @@ class Agent(BaseModel):
 
     is_sig_engine_effect_on: bool | None = Field(alias="WeaponEffectState")
     obtained_at: datetime.datetime = Field(alias="ObtainmentTimestamp")
-    """Time when the agent was obtained , in server timezone."""
 
     skills: list[AgentSkill] = Field(alias="SkillLevelList")
     discs: list[DriveDisc] = Field(alias="EquippedList")
@@ -144,10 +233,8 @@ class Agent(BaseModel):
     elements: list[Element] = Field(default_factory=list)
     icon: AgentIcon = Field(default=None)  # pyright: ignore[reportAssignmentType]
     sig_engine_id: int = Field(default=0)
-    """Signature W-Engine ID."""
     color: AgentColor = Field(default=None)  # pyright: ignore[reportAssignmentType]
     highlight_stats: list[StatType] = Field(default_factory=list)
-    """Stats that are highlighted in the agent menu."""
     stats: dict[StatType, Stat] = Field(default_factory=dict)
 
     @field_validator("is_sig_engine_effect_on", mode="before")
