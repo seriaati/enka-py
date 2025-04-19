@@ -10,26 +10,53 @@ __all__ = ("BaseTTLCache", "MemoryCache", "SQLiteCache")
 
 
 class BaseTTLCache(abc.ABC):
-    @abc.abstractmethod
-    async def start(self) -> None: ...
+    """Base class for TTL cache, inherit from this class to implement your own cache."""
 
     @abc.abstractmethod
-    async def close(self) -> None: ...
+    async def start(self) -> None:
+        """Start the cache, called when `BaseClient` is started."""
 
     @abc.abstractmethod
-    async def get(self, key: str) -> str | None: ...
+    async def close(self) -> None:
+        """Close the cache, called when `BaseClient` is closed."""
 
     @abc.abstractmethod
-    async def set(self, key: str, value: str, ttl: int) -> None: ...
+    async def get(self, key: str) -> str | None:
+        """Get a value from the cache.
+
+        Returns:
+            The value if it exists, otherwise None.
+        """
 
     @abc.abstractmethod
-    async def delete(self, key: str) -> None: ...
+    async def set(self, key: str, value: str, ttl: int) -> None:
+        """Set the value in the cache.
+
+        Args:
+            key: The key to set.
+            value: The value to set.
+            ttl: The time to live in seconds.
+        """
 
     @abc.abstractmethod
-    async def clear_expired(self) -> None: ...
+    async def delete(self, key: str) -> None:
+        """Delete the value from the cache.
+
+        Args:
+            key: The key to delete.
+        """
+
+    @abc.abstractmethod
+    async def clear_expired(self) -> None:
+        """Clear expired values from the cache."""
 
 
 class MemoryCache(BaseTTLCache):
+    """In-memory cache implementation.
+
+    This cache is not persistent and will be cleared when the program exits.
+    """
+
     def __init__(self) -> None:
         self._cache: dict[str, tuple[float, str]] = {}
 
@@ -58,6 +85,11 @@ class MemoryCache(BaseTTLCache):
 
 
 class SQLiteCache(BaseTTLCache):
+    """SQLite cache implementation.
+
+    This cache is persistent and will be saved to the specified file.
+    """
+
     def __init__(self, db_path: pathlib.Path | str = ".cache/enka_py.db") -> None:
         self._db_path = pathlib.Path(db_path)
         self._conn: aiosqlite.Connection | None = None

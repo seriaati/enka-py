@@ -29,9 +29,9 @@ class GenshinClient(BaseClient):
     """The main client to interact with the Enka Network Genshin Impact API.
 
     Args:
-        lang (Language | str): The language to use for the client, defaults to Language.ENGLISH.
-        headers (dict[str, Any] | None): The headers to use for the client, defaults to None.
-        cache (BaseTTLCache | None): The cache to use for the client, defaults to None.
+        lang: The language to use for the client, defaults to Language.ENGLISH.
+        headers: The headers to use for the client, defaults to None.
+        cache: The cache to use for the client, defaults to None.
     """
 
     def __init__(
@@ -232,15 +232,15 @@ class GenshinClient(BaseClient):
     async def fetch_showcase(
         self, uid: str | int, *, info_only: bool = False, raw: bool = False
     ) -> ShowcaseResponse | dict[str, Any]:
-        """Fetches the Impact character showcase of the given UID.
+        """Fetch the player showcase of the given UID.
 
         Args:
-            uid (str | int): The UID of the user.
-            info_only (bool): Whether to only fetch player info, defaults to False.
-            raw (bool): Whether to return the raw data, defaults to False.
+            uid: The UID of the user.
+            info_only: Whether to only fetch player info, defaults to False.
+            raw: Whether to return the raw data, defaults to False.
 
         Returns:
-            ShowcaseResponse | dict[str, Any]: The parsed or raw showcase data.
+            The parsed or raw showcase data.
         """
         url = API_URL.format(uid=uid)
         if info_only:
@@ -256,13 +256,13 @@ class GenshinClient(BaseClient):
         return showcase
 
     def parse_showcase(self, data: dict[str, Any]) -> ShowcaseResponse:
-        """Parses the given showcase data.
+        """Parse the given showcase data.
 
         Args:
-            data (dict[str, Any]): The showcase data.
+            data: The showcase data.
 
         Returns:
-            ShowcaseResponse: The parsed showcase response.
+            The parsed showcase response.
         """
         data = copy.deepcopy(data)
         showcase = ShowcaseResponse(**data)
@@ -270,13 +270,13 @@ class GenshinClient(BaseClient):
         return showcase
 
     async def fetch_builds(self, owner: Owner) -> dict[str, list[Build]]:
-        """Fetches the builds of the given owner.
+        """Fetch the character builds of the given owner.
 
         Args:
-            owner (Owner): The owner of the builds.
+            owner: The owner of the builds.
 
         Returns:
-            dict[str, list[Build]]: Character ID to list of builds mapping.
+            Character ID to list of builds mapping.
         """
         url = f"https://enka.network/api/profile/{owner.username}/hoyos/{owner.hash}/builds/"
         data = await self._request(url)

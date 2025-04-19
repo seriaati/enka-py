@@ -9,9 +9,13 @@ HAKUSHIN_BASE = "https://api.hakush.in/zzz/UI/{filename}.webp"
 
 
 class AgentIcon(BaseModel):
-    """ZZZ agent icon."""
+    """Represents a ZZZ character's icon.
 
-    filename: str  # Should be "IconRoleXX", parsed from "image" property.
+    Attributes:
+        filename: Should be "IconRoleXX", parsed from "image" property.
+    """
+
+    filename: str
 
     @computed_field
     @property

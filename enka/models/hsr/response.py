@@ -13,14 +13,14 @@ __all__ = ("ShowcaseResponse",)
 
 class ShowcaseResponse(BaseModel):
     """
-    Represents a Honkai: Star Rail showcase response.
+    Represents a HSR showcase response.
 
     Attributes:
-        characters (List[Character]): The characters in the showcase.
-        player (Player): The player.
-        ttl (int): The time to live of the response.
-        uid (str): The UID of the showcase.
-        owner (Owner, optional): The owner of the showcase's account.
+        characters: The characters in the showcase.
+        player: The player.
+        ttl: The time to live of the response.
+        uid: The UID of the showcase.
+        owner: The owner of the showcase's account, if any.
     """
 
     characters: list[Character] = Field(alias="avatarDetailList")

@@ -11,7 +11,14 @@ __all__ = ("ShowcaseResponse",)
 
 
 class ShowcaseResponse(BaseModel):
-    """ZZZ showcase response."""
+    """Represents a ZZZ player's showcase information.
+
+    Attributes:
+        agents: List of agents (characters) in the player's showcase.
+        player: The player's profile information.
+        uid: The player's unique identifier.
+        ttl: The time-to-live for the showcase data.
+    """
 
     agents: list[Agent] = Field(alias="ShowcaseDetail")
     player: Player = Field(alias="SocialDetail")

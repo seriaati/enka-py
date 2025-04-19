@@ -359,14 +359,14 @@ class ZZZClient(BaseClient):
     async def fetch_showcase(
         self, uid: str | int, *, raw: bool = False
     ) -> models.ShowcaseResponse | dict[str, Any]:
-        """Fetches the ZZZ character showcase of the given UID.
+        """Fetch the player showcase of the given UID.
 
         Args:
-            uid (str | int): The UID of the player.
-            raw (bool): Whether to return the raw data or not, defaults to False.
+            uid: The UID of the user.
+            raw: Whether to return the raw data, defaults to False.
 
         Returns:
-            ShowcaseResponse | dict[str, Any]: The parsed or raw showcase data.
+            The parsed or raw showcase data.
         """
         url = API_URL.format(uid=uid)
 
@@ -380,13 +380,13 @@ class ZZZClient(BaseClient):
         return showcase
 
     def parse_showcase(self, data: dict[str, Any]) -> models.ShowcaseResponse:
-        """Parses the given showcase data.
+        """Parse the given showcase data.
 
         Args:
-            data (dict[str, Any]): The showcase data.
+            data: The showcase data.
 
         Returns:
-            ShowcaseResponse: The parsed showcase data.
+            The parsed showcase response.
         """
         data = copy.deepcopy(data)
         showcase = models.ShowcaseResponse(**data)

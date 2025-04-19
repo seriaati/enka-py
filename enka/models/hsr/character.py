@@ -13,6 +13,18 @@ __all__ = ("Character", "LightCone", "Relic", "RelicSubAffix", "Stat", "Trace")
 
 
 class Trace(BaseModel):
+    """Represents a character's trace (skill).
+
+    Attributes:
+        id: The trace's ID.
+        level: The trace's level.
+        boosted: Whether the trace's level is boosted by an activated eidolon's effect.
+        icon: The trace's icon.
+        max_level: The trace's maximum level.
+        anchor: The trace's anchor.
+        type: The trace's type.
+    """
+
     id: int = Field(alias="pointId")
     level: int
     boosted: bool = False
@@ -26,6 +38,15 @@ class Trace(BaseModel):
 
 
 class Stat(BaseModel):
+    """Represents a HSR stat.
+
+    Attributes:
+        type: The type of the stat.
+        value: The value of the stat.
+        name: The name of the stat.
+        icon: The icon of the stat.
+    """
+
     type: StatType
     value: float
 
@@ -42,7 +63,7 @@ class Stat(BaseModel):
     @computed_field
     @property
     def formatted_value(self) -> str:
-        """Returns the formatted value of the stat."""
+        """The formatted value of the stat."""
         if self.is_percentage:
             return f"{round_down(self.value * 100, 1)}%"
         if self.type in {StatType.SPD, StatType.SPEED_DELTA}:
@@ -51,6 +72,19 @@ class Stat(BaseModel):
 
 
 class LightCone(BaseModel):
+    """Represents a light cone (weapon.)
+
+    Attributes:
+        id: The light cone's ID.
+        level: The light cone's level.
+        ascension: The light cone's ascension level.
+        superimpose: The light cone's superimpose level.
+        name: The name of the light cone.
+        stats: The stats of the light cone.
+        rarity: The rarity of the light cone.
+        icon: The icon of the light cone.
+    """
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     id: int = Field(alias="tid")
@@ -84,12 +118,35 @@ class LightCone(BaseModel):
 
 
 class RelicSubAffix(BaseModel):
+    """Represents a relic's sub-stat information.
+
+    Attributes:
+        id: The ID of the sub-stat.
+        cnt: The count of the sub-stat.
+        step: The step of the sub-stat.
+    """
+
     id: int = Field(alias="affixId")
     cnt: int
     step: int | None = None
 
 
 class Relic(BaseModel):
+    """Represents a relic in HSR.
+
+    Attributes:
+        id: The relic's ID.
+        level: The relic's level.
+        type: The relic's type.
+        main_affix_id: The ID of the main affix.
+        set_name: The name of the relic set.
+        set_id: The ID of the relic set.
+        stats: The stats of the relic.
+        sub_affix_list: List of sub-stat information for the relic.
+        icon: The icon of the relic.
+        rarity: The rarity of the relic.
+    """
+
     id: int = Field(alias="tid")
     level: int = 0
     type: RelicType
@@ -118,21 +175,51 @@ class Relic(BaseModel):
     @computed_field
     @property
     def main_stat(self) -> Stat:
+        """The relic's main stat."""
         return self.stats[0]
 
     @computed_field
     @property
     def sub_stats(self) -> list[Stat]:
+        """The relic's sub-stats."""
         return self.stats[1:]
 
 
 class Eidolon(BaseModel):
+    """Represents a character's eidolon.
+
+    Attributes:
+        id: The eidolon's ID.
+        icon: The eidolon's icon.
+        unlocked: Whether the eidolon is unlocked.
+    """
+
     id: int
     icon: str
     unlocked: bool
 
 
 class Character(BaseModel):
+    """Represents a character in HSR.
+
+    Attributes:
+        level: The character's level.
+        ascension: The character's ascension level.
+        id: The character's ID.
+        traces: List of the character's traces (skills).
+        light_cone: The character's light cone (weapon).
+        relics: List of the character's relics.
+        eidolons: List of the character's eidolons.
+        eidolons_unlocked: The number of unlocked eidolons.
+        is_assist: Whether the character is an assist character.
+        icon: The character's icon.
+        name: The character's name.
+        rarity: The character's rarity.
+        element: The character's element (type.)
+        path: The character's path.
+        stats: The character's stats.
+    """
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     level: int

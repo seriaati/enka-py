@@ -10,12 +10,11 @@ __all__ = ("Costume",)
 
 
 class Costume(BaseModel):
-    """
-    Represents a character's costume.
+    """Represents a character's costume.
 
     Attributes:
-       id (int): The costume's ID.
-       icon (Icon): The costume's icon.
+       id: The costume's ID.
+       icon: The costume's icon.
     """
 
     id: int
