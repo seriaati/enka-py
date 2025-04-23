@@ -339,12 +339,23 @@ class ZZZClient(BaseClient):
         self._post_process_engine(agent.w_engine)
         self._calc_agent_stats(agent)
 
-    def _post_process_showcase(self, showcase: models.ShowcaseResponse) -> None:
-        """Post-process the showcase data.
+    def _post_process_title(self, title: models.Title) -> None:
+        title_data = self._assets.titles[str(title.id)]
+        title.text = self._text_map[title_data["TitleText"]]
+        title.color1 = f"#{title_data['ColorA']}"
+        title.color2 = f"#{title_data['ColorB']}"
 
-        Args:
-            showcase : The showcase data to post-process.
-        """
+    def _post_process_player(self, player: models.Player) -> None:
+        self._post_process_title(player.title)
+
+        # Namecard
+        namecard_id = player.namecard_id
+        player.namecard = models.Namecard(
+            id=namecard_id, icon=self._assets.namecards[str(namecard_id)]["Icon"]
+        )
+
+    def _post_process_showcase(self, showcase: models.ShowcaseResponse) -> None:
+        self._post_process_player(showcase.player)
         for agent in showcase.agents:
             self._post_process_agent(agent)
 
