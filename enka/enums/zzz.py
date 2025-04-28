@@ -108,7 +108,7 @@ class ProfessionType(StrEnum):
 class Element(StrEnum):
     """ZZZ element type."""
 
-    PHYSICAL = "Physical"
+    PHYSICAL = "Physics"
     FIRE = "Fire"
     ICE = "Ice"
     ELECTRIC = "Elec"
