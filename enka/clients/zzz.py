@@ -231,7 +231,8 @@ class ZZZClient(BaseClient):
         raw_stats = self._get_agent_base_stats(agent)
 
         # 2. Add engine stats
-        self._add_engine_stats(raw_stats, agent.w_engine)
+        if agent.w_engine is not None:
+            self._add_engine_stats(raw_stats, agent.w_engine)
 
         # 3. Add disc stats
         self._add_disc_stats(raw_stats, agent.discs)
@@ -336,7 +337,8 @@ class ZZZClient(BaseClient):
         for disc in agent.discs:
             self._post_process_disc(disc)
 
-        self._post_process_engine(agent.w_engine)
+        if agent.w_engine is not None:
+            self._post_process_engine(agent.w_engine)
         self._calc_agent_stats(agent)
 
     def _post_process_title(self, title: models.Title) -> None:
