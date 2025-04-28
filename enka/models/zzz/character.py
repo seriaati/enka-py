@@ -225,7 +225,7 @@ class Agent(BaseModel):
 
     skills: list[AgentSkill] = Field(alias="SkillLevelList")
     discs: list[DriveDisc] = Field(alias="EquippedList")
-    w_engine: WEngine = Field(alias="Weapon")
+    w_engine: WEngine | None = Field(None, alias="Weapon")
 
     # Fields that are not in the API response
     name: str = Field(default="")
