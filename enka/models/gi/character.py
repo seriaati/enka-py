@@ -182,6 +182,7 @@ class Weapon(BaseModel):
         return [
             Stat(type=StatType(stat["appendPropId"]), value=stat["statValue"], name="")
             for stat in v
+            if stat["statValue"] != 0
         ]
 
     @field_validator("name", mode="before")
