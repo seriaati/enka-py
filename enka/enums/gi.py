@@ -55,7 +55,6 @@ class ItemType(StrEnum):
 class StatType(StrEnum):
     """GI stat types."""
 
-    FIGHT_PROP_NONE = "FIGHT_PROP_NONE"
     FIGHT_PROP_BASE_ATTACK = "FIGHT_PROP_BASE_ATTACK"
     FIGHT_PROP_HP = "FIGHT_PROP_HP"
     FIGHT_PROP_ATTACK = "FIGHT_PROP_ATTACK"
