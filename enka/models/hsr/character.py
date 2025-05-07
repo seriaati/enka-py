@@ -83,6 +83,7 @@ class LightCone(BaseModel):
         stats: The stats of the light cone.
         rarity: The rarity of the light cone.
         icon: The icon of the light cone.
+        path: The light cone's path.
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -97,6 +98,7 @@ class LightCone(BaseModel):
     # Following fields are added in post-processing
     icon: LightConeIcon = LightConeIcon(light_cone_id=0)
     rarity: Literal[3, 4, 5] = 3
+    path: Path = Path.NONE
 
     @computed_field
     @property

@@ -15,17 +15,3 @@ def round_down(number: int | float, decimal_places: int) -> int | float:
     """
     factor = 10**decimal_places
     return math.floor(number * factor) / factor
-
-
-def update_stats(original: dict[str, float], new: dict[str, float]) -> None:
-    """Update a dictionary of stats with a new dictionary of stats.
-
-    Args:
-        original: The original dictionary of stats.
-        new: The new dictionary of stats.
-    """
-    for key, value in new.items():
-        if key in original:
-            original[key] += value
-        else:
-            original[key] = value

@@ -1,20 +1,18 @@
 from __future__ import annotations
 
 import copy
-from collections import defaultdict
 from typing import TYPE_CHECKING, Any, Final, Literal, overload
 
 from loguru import logger
 
 from ..assets.data import TextMap
 from ..assets.hsr.manager import HSR_ASSETS
-from ..constants.hsr import DEFAULT_STATS
+from ..calc.hsr import LayerGenerator, PropState
 from ..enums.enum import Game
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
 from ..models.hsr import CharacterIcon, LightConeIcon, Player, ShowcaseResponse, Stat
 from ..models.hsr.build import Build
 from ..models.hsr.character import Eidolon
-from ..utils import update_stats
 from .base import BaseClient
 
 if TYPE_CHECKING:
@@ -94,9 +92,12 @@ class HSRClient(BaseClient):
 
     def _post_process_light_cone(self, light_cone: LightCone) -> None:
         text_map = self._text_map
+        data = self._assets.light_cones_data[str(light_cone.id)]
+
         light_cone.name = text_map[light_cone.name]
-        light_cone.rarity = self._assets.light_cones_data[str(light_cone.id)]["Rarity"]
+        light_cone.rarity = data["Rarity"]
         light_cone.icon = LightConeIcon(light_cone_id=light_cone.id)
+        light_cone.path = Path(data["AvatarBaseType"])
 
         for stat in light_cone.stats:
             stat.name = text_map[stat.type.value]
@@ -161,69 +162,42 @@ class HSRClient(BaseClient):
         if character.light_cone is not None:
             self._post_process_light_cone(character.light_cone)
 
-        # Credits to Algoinde for the following code
-        chara_stats = self._add_up_character_stats(character)
+        # Credit to Enka Network for the following code
+        generator = LayerGenerator(self._assets)
+        prop_state = PropState()
+
+        prop_state.add(generator.character(character))
+        if character.light_cone is not None:
+            prop_state.add(generator.light_cone(character.light_cone))
+
+            if character.light_cone.path == character.path:
+                prop_state.add(generator.light_cone_skill(character.light_cone))
+
+        prop_state.add(generator.relics(character.relics))
+        prop_state.add(generator.relic_set(character.relics))
+        prop_state.add(generator.skill_tree(character))
+
+        props = prop_state.sum()
+
         final_stats: dict[StatType, float] = {
-            StatType.MAX_HP: (
-                chara_stats["BaseHP"]
-                + chara_stats["HPBase"]
-                + chara_stats["HPAdd"] * (character.level - 1)
-            )
-            * (1 + chara_stats["HPAddedRatio"])
-            + chara_stats["HPDelta"]
-            + chara_stats["HPConvert"],
-            StatType.ATK: (
-                chara_stats["BaseAttack"]
-                + chara_stats["AttackBase"]
-                + chara_stats["AttackAdd"] * (character.level - 1)
-            )
-            * (1 + chara_stats["AttackAddedRatio"])
-            + chara_stats["AttackDelta"]
-            + chara_stats["AttackConvert"],
-            StatType.DEF: (
-                chara_stats["BaseDefence"]
-                + chara_stats["DefenceBase"]
-                + chara_stats["DefenceAdd"] * (character.level - 1)
-            )
-            * (1 + chara_stats["DefenceAddedRatio"])
-            + chara_stats["DefenceDelta"]
-            + chara_stats["DefenceConvert"],
-            StatType.SPD: (chara_stats["BaseSpeed"] + chara_stats["SpeedBase"])
-            * (1 + chara_stats["SpeedAddedRatio"])
-            + chara_stats["SpeedDelta"]
-            + chara_stats["SpeedConvert"],
-            StatType.BASE_HP: chara_stats["BaseHP"]
-            + chara_stats["HPBase"]
-            + chara_stats["HPAdd"] * (character.level - 1),
-            StatType.BASE_ATK: chara_stats["BaseAttack"]
-            + chara_stats["AttackBase"]
-            + chara_stats["AttackAdd"] * (character.level - 1),
-            StatType.BASE_DEF: chara_stats["BaseDefence"]
-            + chara_stats["DefenceBase"]
-            + chara_stats["DefenceAdd"] * (character.level - 1),
-            StatType.BASE_SPEED: chara_stats["BaseSpeed"] + chara_stats["SpeedBase"],
-            StatType.CRIT_RATE: chara_stats["CriticalChanceBase"] + chara_stats["CriticalChance"],
-            StatType.CRIT_DMG: chara_stats["CriticalDamageBase"] + chara_stats["CriticalDamage"],
-            StatType.BREAK_EFFECT: chara_stats["BreakDamageAddedRatioBase"]
-            + chara_stats["BreakDamageAddedRatio"],
-            StatType.HEALING_BOOST: chara_stats["HealRatioBase"] + chara_stats["HealRatioConvert"],
-            StatType.ENERGY_REGEN_RATE: chara_stats["SPRatioBase"]
-            + chara_stats["SPRatio"]
-            + chara_stats["SPRatioConvert"]
-            + 1,
-            StatType.EFFECT_HIT_RATE: chara_stats["StatusProbabilityBase"]
-            + chara_stats["StatusProbability"]
-            + chara_stats["StatusProbabilityConvert"],
-            StatType.EFFECT_RES: chara_stats["StatusResistanceBase"]
-            + chara_stats["StatusResistance"]
-            + chara_stats["StatusResistanceConvert"],
-            StatType.PHYSICAL_DMG_BOOST: chara_stats["PhysicalAddedRatio"],
-            StatType.FIRE_DMG_BOOST: chara_stats["FireAddedRatio"],
-            StatType.ICE_DMG_BOOST: chara_stats["IceAddedRatio"],
-            StatType.LIGHTNING_DMG_BOOST: chara_stats["ThunderAddedRatio"],
-            StatType.WIND_DMG_BOOST: chara_stats["WindAddedRatio"],
-            StatType.QUANTUM_DMG_BOOST: chara_stats["QuantumAddedRatio"],
-            StatType.IMAGINARY_DMG_BOOST: chara_stats["ImaginaryAddedRatio"],
+            StatType.MAX_HP: props.hp,
+            StatType.ATK: props.attack,
+            StatType.DEF: props.defence,
+            StatType.SPD: props.speed,
+            StatType.CRIT_RATE: props.critical_chance,
+            StatType.CRIT_DMG: props.critical_damage,
+            StatType.BREAK_EFFECT: props.break_damage,
+            StatType.HEALING_BOOST: props.heal_ratio,
+            StatType.ENERGY_REGEN_RATE: props.sp_ratio,
+            StatType.EFFECT_HIT_RATE: props.status_probability,
+            StatType.EFFECT_RES: props.status_resistance,
+            StatType.PHYSICAL_DMG_BOOST: props.physical_damage,
+            StatType.FIRE_DMG_BOOST: props.fire_damage,
+            StatType.ICE_DMG_BOOST: props.ice_damage,
+            StatType.LIGHTNING_DMG_BOOST: props.thunder_damage,
+            StatType.WIND_DMG_BOOST: props.wind_damage,
+            StatType.QUANTUM_DMG_BOOST: props.quantum_damage,
+            StatType.IMAGINARY_DMG_BOOST: props.imaginary_damage,
         }
 
         character.stats = {
@@ -237,58 +211,6 @@ class HSRClient(BaseClient):
             )
             for stat_type, value in final_stats.items()
         }
-
-    def _add_up_character_stats(self, character: Character) -> dict[str, float]:
-        chara_stats = DEFAULT_STATS.copy()
-
-        # Add base stats
-        chara_meta: dict[str, float] = self._assets.meta_data["avatar"][str(character.id)][
-            str(character.ascension)
-        ]
-        update_stats(chara_stats, chara_meta)
-
-        # Add light cone stats
-        if character.light_cone is not None:
-            lc = character.light_cone
-
-            lc_meta: dict[str, float] = self._assets.meta_data["equipment"][str(lc.id)][
-                str(lc.ascension)
-            ]
-            update_stats(chara_stats, lc_meta)
-
-            # Add light cone skill stats
-            lc_skill_meta_ = self._assets.meta_data["equipmentSkill"]
-            if str(lc.id) in lc_skill_meta_:
-                lc_skill_meta: dict[str, float] = lc_skill_meta_[str(lc.id)][str(lc.superimpose)][
-                    "props"
-                ]
-                update_stats(chara_stats, lc_skill_meta)
-
-        # Add relic stats
-        relic_sets: defaultdict[int, int] = defaultdict(int)
-        for relic in character.relics:
-            relic_sets[relic.set_id] += 1
-
-            for stat in relic.stats:
-                update_stats(chara_stats, {stat.type.value: stat.value})
-
-        # Add relic set stats
-        for relic_set_id, count in relic_sets.items():
-            for i in range(1, count + 1):
-                relic_set_meta: dict[str, dict[str, float]] | None = self._assets.meta_data[
-                    "relic"
-                ]["setSkill"][str(relic_set_id)].get(str(i))
-                if relic_set_meta is not None:
-                    update_stats(chara_stats, relic_set_meta["props"])
-
-        # Add trace stats
-        for trace in character.traces:
-            trace_meta_ = self._assets.meta_data["tree"]
-            if str(trace.id) in trace_meta_:
-                trace_meta: dict[str, float] = trace_meta_[str(trace.id)][str(trace.level)]["props"]
-                update_stats(chara_stats, trace_meta)
-
-        return chara_stats
 
     def _post_process_player(self, player: Player) -> None:
         player.icon = self._get_icon(self._assets.avatar_data[player.icon]["Icon"])
