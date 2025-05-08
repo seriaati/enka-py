@@ -175,7 +175,7 @@ class GenshinClient(BaseClient):
         self._post_process_talents(c, data)
 
         # talent order
-        c.talent_order = data["SkillOrder"]
+        c.talent_order = [100540] if is_no_element_traveler else data["SkillOrder"]
 
         # element
         element = data["Element"]
