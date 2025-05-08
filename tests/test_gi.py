@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from enka.gi import GenshinClient, Language
+from enka.gi import Element, GenshinClient, Language
 
 
 async def test_update_assets(genshin_client: GenshinClient) -> None:
@@ -59,3 +59,9 @@ async def test_raw_and_parse(genshin_client: GenshinClient) -> None:
 
 async def test_invalid_player(genshin_client: GenshinClient) -> None:
     await genshin_client.fetch_showcase("901211015")
+
+
+async def test_no_element_traveler(genshin_client: GenshinClient) -> None:
+    showcase = await genshin_client.fetch_showcase("828107378")
+    traveler = next(c for c in showcase.characters if c.name == "Aether")
+    assert traveler.element is Element.NONE

@@ -16,7 +16,7 @@ from .base import BaseClient
 
 if TYPE_CHECKING:
     from ..models.enka.owner import Owner
-    from ..models.gi.character import Character
+    from ..models.gi.character import Artifact, Character, Weapon
     from ..models.gi.player import Player, ShowcaseCharacter
     from .cache import BaseTTLCache
 
@@ -105,46 +105,36 @@ class GenshinClient(BaseClient):
                 data=costume_data[str(showcase_character.costume_id)],
             )
 
-    def _post_process_character(self, character: Character) -> None:  # noqa: PLR0912
-        characer_id = (
-            f"{character.id}-{character.skill_depot_id}"
-            if character.id in {10000005, 10000007}
-            else str(character.id)
-        )
-
-        character_data = self._assets.character_data[characer_id]
-        # name
-        character_name_text_map_hash = character_data["NameTextMapHash"]
-        character.name = self._text_map[character_name_text_map_hash]
-
-        # icon
-        side_icon_name = character_data["SideIconName"]
-        character.icon = Icon(side_icon_ui_path=side_icon_name)
-
-        # weapon
-        weapon = character.weapon
+    def _post_process_weapon(self, weapon: Weapon) -> None:
         weapon.name = self._text_map[weapon.name]
         for stat in weapon.stats:
             stat.name = self._text_map[stat.type.value]
 
-        # artifacts
-        for artifact in character.artifacts:
-            artifact.name = self._text_map[artifact.name]
-            artifact.set_name = self._text_map[artifact.set_name]
-            artifact.main_stat.name = self._text_map[artifact.main_stat.type.value]
-            for stat in artifact.sub_stats:
-                stat.name = self._text_map[stat.type.value]
+    def _post_process_talents(self, c: Character, data: dict[str, Any]) -> None:
+        for talent in c.talents:
+            talent_data = self._assets.talents_data[str(talent.id)]
+            talent.name = self._text_map[talent_data["nameTextMapHash"]]
+            talent.icon = f"https://enka.network/ui/{talent_data['icon']}.png"
+            if c.talent_extra_level_map:
+                proud_map: dict[str, int] = data["ProudMap"]
+                proud_id = proud_map.get(str(talent.id))
+                if proud_id is None:
+                    continue
+                if extra_level := c.talent_extra_level_map.get(str(proud_id), 0):
+                    talent.level += extra_level
+                    talent.is_upgraded = True
 
-        # stats
-        for stat_type, stat in character.stats.items():
-            if not isinstance(stat_type, FightPropType):
-                continue
-            stat.name = self._text_map.get(stat_type.name)
+    def _post_process_artifact(self, artifact: Artifact) -> None:
+        artifact.name = self._text_map[artifact.name]
+        artifact.set_name = self._text_map[artifact.set_name]
+        artifact.main_stat.name = self._text_map[artifact.main_stat.type.value]
+        for stat in artifact.sub_stats:
+            stat.name = self._text_map[stat.type.value]
 
-        # constellations
+    def _post_process_constellations(self, c: Character, data: dict[str, Any]) -> None:
         all_consts: list[dict[str, str]] = []
         for const_id, const in self._assets.consts_data.items():
-            if const["icon"] not in character_data["Consts"]:
+            if const["icon"] not in data["Consts"]:
                 continue
             const["id"] = const_id
             all_consts.append(const)
@@ -154,48 +144,70 @@ class GenshinClient(BaseClient):
                 id=int(const["id"]),
                 name=self._text_map[const["nameTextMapHash"]],
                 icon=f"https://enka.network/ui/{const['icon']}.png",
-                unlocked=any(const["id"] == str(c.id) for c in character.constellations),
+                unlocked=any(const["id"] == str(c.id) for c in c.constellations),
             )
             for const in all_consts
         ]
-        character.constellations = consts
+        c.constellations = consts
+
+    def _post_process_character(self, c: Character) -> None:
+        is_no_element_traveler = c.skill_depot_id in {501, 701}
+        characer_id = (
+            f"{c.id}-{c.skill_depot_id}"
+            if c.id in {10000005, 10000007} and not is_no_element_traveler
+            else str(c.id)
+        )
+
+        data = self._assets.character_data[characer_id]
+        # name
+        character_name_text_map_hash = data["NameTextMapHash"]
+        c.name = self._text_map[character_name_text_map_hash]
+
+        # icon
+        side_icon_name = data["SideIconName"]
+        c.icon = Icon(side_icon_ui_path=side_icon_name)
+
+        # constellations
+        if not is_no_element_traveler:
+            self._post_process_constellations(c, data)
 
         # talents
-        for talent in character.talents:
-            talent_data = self._assets.talents_data[str(talent.id)]
-            talent.name = self._text_map[talent_data["nameTextMapHash"]]
-            talent.icon = f"https://enka.network/ui/{talent_data['icon']}.png"
-            if character.talent_extra_level_map:
-                proud_map: dict[str, int] = character_data["ProudMap"]
-                proud_id = proud_map.get(str(talent.id))
-                if proud_id is None:
-                    continue
-                if extra_level := character.talent_extra_level_map.get(str(proud_id), 0):
-                    talent.level += extra_level
-                    talent.is_upgraded = True
+        self._post_process_talents(c, data)
 
         # talent order
-        character.talent_order = character_data["SkillOrder"]
+        c.talent_order = data["SkillOrder"]
 
         # element
-        element = character_data["Element"]
-        character.element = Element(element)
+        element = data["Element"]
+        c.element = Element.NONE if is_no_element_traveler else Element(element)
 
         # rarity
-        character.rarity = CHARACTER_RARITY_MAP[character_data["QualityType"]]
+        c.rarity = CHARACTER_RARITY_MAP[data["QualityType"]]
 
         # namecard
-        ui_path = character_data.get("NamecardIcon")
+        ui_path = data.get("NamecardIcon")
         if ui_path is not None:
-            character.namecard = Namecard(ui_path=ui_path)
+            c.namecard = Namecard(ui_path=ui_path)
 
         # costume
-        if character.costume_id is not None:
-            costume_data = character_data.get("Costumes")
+        if c.costume_id is not None:
+            costume_data = data.get("Costumes")
             if costume_data is not None:
-                character.costume = Costume(
-                    id=character.costume_id, data=costume_data[str(character.costume_id)]
-                )
+                c.costume = Costume(id=c.costume_id, data=costume_data[str(c.costume_id)])
+
+        # weapon
+        weapon = c.weapon
+        self._post_process_weapon(weapon)
+
+        # artifacts
+        for artifact in c.artifacts:
+            self._post_process_artifact(artifact)
+
+        # stats
+        for stat_type, stat in c.stats.items():
+            if not isinstance(stat_type, FightPropType):
+                continue
+            stat.name = self._text_map.get(stat_type.name)
 
     def _post_process_showcase(self, showcase: ShowcaseResponse) -> None:
         # player

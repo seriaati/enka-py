@@ -210,3 +210,4 @@ class Element(StrEnum):
     PYRO = "Fire"
     CRYO = "Ice"
     HYDRO = "Water"
+    NONE = "None"
