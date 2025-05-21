@@ -28,3 +28,7 @@ async def test_raw_and_parse(zzz_client: ZZZClient) -> None:
 async def test_not_exist_player(zzz_client: ZZZClient) -> None:
     with pytest.raises(PlayerDoesNotExistError):
         await zzz_client.fetch_showcase("1000000000")
+
+
+async def test_fetch_builds(zzz_client: ZZZClient) -> None:
+    await zzz_client.fetch_builds({"hash": "2rfpm9", "username": "CharaAni"})
