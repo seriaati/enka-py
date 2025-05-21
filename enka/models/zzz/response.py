@@ -4,6 +4,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from ..enka.owner import Owner
 from .character import Agent
 from .player import Player
 
@@ -22,6 +23,7 @@ class ShowcaseResponse(BaseModel):
 
     agents: list[Agent] = Field(alias="ShowcaseDetail")
     player: Player = Field(alias="SocialDetail")
+    owner: Owner | None = None
 
     uid: int
     ttl: int
