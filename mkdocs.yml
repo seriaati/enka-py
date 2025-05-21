@@ -87,5 +87,6 @@ nav:
         - Enums: reference/zzz/enums.md
     - Exceptions: reference/errors.md
     - Cache: reference/cache.md
+    - Profile: reference/profile.md
   - Legacy: legacy.md
 
