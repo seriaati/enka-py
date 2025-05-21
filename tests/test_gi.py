@@ -15,8 +15,8 @@ async def test_fetch_showcase(genshin_client: GenshinClient) -> None:
 
 
 async def test_empty_showcase(genshin_client: GenshinClient) -> None:
-    showcase = await genshin_client.fetch_showcase("123456789")
-    assert showcase.uid == "123456789"
+    showcase = await genshin_client.fetch_showcase("900000001")
+    assert showcase.uid == "900000001"
     assert len(showcase.characters) == 0
 
 
