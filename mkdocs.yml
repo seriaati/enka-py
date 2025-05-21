@@ -69,6 +69,7 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting Started: getting_started.md
+  - Profile Endpoint: profile.md
   - Caching: caching.md
   - Update Game Assets: update_assets.md
   - Migration Guide: migration.md
