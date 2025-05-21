@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Any, Final, Literal, overload
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
 
 from ..assets.data import TextMap
 from ..assets.gi.manager import GI_ASSETS
-from ..constants.common import DEFAULT_TIMEOUT
+from ..constants.common import DEFAULT_TIMEOUT, GI_API_URL
 from ..constants.gi import CHARACTER_RARITY_MAP
 from ..enums.gi import Element, FightPropType, Language
 from ..models.gi import Constellation, Costume, Icon, Namecard, ShowcaseResponse
@@ -21,8 +21,6 @@ if TYPE_CHECKING:
     from .cache import BaseTTLCache
 
 __all__ = ("GenshinClient",)
-
-API_URL: Final[str] = "https://enka.network/api/uid/{uid}"
 
 
 class GenshinClient(BaseClient):
@@ -256,7 +254,7 @@ class GenshinClient(BaseClient):
         Returns:
             The parsed or raw showcase data.
         """
-        url = API_URL.format(uid=uid)
+        url = GI_API_URL.format(uid)
         if info_only:
             url += "?info"
 

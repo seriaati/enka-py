@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Any, Final, Literal, overload
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
 
 from ..assets.data import TextMap
 from ..assets.hsr.manager import HSR_ASSETS
 from ..calc.hsr import LayerGenerator, PropState
-from ..constants.common import DEFAULT_TIMEOUT
+from ..constants.common import DEFAULT_TIMEOUT, HSR_API_URL
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
 from ..models.hsr import CharacterIcon, LightConeIcon, Player, ShowcaseResponse, Stat
 from ..models.hsr.build import Build
@@ -21,8 +21,6 @@ if TYPE_CHECKING:
     from .cache import BaseTTLCache
 
 __all__ = ("HSRClient",)
-
-API_URL: Final[str] = "https://enka.network/api/hsr/uid/{uid}"
 
 
 class HSRClient(BaseClient):
@@ -260,8 +258,7 @@ class HSRClient(BaseClient):
         Returns:
             The parsed or raw showcase data.
         """
-        url = API_URL.format(uid=uid)
-
+        url = HSR_API_URL.format(uid)
         data = await self._request(url)
         if raw:
             return data

@@ -3,13 +3,13 @@ from __future__ import annotations
 import copy
 import math
 from collections import defaultdict
-from typing import TYPE_CHECKING, Any, Final, Literal, overload
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
 
 from ..assets.data import TextMap
 from ..assets.zzz.manager import ZZZ_ASSETS
-from ..constants.common import DEFAULT_TIMEOUT
+from ..constants.common import DEFAULT_TIMEOUT, ZZZ_API_URL
 from ..enums import zzz as enums
 from ..models import zzz as models
 from .base import BaseClient
@@ -18,8 +18,6 @@ if TYPE_CHECKING:
     from .cache import BaseTTLCache
 
 __all__ = ("ZZZClient",)
-
-API_URL: Final[str] = "https://enka.network/api/zzz/uid/{uid}"
 
 
 class ZZZClient(BaseClient):
@@ -383,7 +381,7 @@ class ZZZClient(BaseClient):
         Returns:
             The parsed or raw showcase data.
         """
-        url = API_URL.format(uid=uid)
+        url = ZZZ_API_URL.format(uid)
 
         data = await self._request(url)
         if raw:
