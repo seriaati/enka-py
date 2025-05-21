@@ -73,6 +73,8 @@ class BaseClient:
         except Exception as e:
             if isinstance(e, asyncio.TimeoutError):
                 raise APIRequestTimeoutError from e
+            if isinstance(e, EnkaAPIError):
+                raise
             raise EnkaAPIError from e
 
     async def _request_profile(self, owner: Owner | OwnerInput) -> dict[str, Any]:
