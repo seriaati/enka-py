@@ -21,7 +21,7 @@ class EnkaAPIError(Exception):
     """Base exception class for Enka API."""
 
     def __str__(self) -> str:
-        return "An erorr occurred while requesting the API"
+        return "An error occurred while requesting the API"
 
 
 class WrongUIDFormatError(EnkaAPIError):
