@@ -21,7 +21,7 @@ class EnkaAPIError(Exception):
     """Base exception class for Enka API."""
 
     def __str__(self) -> str:
-        return "Unknown error"
+        return "An error occurred while requesting the API"
 
 
 class WrongUIDFormatError(EnkaAPIError):
@@ -71,6 +71,13 @@ class GatewayTimeoutError(EnkaAPIError):
 
     def __str__(self) -> str:
         return "Gateway timeout"
+
+
+class APIRequestTimeoutError(EnkaAPIError):
+    """Raised when an API request times out."""
+
+    def __str__(self) -> str:
+        return "API request timed out"
 
 
 def raise_for_retcode(retcode: int) -> None:
