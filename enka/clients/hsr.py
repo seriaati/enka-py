@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
 
+from ..errors import WrongUIDFormatError
+
 from ..assets.data import TextMap
 from ..assets.hsr.manager import HSR_ASSETS
 from ..calc.hsr import LayerGenerator, PropState
@@ -258,6 +260,9 @@ class HSRClient(BaseClient):
         Returns:
             The parsed or raw showcase data.
         """
+        if not str(uid).isdigit():
+            raise WrongUIDFormatError
+
         url = HSR_API_URL.format(uid)
         data = await self._request(url)
         if raw:

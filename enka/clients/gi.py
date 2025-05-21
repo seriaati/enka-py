@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
 
+from ..errors import WrongUIDFormatError
+
 from ..assets.data import TextMap
 from ..assets.gi.manager import GI_ASSETS
 from ..constants.common import DEFAULT_TIMEOUT, GI_API_URL
@@ -254,6 +256,9 @@ class GenshinClient(BaseClient):
         Returns:
             The parsed or raw showcase data.
         """
+        if not str(uid).isdigit():
+            raise WrongUIDFormatError
+
         url = GI_API_URL.format(uid)
         if info_only:
             url += "?info"

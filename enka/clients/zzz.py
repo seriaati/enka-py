@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
 
+from ..errors import WrongUIDFormatError
+
 from ..assets.data import TextMap
 from ..assets.zzz.manager import ZZZ_ASSETS
 from ..constants.common import DEFAULT_TIMEOUT, ZZZ_API_URL
@@ -381,8 +383,10 @@ class ZZZClient(BaseClient):
         Returns:
             The parsed or raw showcase data.
         """
-        url = ZZZ_API_URL.format(uid)
+        if not str(uid).isdigit():
+            raise WrongUIDFormatError
 
+        url = ZZZ_API_URL.format(uid)
         data = await self._request(url)
         if raw:
             return data
