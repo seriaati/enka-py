@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Any, Final, Literal, overload
 from loguru import logger
 
 from enka.constants.common import DEFAULT_TIMEOUT
+from enka.errors import EnkaAPIError
+from enka.utils import is_hsr_cn_uid
 
 from ..assets.data import TextMap
 from ..assets.hsr.manager import HSR_ASSETS
@@ -24,6 +26,7 @@ if TYPE_CHECKING:
 __all__ = ("HSRClient",)
 
 API_URL: Final[str] = "https://enka.network/api/hsr/uid/{uid}"
+BACKUP_API_URL: Final[str] = "https://api.asterity.net/hsr/uid/{uid}"
 
 
 class HSRClient(BaseClient):
@@ -263,7 +266,17 @@ class HSRClient(BaseClient):
         """
         url = API_URL.format(uid=uid)
 
-        data = await self._request(url)
+        try:
+            data = await self._request(url)
+        except EnkaAPIError:
+            if not is_hsr_cn_uid(str(uid)):
+                logger.debug("Failed to fetch showcase from Enka Network, trying backup API")
+
+                url = BACKUP_API_URL.format(uid=uid)
+                data = await self._request(url)
+            else:
+                raise
+
         if raw:
             return data
 
