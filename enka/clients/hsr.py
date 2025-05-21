@@ -17,6 +17,8 @@ from ..models.hsr.character import Eidolon
 from .base import BaseClient
 
 if TYPE_CHECKING:
+    from enka.models.enka.owner import OwnerInput
+
     from ..models.enka.owner import Owner
     from ..models.hsr.character import Character, LightCone, Relic, Trace
     from .cache import BaseTTLCache
@@ -286,7 +288,7 @@ class HSRClient(BaseClient):
         self._post_process_showcase(showcase)
         return showcase
 
-    async def fetch_builds(self, owner: Owner) -> dict[str, list[Build]]:
+    async def fetch_builds(self, owner: Owner | OwnerInput) -> dict[str, list[Build]]:
         """Fetch the character builds of the given owner.
 
         Args:
@@ -295,8 +297,7 @@ class HSRClient(BaseClient):
         Returns:
             Character ID to list of builds mapping.
         """
-        url = f"https://enka.network/api/profile/{owner.username}/hoyos/{owner.hash}/builds/"
-        data = await self._request(url)
+        data = await self._request_profile(owner)
         result: dict[str, list[Build]] = {}
 
         for key, builds in data.items():

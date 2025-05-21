@@ -7,10 +7,14 @@ import aiohttp
 import orjson
 from loguru import logger
 
+from enka.models.enka.owner import Owner, OwnerInput
+
 from ..errors import APIRequestTimeoutError, EnkaAPIError, raise_for_retcode
 
 if TYPE_CHECKING:
     from .cache import BaseTTLCache
+
+ENKA_PROFILE_API_URL = "https://enka.network/api/profile/{}/hoyos/{}/builds/"
 
 
 class BaseClient:
@@ -72,3 +76,12 @@ class BaseClient:
             if isinstance(e, asyncio.TimeoutError):
                 raise APIRequestTimeoutError from e
             raise EnkaAPIError from e
+
+    async def _request_profile(self, owner: Owner | OwnerInput) -> dict[str, Any]:
+        if isinstance(owner, Owner):
+            owner_hash, username = owner.hash, owner.username
+        else:
+            owner_hash, username = owner["hash"], owner["username"]
+
+        url = ENKA_PROFILE_API_URL.format(owner_hash, username)
+        return await self._request(url)
