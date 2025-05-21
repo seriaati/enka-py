@@ -81,5 +81,5 @@ class BaseClient:
         else:
             owner_hash, username = owner["hash"], owner["username"]
 
-        url = PROFILE_API_URL.format(owner_hash, username)
+        url = PROFILE_API_URL.format(username, owner_hash)
         return await self._request(url)
