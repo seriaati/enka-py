@@ -5,10 +5,11 @@ from typing import TYPE_CHECKING, Any, Final, Literal, overload
 
 from loguru import logger
 
+from enka.constants.common import DEFAULT_TIMEOUT
+
 from ..assets.data import TextMap
 from ..assets.hsr.manager import HSR_ASSETS
 from ..calc.hsr import LayerGenerator, PropState
-from ..enums.enum import Game
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
 from ..models.hsr import CharacterIcon, LightConeIcon, Player, ShowcaseResponse, Stat
 from ..models.hsr.build import Build
@@ -33,6 +34,7 @@ class HSRClient(BaseClient):
         headers (dict[str, Any] | None): The headers to use for the client, defaults to None.
         cache (BaseTTLCache | None): The cache to use for the client, defaults to None.
         use_enka_icons (bool): Whether to get stat icons from Enka, defaults to True.
+        timeout (int): The timeout for the client, defaults to DEFAULT_TIMEOUT.
     """
 
     def __init__(
@@ -42,8 +44,9 @@ class HSRClient(BaseClient):
         headers: dict[str, Any] | None = None,
         cache: BaseTTLCache | None = None,
         use_enka_icons: bool = True,
+        timeout: int = DEFAULT_TIMEOUT,
     ) -> None:
-        super().__init__(Game.HSR, headers=headers, cache=cache)
+        super().__init__(headers=headers, cache=cache, timeout=timeout)
 
         self._lang = self._convert_lang(lang)
         self._use_enka_icons = use_enka_icons

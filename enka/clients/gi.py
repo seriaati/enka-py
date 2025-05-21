@@ -5,10 +5,11 @@ from typing import TYPE_CHECKING, Any, Final, Literal, overload
 
 from loguru import logger
 
+from enka.constants.common import DEFAULT_TIMEOUT
+
 from ..assets.data import TextMap
 from ..assets.gi.manager import GI_ASSETS
 from ..constants.gi import CHARACTER_RARITY_MAP
-from ..enums.enum import Game
 from ..enums.gi import Element, FightPropType, Language
 from ..models.gi import Constellation, Costume, Icon, Namecard, ShowcaseResponse
 from ..models.gi.build import Build
@@ -32,6 +33,7 @@ class GenshinClient(BaseClient):
         lang: The language to use for the client, defaults to Language.ENGLISH.
         headers: The headers to use for the client, defaults to None.
         cache: The cache to use for the client, defaults to None.
+        timeout (int): The timeout for the client, defaults to DEFAULT_TIMEOUT.
     """
 
     def __init__(
@@ -40,8 +42,9 @@ class GenshinClient(BaseClient):
         *,
         headers: dict[str, Any] | None = None,
         cache: BaseTTLCache | None = None,
+        timeout: int = DEFAULT_TIMEOUT,
     ) -> None:
-        super().__init__(Game.GI, headers=headers, cache=cache)
+        super().__init__(headers=headers, cache=cache, timeout=timeout)
 
         self._lang = self._convert_lang(lang)
         self._assets = GI_ASSETS

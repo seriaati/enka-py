@@ -7,10 +7,11 @@ from typing import TYPE_CHECKING, Any, Final, Literal, overload
 
 from loguru import logger
 
+from enka.constants.common import DEFAULT_TIMEOUT
+
 from ..assets.data import TextMap
 from ..assets.zzz.manager import ZZZ_ASSETS
 from ..enums import zzz as enums
-from ..enums.enum import Game
 from ..models import zzz as models
 from .base import BaseClient
 
@@ -29,6 +30,7 @@ class ZZZClient(BaseClient):
         lang (Language | str): The language to use for the client, defaults to Language.ENGLISH.
         headers (dict[str, Any] | None): The headers to use for the client, defaults to None.
         cache (BaseTTLCache | None): The cache to use for the client, defaults to None.
+        timeout (int): The timeout for the client, defaults to DEFAULT_TIMEOUT.
     """
 
     def __init__(
@@ -37,8 +39,9 @@ class ZZZClient(BaseClient):
         *,
         headers: dict[str, Any] | None = None,
         cache: BaseTTLCache | None = None,
+        timeout: int = DEFAULT_TIMEOUT,
     ) -> None:
-        super().__init__(Game.ZZZ, headers=headers, cache=cache)
+        super().__init__(headers=headers, cache=cache, timeout=timeout)
 
         self._lang = self._convert_lang(lang)
         self._assets = ZZZ_ASSETS
