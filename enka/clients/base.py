@@ -1,15 +1,15 @@
 from __future__ import annotations
 
+import asyncio
 from typing import TYPE_CHECKING, Any
 
 import aiohttp
 import orjson
 from loguru import logger
 
-from ..errors import raise_for_retcode
+from ..errors import APIRequestTimeoutError, EnkaAPIError, raise_for_retcode
 
 if TYPE_CHECKING:
-    from ..enums.enum import Game
     from .cache import BaseTTLCache
 
 
@@ -17,17 +17,12 @@ class BaseClient:
     """Base client with requesting capabilities."""
 
     def __init__(
-        self,
-        game: Game,
-        *,
-        headers: dict[str, Any] | None = None,
-        cache: BaseTTLCache | None = None,
+        self, *, headers: dict[str, Any] | None, cache: BaseTTLCache | None, timeout: int
     ) -> None:
-        self.game = game
-
         self._headers = headers or {"User-Agent": "enka-py"}
         self._session: aiohttp.ClientSession | None = None
         self._cache = cache
+        self._timeout = timeout
 
     @property
     def session(self) -> aiohttp.ClientSession:
@@ -44,7 +39,9 @@ class BaseClient:
         await self.close()
 
     async def start(self) -> None:
-        self._session = aiohttp.ClientSession(headers=self._headers)
+        timeout = aiohttp.ClientTimeout(total=self._timeout)
+
+        self._session = aiohttp.ClientSession(headers=self._headers, timeout=timeout)
         if self._cache is not None:
             await self._cache.start()
 
@@ -62,11 +59,16 @@ class BaseClient:
 
         logger.debug(f"Requesting {url}")
 
-        async with self.session.get(url) as resp:
-            if resp.status != 200:
-                raise_for_retcode(resp.status)
+        try:
+            async with self.session.get(url) as resp:
+                if resp.status != 200:
+                    raise_for_retcode(resp.status)
 
-            data: dict[str, Any] = await resp.json()
-            if self._cache is not None:
-                await self._cache.set(url, orjson.dumps(data).decode(), ttl=60)
-            return data
+                data: dict[str, Any] = await resp.json()
+                if self._cache is not None:
+                    await self._cache.set(url, orjson.dumps(data).decode(), ttl=60)
+                return data
+        except Exception as e:
+            if isinstance(e, asyncio.TimeoutError):
+                raise APIRequestTimeoutError from e
+            raise EnkaAPIError from e
