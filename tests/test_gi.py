@@ -52,6 +52,10 @@ async def test_owner_and_builds(genshin_client: GenshinClient) -> None:
     await genshin_client.fetch_builds(showcase.owner)
 
 
+async def test_fetch_builds(genshin_client: GenshinClient) -> None:
+    await genshin_client.fetch_builds({"hash": "1LLUyx", "username": "seria_ati"})
+
+
 async def test_raw_and_parse(genshin_client: GenshinClient) -> None:
     raw = await genshin_client.fetch_showcase("901211014", raw=True)
     genshin_client.parse_showcase(raw)

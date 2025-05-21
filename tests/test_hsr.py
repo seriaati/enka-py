@@ -33,6 +33,10 @@ async def test_owner_and_builds(hsr_client: HSRClient) -> None:
     await hsr_client.fetch_builds(showcase.owner)
 
 
+async def test_fetch_builds(hsr_client: HSRClient) -> None:
+    await hsr_client.fetch_builds({"hash": "2A2VAE", "username": "seria_ati"})
+
+
 async def test_raw_and_parse(hsr_client: HSRClient) -> None:
     raw = await hsr_client.fetch_showcase("809162009", raw=True)
     hsr_client.parse_showcase(raw)
