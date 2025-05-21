@@ -7,9 +7,8 @@ import aiohttp
 import orjson
 from loguru import logger
 
-from enka.models.enka.owner import Owner, OwnerInput
-
 from ..errors import APIRequestTimeoutError, EnkaAPIError, raise_for_retcode
+from ..models.enka.owner import Owner, OwnerInput
 
 if TYPE_CHECKING:
     from .cache import BaseTTLCache

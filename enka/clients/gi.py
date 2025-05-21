@@ -5,10 +5,9 @@ from typing import TYPE_CHECKING, Any, Final, Literal, overload
 
 from loguru import logger
 
-from enka.constants.common import DEFAULT_TIMEOUT
-
 from ..assets.data import TextMap
 from ..assets.gi.manager import GI_ASSETS
+from ..constants.common import DEFAULT_TIMEOUT
 from ..constants.gi import CHARACTER_RARITY_MAP
 from ..enums.gi import Element, FightPropType, Language
 from ..models.gi import Constellation, Costume, Icon, Namecard, ShowcaseResponse
@@ -16,9 +15,7 @@ from ..models.gi.build import Build
 from .base import BaseClient
 
 if TYPE_CHECKING:
-    from enka.models.enka.owner import OwnerInput
-
-    from ..models.enka.owner import Owner
+    from ..models.enka.owner import Owner, OwnerInput
     from ..models.gi.character import Artifact, Character, Weapon
     from ..models.gi.player import Player, ShowcaseCharacter
     from .cache import BaseTTLCache

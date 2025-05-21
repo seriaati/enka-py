@@ -7,10 +7,9 @@ from typing import TYPE_CHECKING, Any, Final, Literal, overload
 
 from loguru import logger
 
-from enka.constants.common import DEFAULT_TIMEOUT
-
 from ..assets.data import TextMap
 from ..assets.zzz.manager import ZZZ_ASSETS
+from ..constants.common import DEFAULT_TIMEOUT
 from ..enums import zzz as enums
 from ..models import zzz as models
 from .base import BaseClient

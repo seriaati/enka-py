@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 from enum import IntEnum
 
-from enka.constants.zzz import ELEMENT_ICON
+from ..constants.zzz import ELEMENT_ICON
 
 if sys.version_info < (3, 11):
     from enum import Enum as StrEnum

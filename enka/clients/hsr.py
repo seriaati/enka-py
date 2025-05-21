@@ -5,11 +5,10 @@ from typing import TYPE_CHECKING, Any, Final, Literal, overload
 
 from loguru import logger
 
-from enka.constants.common import DEFAULT_TIMEOUT
-
 from ..assets.data import TextMap
 from ..assets.hsr.manager import HSR_ASSETS
 from ..calc.hsr import LayerGenerator, PropState
+from ..constants.common import DEFAULT_TIMEOUT
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
 from ..models.hsr import CharacterIcon, LightConeIcon, Player, ShowcaseResponse, Stat
 from ..models.hsr.build import Build
@@ -17,9 +16,7 @@ from ..models.hsr.character import Eidolon
 from .base import BaseClient
 
 if TYPE_CHECKING:
-    from enka.models.enka.owner import OwnerInput
-
-    from ..models.enka.owner import Owner
+    from ..models.enka.owner import Owner, OwnerInput
     from ..models.hsr.character import Character, LightCone, Relic, Trace
     from .cache import BaseTTLCache
 
