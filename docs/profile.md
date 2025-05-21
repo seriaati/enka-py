@@ -11,6 +11,8 @@ There are 2 ways to fetch character builds:
 1. When you've already fetched the showcase of some UID, and the UID is attached to an Enka Network account. Note that an Enka Network user can choose to not display their account on their UID page, in this case, `showcase.owner` would be `None`.
 2. When you have the Enka Network account's hash and username.
 
+The code block belows shows how you would fetch builds for a Genshin Impact account, but the same applies to other games, you just need to change the client being used.
+
 ```py
 import enka
 
