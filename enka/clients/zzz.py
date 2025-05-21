@@ -7,12 +7,11 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
 
-from ..errors import WrongUIDFormatError
-
 from ..assets.data import TextMap
 from ..assets.zzz.manager import ZZZ_ASSETS
 from ..constants.common import DEFAULT_TIMEOUT, ZZZ_API_URL
 from ..enums import zzz as enums
+from ..errors import WrongUIDFormatError
 from ..models import zzz as models
 from .base import BaseClient
 

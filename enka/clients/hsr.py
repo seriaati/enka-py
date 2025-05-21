@@ -5,13 +5,12 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
 
-from ..errors import WrongUIDFormatError
-
 from ..assets.data import TextMap
 from ..assets.hsr.manager import HSR_ASSETS
 from ..calc.hsr import LayerGenerator, PropState
 from ..constants.common import DEFAULT_TIMEOUT, HSR_API_URL
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
+from ..errors import WrongUIDFormatError
 from ..models.hsr import CharacterIcon, LightConeIcon, Player, ShowcaseResponse, Stat
 from ..models.hsr.build import Build
 from ..models.hsr.character import Eidolon

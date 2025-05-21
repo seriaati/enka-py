@@ -5,13 +5,12 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
 
-from ..errors import WrongUIDFormatError
-
 from ..assets.data import TextMap
 from ..assets.gi.manager import GI_ASSETS
 from ..constants.common import DEFAULT_TIMEOUT, GI_API_URL
 from ..constants.gi import CHARACTER_RARITY_MAP
 from ..enums.gi import Element, FightPropType, Language
+from ..errors import WrongUIDFormatError
 from ..models.gi import Constellation, Costume, Icon, Namecard, ShowcaseResponse
 from ..models.gi.build import Build
 from .base import BaseClient
