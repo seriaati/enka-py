@@ -5,19 +5,16 @@ from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
 
-from enka.constants.common import DEFAULT_TIMEOUT
-from enka.errors import EnkaAPIError
-from enka.utils import is_hsr_cn_uid
-
 from ..assets.data import TextMap
 from ..assets.hsr.manager import HSR_ASSETS
 from ..calc.hsr import LayerGenerator, PropState
-from ..constants.common import DEFAULT_TIMEOUT, HSR_API_URL
+from ..constants.common import DEFAULT_TIMEOUT, HSR_API_URL, HSR_BACKUP_API_URL
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
-from ..errors import WrongUIDFormatError
+from ..errors import EnkaAPIError, WrongUIDFormatError
 from ..models.hsr import CharacterIcon, LightConeIcon, Player, ShowcaseResponse, Stat
 from ..models.hsr.build import Build
 from ..models.hsr.character import Eidolon
+from ..utils import is_hsr_cn_uid
 from .base import BaseClient
 
 if TYPE_CHECKING:
@@ -267,7 +264,15 @@ class HSRClient(BaseClient):
             raise WrongUIDFormatError
 
         url = HSR_API_URL.format(uid)
-        data = await self._request(url)
+        try:
+            data = await self._request(url)
+        except EnkaAPIError:
+            if not is_hsr_cn_uid(str(uid)):
+                url = HSR_BACKUP_API_URL.format(uid)
+                data = await self._request(url)
+            else:
+                raise
+
         if raw:
             return data
 
