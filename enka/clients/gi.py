@@ -1,29 +1,27 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Any, Final, Literal, overload
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
 
-from enka.constants.common import DEFAULT_TIMEOUT
-
 from ..assets.data import TextMap
 from ..assets.gi.manager import GI_ASSETS
+from ..constants.common import DEFAULT_TIMEOUT, GI_API_URL
 from ..constants.gi import CHARACTER_RARITY_MAP
 from ..enums.gi import Element, FightPropType, Language
+from ..errors import WrongUIDFormatError
 from ..models.gi import Constellation, Costume, Icon, Namecard, ShowcaseResponse
 from ..models.gi.build import Build
 from .base import BaseClient
 
 if TYPE_CHECKING:
-    from ..models.enka.owner import Owner
+    from ..models.enka.owner import Owner, OwnerInput
     from ..models.gi.character import Artifact, Character, Weapon
     from ..models.gi.player import Player, ShowcaseCharacter
     from .cache import BaseTTLCache
 
 __all__ = ("GenshinClient",)
-
-API_URL: Final[str] = "https://enka.network/api/uid/{uid}"
 
 
 class GenshinClient(BaseClient):
@@ -257,7 +255,10 @@ class GenshinClient(BaseClient):
         Returns:
             The parsed or raw showcase data.
         """
-        url = API_URL.format(uid=uid)
+        if not str(uid).isdigit():
+            raise WrongUIDFormatError
+
+        url = GI_API_URL.format(uid)
         if info_only:
             url += "?info"
 
@@ -284,7 +285,7 @@ class GenshinClient(BaseClient):
         self._post_process_showcase(showcase)
         return showcase
 
-    async def fetch_builds(self, owner: Owner) -> dict[str, list[Build]]:
+    async def fetch_builds(self, owner: Owner | OwnerInput) -> dict[str, list[Build]]:
         """Fetch the character builds of the given owner.
 
         Args:
@@ -293,8 +294,7 @@ class GenshinClient(BaseClient):
         Returns:
             Character ID to list of builds mapping.
         """
-        url = f"https://enka.network/api/profile/{owner.username}/hoyos/{owner.hash}/builds/"
-        data = await self._request(url)
+        data = await self._request_profile(owner)
         result: dict[str, list[Build]] = {}
 
         for key, builds in data.items():

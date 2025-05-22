@@ -7,7 +7,9 @@ import aiohttp
 import orjson
 from loguru import logger
 
+from ..constants.common import PROFILE_API_URL
 from ..errors import APIRequestTimeoutError, EnkaAPIError, raise_for_retcode
+from ..models.enka.owner import Owner, OwnerInput
 
 if TYPE_CHECKING:
     from .cache import BaseTTLCache
@@ -71,4 +73,15 @@ class BaseClient:
         except Exception as e:
             if isinstance(e, asyncio.TimeoutError):
                 raise APIRequestTimeoutError from e
+            if isinstance(e, EnkaAPIError):
+                raise
             raise EnkaAPIError from e
+
+    async def _request_profile(self, owner: Owner | OwnerInput) -> dict[str, Any]:
+        if isinstance(owner, Owner):
+            owner_hash, username = owner.hash, owner.username
+        else:
+            owner_hash, username = owner["hash"], owner["username"]
+
+        url = PROFILE_API_URL.format(username, owner_hash)
+        return await self._request(url)

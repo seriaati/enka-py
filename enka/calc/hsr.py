@@ -4,8 +4,8 @@ from collections import defaultdict
 from typing import TYPE_CHECKING, Final
 
 if TYPE_CHECKING:
-    from enka.assets.hsr.manager import HSRAssetManager
-    from enka.models.hsr import Character, LightCone, Relic
+    from ..assets.hsr.manager import HSRAssetManager
+    from ..models.hsr import Character, LightCone, Relic
 
 DEFAULT_PROPS: Final[dict[str, float]] = {
     "BaseHP": 0,

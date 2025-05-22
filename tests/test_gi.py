@@ -15,8 +15,8 @@ async def test_fetch_showcase(genshin_client: GenshinClient) -> None:
 
 
 async def test_empty_showcase(genshin_client: GenshinClient) -> None:
-    showcase = await genshin_client.fetch_showcase("123456789")
-    assert showcase.uid == "123456789"
+    showcase = await genshin_client.fetch_showcase("900000001")
+    assert showcase.uid == "900000001"
     assert len(showcase.characters) == 0
 
 
@@ -50,6 +50,10 @@ async def test_owner_and_builds(genshin_client: GenshinClient) -> None:
     showcase = await genshin_client.fetch_showcase("618285856")
     assert showcase.owner is not None
     await genshin_client.fetch_builds(showcase.owner)
+
+
+async def test_fetch_builds(genshin_client: GenshinClient) -> None:
+    await genshin_client.fetch_builds({"hash": "1LLUyx", "username": "seria_ati"})
 
 
 async def test_raw_and_parse(genshin_client: GenshinClient) -> None:

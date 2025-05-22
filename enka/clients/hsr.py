@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Any, Final, Literal, overload
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
 
@@ -12,21 +12,20 @@ from enka.utils import is_hsr_cn_uid
 from ..assets.data import TextMap
 from ..assets.hsr.manager import HSR_ASSETS
 from ..calc.hsr import LayerGenerator, PropState
+from ..constants.common import DEFAULT_TIMEOUT, HSR_API_URL
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
+from ..errors import WrongUIDFormatError
 from ..models.hsr import CharacterIcon, LightConeIcon, Player, ShowcaseResponse, Stat
 from ..models.hsr.build import Build
 from ..models.hsr.character import Eidolon
 from .base import BaseClient
 
 if TYPE_CHECKING:
-    from ..models.enka.owner import Owner
+    from ..models.enka.owner import Owner, OwnerInput
     from ..models.hsr.character import Character, LightCone, Relic, Trace
     from .cache import BaseTTLCache
 
 __all__ = ("HSRClient",)
-
-API_URL: Final[str] = "https://enka.network/api/hsr/uid/{uid}"
-BACKUP_API_URL: Final[str] = "https://api.asterity.net/hsr/uid/{uid}"
 
 
 class HSRClient(BaseClient):
@@ -264,19 +263,11 @@ class HSRClient(BaseClient):
         Returns:
             The parsed or raw showcase data.
         """
-        url = API_URL.format(uid=uid)
+        if not str(uid).isdigit():
+            raise WrongUIDFormatError
 
-        try:
-            data = await self._request(url)
-        except EnkaAPIError:
-            if not is_hsr_cn_uid(str(uid)):
-                logger.debug("Failed to fetch showcase from Enka Network, trying backup API")
-
-                url = BACKUP_API_URL.format(uid=uid)
-                data = await self._request(url)
-            else:
-                raise
-
+        url = HSR_API_URL.format(uid)
+        data = await self._request(url)
         if raw:
             return data
 
@@ -299,7 +290,7 @@ class HSRClient(BaseClient):
         self._post_process_showcase(showcase)
         return showcase
 
-    async def fetch_builds(self, owner: Owner) -> dict[str, list[Build]]:
+    async def fetch_builds(self, owner: Owner | OwnerInput) -> dict[str, list[Build]]:
         """Fetch the character builds of the given owner.
 
         Args:
@@ -308,8 +299,7 @@ class HSRClient(BaseClient):
         Returns:
             Character ID to list of builds mapping.
         """
-        url = f"https://enka.network/api/profile/{owner.username}/hoyos/{owner.hash}/builds/"
-        data = await self._request(url)
+        data = await self._request_profile(owner)
         result: dict[str, list[Build]] = {}
 
         for key, builds in data.items():

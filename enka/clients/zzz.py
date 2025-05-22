@@ -3,24 +3,24 @@ from __future__ import annotations
 import copy
 import math
 from collections import defaultdict
-from typing import TYPE_CHECKING, Any, Final, Literal, overload
+from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
 
-from enka.constants.common import DEFAULT_TIMEOUT
-
 from ..assets.data import TextMap
 from ..assets.zzz.manager import ZZZ_ASSETS
+from ..constants.common import DEFAULT_TIMEOUT, ZZZ_API_URL
 from ..enums import zzz as enums
+from ..errors import WrongUIDFormatError
 from ..models import zzz as models
+from ..models.zzz.build import Build
 from .base import BaseClient
 
 if TYPE_CHECKING:
+    from ..models.enka.owner import Owner, OwnerInput
     from .cache import BaseTTLCache
 
 __all__ = ("ZZZClient",)
-
-API_URL: Final[str] = "https://enka.network/api/zzz/uid/{uid}"
 
 
 class ZZZClient(BaseClient):
@@ -384,8 +384,10 @@ class ZZZClient(BaseClient):
         Returns:
             The parsed or raw showcase data.
         """
-        url = API_URL.format(uid=uid)
+        if not str(uid).isdigit():
+            raise WrongUIDFormatError
 
+        url = ZZZ_API_URL.format(uid)
         data = await self._request(url)
         if raw:
             return data
@@ -408,3 +410,24 @@ class ZZZClient(BaseClient):
         showcase = models.ShowcaseResponse(**data)
         self._post_process_showcase(showcase)
         return showcase
+
+    async def fetch_builds(self, owner: Owner | OwnerInput) -> dict[str, list[Build]]:
+        """Fetch the character builds of the given owner.
+
+        Args:
+            owner: The owner of the builds.
+
+        Returns:
+            Character ID to list of builds mapping.
+        """
+        data = await self._request_profile(owner)
+        result: dict[str, list[Build]] = {}
+
+        for key, builds in data.items():
+            result[key] = []
+            for build in builds:
+                build_ = Build(**build)
+                self._post_process_agent(build_.character)
+                result[key].append(build_)
+
+        return result
