@@ -2,25 +2,22 @@
 
 ## ⚠️ Notice: Package Renaming
 
-**Important Announcement:**
-
 The `enka-api` package has been deprecated and is now replaced by the new package named **`enka`**.
+Please install the new package:
 
-### What You Need to Know
+```bash
+pip install enka
+```
 
-- **New Package**: Please install the new package using the following command:
-
-  ```bash
-  pip install enka
-  ```
-
-- **Deprecation Details**: The `enka-api` package will continue to be available, but new updates will be released in the `enka` package, so I encourage you to transition to the new package as soon as possible.
+The `enka-api` package will continue to be available, but new updates will be released in the `enka` package, so I encourage you to transition to the new package as soon as possible.
 
 ## Introduction
 
-enka.py is an async API wrapper for [enka.network](https://enka.network/) written in Python.  
-You can find the API docs for Enka Network [here](http://api.enka.network/).  
+enka.py is an async API wrapper for [Enka Network](https://enka.network/) written in Python.  
 Developing something for Hoyoverse games? You might be interested in [other API wrappers](https://github.com/seriaati#api-wrappers) written by me.
+
+- [Enka Network API docs](http://api.enka.network/)
+- [Documentation for this wrapper](https://gh.seria.moe/enka-py)
 
 ### Features
 
