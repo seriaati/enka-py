@@ -164,7 +164,7 @@ class HSRClient(BaseClient):
         if character.light_cone is not None:
             self._post_process_light_cone(character.light_cone)
 
-        # Credit to Enka Network for the following code
+        # Credit to Enka Network for stat calculation logic
         generator = LayerGenerator(self._assets)
         prop_state = PropState()
 
