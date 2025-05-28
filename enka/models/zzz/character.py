@@ -6,10 +6,19 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field, computed_field, field_validator, model_validator
 
 from ...constants.zzz import RARITY_MAP
-from ...enums.zzz import Element, ProfessionType, SkillType, StatType
+from ...enums.zzz import AgentStatType, Element, ProfessionType, SkillType, StatType
 from ...models.zzz.icon import AgentIcon
 
-__all__ = ("Agent", "AgentColor", "AgentSkill", "DriveDisc", "DriveDiscStat", "Stat", "WEngine")
+__all__ = (
+    "Agent",
+    "AgentColor",
+    "AgentSkill",
+    "AgentStat",
+    "DriveDisc",
+    "DriveDiscStat",
+    "Stat",
+    "WEngine",
+)
 
 
 def _to_formatted_value(value: int, type_: StatType, format_: str) -> str:
@@ -41,6 +50,19 @@ class Stat(BaseModel):
     def formatted_value(self) -> str:
         """The formatted value of the stat."""
         return _to_formatted_value(self.value, self.type, self.format)
+
+
+class AgentStat(Stat):
+    """Represents an agent's stat.
+
+    Attributes:
+        type: The type of the stat.
+        value: The value of the stat.
+        name: The name of the stat.
+        format: The format specifier.
+    """
+
+    type: AgentStatType
 
 
 class DriveDiscStat(Stat):
@@ -235,7 +257,7 @@ class Agent(BaseModel):
     sig_engine_id: int = Field(default=0)
     color: AgentColor = Field(default=None)  # pyright: ignore[reportAssignmentType]
     highlight_stats: list[StatType] = Field(default_factory=list)
-    stats: dict[StatType, Stat] = Field(default_factory=dict)
+    stats: dict[AgentStatType, AgentStat] = Field(default_factory=dict)
 
     @field_validator("is_sig_engine_effect_on", mode="before")
     @classmethod

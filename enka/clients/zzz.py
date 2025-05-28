@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import copy
 import math
-from collections import defaultdict
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
 
 from ..assets.data import TextMap
 from ..assets.zzz.manager import ZZZ_ASSETS
+from ..calc.zzz import LayerGenerator, PropState
 from ..constants.common import DEFAULT_TIMEOUT, ZZZ_API_URL
 from ..enums import zzz as enums
 from ..errors import WrongUIDFormatError
@@ -115,143 +115,6 @@ class ZZZClient(BaseClient):
             sub.name = self._text_map[sub_data["Name"]]
             sub.format = sub_data["Format"]
 
-    def _get_agent_base_stats(self, agent: models.Agent) -> defaultdict[int, int]:
-        stats: defaultdict[int, int] = defaultdict(int)
-        data = self._assets.avatars[str(agent.id)]
-        base_props: dict[str, int] = data["BaseProps"]
-        growth_props: dict[str, int] = data["GrowthProps"]
-        promotion_props: list[dict[str, int]] = data["PromotionProps"]
-        core_enhancement_props: list[dict[str, int]] = data["CoreEnhancementProps"]
-
-        for prop_id_str, prop_val in base_props.items():
-            prop_id = int(prop_id_str)
-            growth_val = (growth_props.get(prop_id_str, 0) * (agent.level - 1)) / 10000
-            promotion_val = promotion_props[agent.promotion - 1].get(prop_id_str, 0)
-            core_enhancement_val = core_enhancement_props[agent.core_skill_level_num].get(
-                prop_id_str, 0
-            )
-            base_total_val = (
-                prop_val + math.floor(growth_val) + promotion_val + core_enhancement_val
-            )
-            stats[prop_id] += base_total_val
-
-        return stats
-
-    def _add_engine_stats(self, stats: defaultdict[int, int], engine: models.WEngine) -> None:
-        stats[engine.main_stat.type.value] += engine.main_stat.value
-        stats[engine.sub_stat.type.value] += engine.sub_stat.value
-
-    def _add_disc_stats(self, stats: defaultdict[int, int], discs: list[models.DriveDisc]) -> None:
-        for disc in discs:
-            stats[disc.main_stat.type.value] += disc.main_stat.value
-            for sub in disc.sub_stats:
-                stats[sub.type.value] += sub.value
-
-    def _add_disc_set_bonus_stats(
-        self, stats: defaultdict[int, int], discs: list[models.DriveDisc]
-    ) -> None:
-        sets: defaultdict[int, int] = defaultdict(int)
-        for disc in discs:
-            sets[disc.set_id] += 1
-
-        for set_id, count in sets.items():
-            if count < 2:
-                continue
-
-            set_data = self._assets.equipments["Suits"].get(str(set_id))
-            if set_data is None:
-                logger.warning(f"Set data not found for {set_id=}")
-                continue
-
-            set_effect: dict[str, int] = set_data["SetBonusProps"]
-            for prop_id_str, prop_val in set_effect.items():
-                stats[int(prop_id_str)] += prop_val
-
-    def _calculate_final_stats(self, raw_stats: defaultdict[int, int]) -> dict[int, int]:
-        final_stats: dict[int, int] = {
-            stat_type.value: 0
-            for stat_type in enums.StatType
-            if str(stat_type.value).endswith("01")  # Initialize base stats
-        }
-
-        # Apply base stats first
-        for prop_id, prop_val in raw_stats.items():
-            if str(prop_id).endswith("01"):
-                if prop_id not in final_stats:
-                    final_stats[prop_id] = 0
-                final_stats[prop_id] += prop_val
-
-        # Apply percentage stats
-        for prop_id, prop_val in raw_stats.items():
-            if str(prop_id).endswith("02"):
-                base_prop_id = prop_id - 1
-                base_stat = final_stats.get(base_prop_id, 0)
-                stat = base_stat * (1 + prop_val / 10000)
-                # Max HP is rounded up, others down
-                rounded = math.ceil(stat) if base_prop_id == 11101 else math.floor(stat)
-                final_stats[base_prop_id] = rounded
-
-        # Apply flat stats
-        for prop_id, prop_val in raw_stats.items():
-            if str(prop_id).endswith("03"):
-                base_prop_id = prop_id - 2
-                base_stat = final_stats.get(base_prop_id, 0)
-                final_stats[base_prop_id] += prop_val
-
-        return final_stats
-
-    def _apply_special_agent_passives(
-        self, final_stats: dict[int, int], agent: models.Agent
-    ) -> None:
-        if agent.id == 1121:  # Ben
-            # Ben's initial ATK increases along with his initial DEF. He gains X% of his initial DEF as ATK.
-            scalings = (0.4, 0.46, 0.52, 0.6, 0.66, 0.72, 0.8)
-            def_stat_id = 13101
-            atk_stat_id = 11101
-
-            if def_stat_id in final_stats and atk_stat_id in final_stats:
-                final_stats[atk_stat_id] += math.floor(
-                    final_stats[def_stat_id] * scalings[agent.core_skill_level_num]
-                )
-
-    def _assign_final_stats_to_agent(
-        self, final_stats: dict[int, int], agent: models.Agent
-    ) -> None:
-        for prop_id, prop_val in final_stats.items():
-            stat_type = enums.StatType(prop_id)
-            prop_data = self._assets.property[str(prop_id)]
-            agent.stats[stat_type] = models.Stat(
-                type=stat_type,
-                value=prop_val,
-                name=self._text_map[prop_data["Name"]],
-                format=prop_data["Format"],
-            )
-
-    def _calc_agent_stats(self, agent: models.Agent) -> None:
-        # See https://api.enka.network/#/docs/zzz/api?id=agent-stats for the formula
-
-        # 1. Get base stats from agent level, promotion, core skills
-        raw_stats = self._get_agent_base_stats(agent)
-
-        # 2. Add engine stats
-        if agent.w_engine is not None:
-            self._add_engine_stats(raw_stats, agent.w_engine)
-
-        # 3. Add disc stats
-        self._add_disc_stats(raw_stats, agent.discs)
-
-        # 4. Add disc set bonus stats
-        self._add_disc_set_bonus_stats(raw_stats, agent.discs)
-
-        # 5. Calculate final stats (applying %, flat bonuses)
-        final_stats = self._calculate_final_stats(raw_stats)
-
-        # 6. Apply special agent passives
-        self._apply_special_agent_passives(final_stats, agent)
-
-        # 7. Assign final stats to agent object
-        self._assign_final_stats_to_agent(final_stats, agent)
-
     def _calc_engine_stats(self, engine: models.WEngine) -> None:
         # See https://api.enka.network/#/docs/zzz/api?id=w-engine for the formula
 
@@ -342,7 +205,50 @@ class ZZZClient(BaseClient):
 
         if agent.w_engine is not None:
             self._post_process_engine(agent.w_engine)
-        self._calc_agent_stats(agent)
+
+        # Credit to Enka Network for the stats calculation logic
+        generator = LayerGenerator(self._assets)
+        prop_state = PropState()
+
+        prop_state.add(generator.character(agent))
+        prop_state.add(generator.core(agent))
+        if agent.w_engine is not None:
+            prop_state.add(generator.weapon(agent.w_engine))
+
+        prop_state.add(generator.discs(agent.discs))
+        prop_state.add(generator.disc_sets(agent.discs))
+        prop_state.add(generator.corrections(agent, prop_state))
+
+        props = prop_state.sum()
+
+        final_stats: dict[enums.AgentStatType, float] = {
+            enums.AgentStatType.MAX_HP: props.max_hp,
+            enums.AgentStatType.ATK: props.atk,
+            enums.AgentStatType.DEF: props.defense,
+            enums.AgentStatType.IMPACT: props.break_stun,
+            enums.AgentStatType.CRIT_RATE: props.crit,
+            enums.AgentStatType.CRIT_DMG: props.crit_dmg,
+            enums.AgentStatType.PEN_RATIO: props.pen_ratio,
+            enums.AgentStatType.PEN: props.pen_delta,
+            enums.AgentStatType.ENERGY_REGEN: props.sp_recover,
+            enums.AgentStatType.ANOMALY_PROFICIENCY: props.element_mystery,
+            enums.AgentStatType.ANOMALY_MASTERY: props.element_abnormal_power,
+            enums.AgentStatType.PHYSICAL_DMG_BONUS: props.added_damage_ratio_physics,
+            enums.AgentStatType.FIRE_DMG_BONUS: props.added_damage_ratio_fire,
+            enums.AgentStatType.ICE_DMG_BONUS: props.added_damage_ratio_ice,
+            enums.AgentStatType.ELECTRIC_DMG_BONUS: props.added_damage_ratio_elec,
+            enums.AgentStatType.ETHER_DMG_BONUS: props.added_damage_ratio_ether,
+        }
+
+        agent.stats = {
+            stat_type: models.AgentStat(
+                type=stat_type,
+                value=math.floor(value),
+                name=self._text_map[self._assets.property[str(stat_type.value)]["Name"]],
+                format=self._assets.property[str(stat_type.value)]["Format"],
+            )
+            for stat_type, value in final_stats.items()
+        }
 
     def _post_process_title(self, title: models.Title) -> None:
         title_data = self._assets.titles[str(title.id)]

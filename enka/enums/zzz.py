@@ -94,6 +94,28 @@ class StatType(IntEnum):
     ETHER_DMG_BONUS_FLAT = 31903
 
 
+class AgentStatType(StrEnum):
+    """ZZZ stat type for agents."""
+
+    MAX_HP = "HpMax"
+    ATK = "Atk"
+    DEF = "Def"
+    IMPACT = "BreakStun"
+    CRIT_RATE = "Crit"
+    CRIT_DMG = "CritDmg"
+    ANOMALY_PROFICIENCY = "ElementMystery"
+    ANOMALY_MASTERY = "ElementAbnormalPower"
+    PEN_RATIO = "PenRatio"
+    PEN = "PenDelta"
+    ENERGY_REGEN = "SpRecover"
+
+    PHYSICAL_DMG_BONUS = "AddedDamageRatio_Physics"
+    ICE_DMG_BONUS = "AddedDamageRatio_Ice"
+    ELECTRIC_DMG_BONUS = "AddedDamageRatio_Elec"
+    FIRE_DMG_BONUS = "AddedDamageRatio_Fire"
+    ETHER_DMG_BONUS = "AddedDamageRatio_Ether"
+
+
 class ProfessionType(StrEnum):
     """ZZZ agent speciality."""
 
