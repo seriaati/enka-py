@@ -94,6 +94,28 @@ class StatType(IntEnum):
     ETHER_DMG_BONUS_FLAT = 31903
 
 
+class AgentStatType(IntEnum):
+    """ZZZ stat type for agents."""
+
+    MAX_HP = 111
+    ATK = 121
+    DEF = 131
+    IMPACT = 122
+    CRIT_RATE = 201
+    CRIT_DMG = 211
+    ANOMALY_PROFICIENCY = 312
+    ANOMALY_MASTERY = 314
+    PEN_RATIO = 231
+    PEN = 232
+    ENERGY_REGEN = 305
+
+    PHYSICAL_DMG_BONUS = 315
+    FIRE_DMG_BONUS = 316
+    ICE_DMG_BONUS = 317
+    ELECTRIC_DMG_BONUS = 318
+    ETHER_DMG_BONUS = 319
+
+
 class ProfessionType(StrEnum):
     """ZZZ agent speciality."""
 
