@@ -273,6 +273,8 @@ class HSRClient(BaseClient):
             else:
                 raise
 
+        data["uid"] = str(uid)
+
         if raw:
             return data
 
