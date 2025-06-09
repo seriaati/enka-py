@@ -199,6 +199,7 @@ class ZZZClient(BaseClient):
         agent.sig_engine_id = data["WeaponId"]
         agent.color = models.AgentColor(**data["Colors"])
         agent.highlight_stats = [enums.StatType(stat) for stat in data["HighlightProps"]]
+        agent.specialty = enums.ProfessionType(data["ProfessionType"])
 
         for disc in agent.discs:
             self._post_process_disc(disc)
@@ -231,6 +232,8 @@ class ZZZClient(BaseClient):
             enums.AgentStatType.PEN_RATIO: props.pen_ratio,
             enums.AgentStatType.PEN: props.pen_delta,
             enums.AgentStatType.ENERGY_REGEN: props.sp_recover,
+            enums.AgentStatType.SHEER_FORCE: props.skip_def_atk,
+            enums.AgentStatType.AAA: props.rp_recover,
             enums.AgentStatType.ANOMALY_PROFICIENCY: props.element_mystery,
             enums.AgentStatType.ANOMALY_MASTERY: props.element_abnormal_power,
             enums.AgentStatType.PHYSICAL_DMG_BONUS: props.added_damage_ratio_physics,
@@ -238,6 +241,7 @@ class ZZZClient(BaseClient):
             enums.AgentStatType.ICE_DMG_BONUS: props.added_damage_ratio_ice,
             enums.AgentStatType.ELECTRIC_DMG_BONUS: props.added_damage_ratio_elec,
             enums.AgentStatType.ETHER_DMG_BONUS: props.added_damage_ratio_ether,
+            enums.AgentStatType.SHEER_DMG_BONUS: props.skip_def_damage_ratio,
         }
 
         agent.stats = {

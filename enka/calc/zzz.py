@@ -4,6 +4,8 @@ import math
 from collections import defaultdict
 from typing import TYPE_CHECKING, Final
 
+from ..enums.zzz import ProfessionType
+
 if TYPE_CHECKING:
     from enka.assets.zzz.manager import ZZZAssetManager
     from enka.models.zzz.character import Agent, DriveDisc, WEngine
@@ -17,6 +19,8 @@ DEFAULT_PROPS: Final[dict[str, float]] = {
     "Atk_Delta": 0,
     "BreakStun_Base": 0,
     "BreakStun_Ratio": 0,
+    "SkipDefAtk_Base": 0,
+    "SkipDefAtk_Delta": 0,
     "Def_Base": 0,
     "Def_Ratio": 0,
     "Def_Delta": 0,
@@ -62,6 +66,8 @@ PROP_ID_TO_NAME: Final[dict[int, str]] = {
     12103: "Atk_Delta",
     12201: "BreakStun_Base",
     12202: "BreakStun_Ratio",
+    12301: "SkipDefAtk_Base",
+    12303: "SkipDefAtk_Delta",
     13101: "Def_Base",
     13102: "Def_Ratio",
     13103: "Def_Delta",
@@ -170,7 +176,7 @@ class LayerGenerator:
         prop_sum = prop_state.sum()
 
         enh = a.core_skill_level_num
-        if a.id == 1121:  # Ben
+        if a.id == 1121:
             # Ben's initial ATK increases along with his initial DEF. He gains X% of his initial DEF as ATK.
             layer.add(
                 "Atk_Delta",
@@ -179,10 +185,18 @@ class LayerGenerator:
                 ),
             )
 
+        if a.id == 1371:
+            # Yixuan gains extra Sheer Force based on her Max HP, with every 1 point of Max HP increasing Sheer Force by 0.1.
+            layer.add("SkipDefAtk_Delta", math.floor(prop_sum.max_hp * 0.1))
+
+        if a.specialty is ProfessionType.RUPTURE:
+            # Rupture characters gain extra Sheer Force based on their ATK, with every 1 point of ATK increasing Sheer Force by 0.3.
+            layer.add("SkipDefAtk_Delta", math.floor(math.floor(prop_sum.atk) * 0.3))
+
         return layer
 
 
-class PropLayer:
+class PropLayer:  # noqa: PLR0904
     def __init__(self) -> None:
         self.props = DEFAULT_PROPS.copy()
 
@@ -277,6 +291,21 @@ class PropLayer:
     def added_damage_ratio_ether(self) -> float:
         return (
             self.props["AddedDamageRatio_Ether_Base"] + self.props["AddedDamageRatio_Ether_Delta"]
+        )
+
+    @property
+    def skip_def_atk(self) -> float:
+        return self.props["SkipDefAtk_Base"] + self.props["SkipDefAtk_Delta"]
+
+    @property
+    def skip_def_damage_ratio(self) -> float:
+        return self.props["SkipDefDamageRatio_Base"] + self.props["SkipDefDamageRatio_Delta"]
+
+    @property
+    def rp_recover(self) -> float:
+        return (
+            self.props["RpRecover_Base"] * (1 + self.props["RpRecover_Ratio"] / 10_000)
+            + self.props["RpRecover_Delta"]
         )
 
 

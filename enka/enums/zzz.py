@@ -54,12 +54,16 @@ class StatType(IntEnum):
     IMPACT_BASE = 12201
     IMPACT_PERCENT = 12202
 
+    SHEER_FORCE_BASE = 12301
+    SHEER_FORCE_FLAT = 12302
+
     DEF_BASE = 13101
     DEF_PERCENT = 13102
     DEF_FLAT = 13103
 
     CRIT_RATE_BASE = 20101
     CRIT_RATE_FLAT = 20103
+
     CRIT_DMG_BASE = 21101
     CRIT_DMG_FLAT = 21103
 
@@ -84,14 +88,28 @@ class StatType(IntEnum):
 
     PHYSICAL_DMG_BONUS_BASE = 31501
     PHYSICAL_DMG_BONUS_FLAT = 31503
+
     FIRE_DMG_BONUS_BASE = 31601
     FIRE_DMG_BONUS_FLAT = 31603
+
     ICE_DMG_BONUS_BASE = 31701
     ICE_DMG_BONUS_FLAT = 31703
+
     ELECTRIC_DMG_BONUS_BASE = 31801
     ELECTRIC_DMG_BONUS_FLAT = 31803
+
     ETHER_DMG_BONUS_BASE = 31901
     ETHER_DMG_BONUS_FLAT = 31903
+
+    AAA_BASE = 32001
+    """Automatic Adrelanine Accumulation base."""
+    AAA_PERCENT = 32002
+    """Automatic Adrenaline Accumulation percent."""
+    AAA_FLAT = 32003
+    """Automatic Adrenaline Accumulation flat."""
+
+    SHEER_DMG_BONUS_BASE = 32201
+    SHEER_DMG_BONUS_FLAT = 32203
 
 
 class AgentStatType(IntEnum):
@@ -108,12 +126,16 @@ class AgentStatType(IntEnum):
     PEN_RATIO = 231
     PEN = 232
     ENERGY_REGEN = 305
+    SHEER_FORCE = 123
+    AAA = 320
+    """Automatic Adrenaline Accumulation."""
 
     PHYSICAL_DMG_BONUS = 315
     FIRE_DMG_BONUS = 316
     ICE_DMG_BONUS = 317
     ELECTRIC_DMG_BONUS = 318
     ETHER_DMG_BONUS = 319
+    SHEER_DMG_BONUS = 322
 
 
 class ProfessionType(StrEnum):
@@ -124,6 +146,7 @@ class ProfessionType(StrEnum):
     DEFENSE = "Defense"
     SUPPORT = "Support"
     ANOMALY = "Anomaly"
+    RUPTURE = "Rupture"
     UNKNOWN = "Unknown"
 
 
@@ -136,6 +159,7 @@ class Element(StrEnum):
     ELECTRIC = "Elec"
     ETHER = "Ether"
     FIRE_FROST = "FireFrost"
+    AURIC_ETHER = "AuricEther"
     UNKNOWN = "Unknown"
 
     @property

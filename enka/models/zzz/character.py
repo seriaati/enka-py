@@ -258,6 +258,7 @@ class Agent(BaseModel):
     color: AgentColor = Field(default=None)  # pyright: ignore[reportAssignmentType]
     highlight_stats: list[StatType] = Field(default_factory=list)
     stats: dict[AgentStatType, AgentStat] = Field(default_factory=dict)
+    specialty: ProfessionType = ProfessionType.UNKNOWN
 
     @field_validator("is_sig_engine_effect_on", mode="before")
     @classmethod
