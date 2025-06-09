@@ -32,3 +32,7 @@ async def test_not_exist_player(zzz_client: ZZZClient) -> None:
 
 async def test_fetch_builds(zzz_client: ZZZClient) -> None:
     await zzz_client.fetch_builds({"hash": "2rfpm9", "username": "CharaAni"})
+
+
+async def test_rupture_character(zzz_client: ZZZClient) -> None:
+    await zzz_client.fetch_showcase("1500746647")
