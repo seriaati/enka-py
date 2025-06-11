@@ -181,7 +181,7 @@ class LayerGenerator:
             layer.add(
                 "Atk_Delta",
                 math.floor(
-                    math.floor(prop_sum.props["Def"] * (0.4, 0.46, 0.52, 0.6, 0.66, 0.72, 0.8)[enh])
+                    math.floor(prop_sum.defense * (0.4, 0.46, 0.52, 0.6, 0.66, 0.72, 0.8)[enh])
                 ),
             )
 
