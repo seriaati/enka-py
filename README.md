@@ -26,10 +26,11 @@ Developing something for Hoyoverse games? You might be interested in [other API 
 - Provides direct icon URLs.
 - Supports Python 3.10+.
 - Supports all game languages.
-- Supports both Genshin Impact, Honkai Star Rail, and Zenless Zone Zero.
-- Supports persistent caching using SQLite.
-- Supports [Pydantic V2](https://github.com/pydantic/pydantic), this also means full autocomplete support.
-- Seamlessly integrates with [GenshinData](https://gitlab.com/Dimbreath/AnimeGameData) and [StarRailData](https://github.com/Dimbreath/StarRailData).
+- Supports Genshin Impact, Honkai Star Rail, and Zenless Zone Zero.
+- Supports persistent caching using SQLite and allows custom caching strategies.
+- Implements stat calculations for HSR and ZZZ.
+- Uses [Pydantic v2](https://github.com/pydantic/pydantic), this also means full autocomplete support.
+- Seamlessly integrates with [GenshinData](https://gitlab.com/Dimbreath/AnimeGameData), [StarRailData](https://github.com/Dimbreath/StarRailData), and [ZenlessData](https://git.mero.moe/dimbreath/ZenlessData).
 
 ## Installation
 
