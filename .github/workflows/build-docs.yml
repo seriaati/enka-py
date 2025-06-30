@@ -3,6 +3,11 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'enka/**.py'
+      - '.github/workflows/build-docs.yml'
 permissions:
   contents: write
 jobs:

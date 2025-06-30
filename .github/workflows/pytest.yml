@@ -1,11 +1,23 @@
 name: Pytest
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.py'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/pytest.yml'
   pull_request:
-    types: [opened, synchronize]
+    branches:
+      - main
+    paths:
+      - '**.py'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/pytest.yml'
 
 jobs:
   pytest:

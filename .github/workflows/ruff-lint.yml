@@ -1,11 +1,25 @@
-name: Ruff lint
+name: Ruff Lint
 
 on:
-  push:
-    branches: [ main ]
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.py'
+      - 'ruff.toml'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/ruff-lint.yml'
   pull_request:
-    types: [opened, synchronize]
+    branches:
+      - main
+    paths:
+      - '**.py'
+      - 'ruff.toml'
+      - 'pyproject.toml'
+      - 'uv.lock'
+      - '.github/workflows/ruff-lint.yml'
 
 jobs:
   ruff-lint:
