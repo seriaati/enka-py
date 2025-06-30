@@ -2,9 +2,11 @@
 
 ## Introduction
 
-enka.py is an async API wrapper for [enka.network](https://enka.network/) written in Python.  
-You can find the API docs for Enka Network [here](http://api.enka.network/).  
+enka.py is an async API wrapper for [Enka Network](https://enka.network/) written in Python.  
 Developing something for Hoyoverse games? You might be interested in [other API wrappers](https://github.com/seriaati#api-wrappers) written by me.
+
+- [Enka Network API docs](http://api.enka.network/)
+- [Documentation for this wrapper](https://gh.seria.moe/enka-py)
 
 ### Features
 
@@ -13,9 +15,10 @@ Developing something for Hoyoverse games? You might be interested in [other API 
 - Provides direct icon URLs.
 - Supports Python 3.10+.
 - Supports all game languages.
-- Supports both Genshin Impact and Honkai Star Rail.
-- Supports persistent caching using SQLite.
-- Supports [Pydantic V2](https://github.com/pydantic/pydantic), this also means full autocomplete support.
+- Supports Genshin Impact, Honkai Star Rail, and Zenless Zone Zero.
+- Supports persistent caching using SQLite and allows custom caching strategies.
+- Implements stat calculations for HSR and ZZZ.
+- Uses [Pydantic v2](https://github.com/pydantic/pydantic), this also means full autocomplete support.
 - Seamlessly integrates with [GenshinData](https://gitlab.com/Dimbreath/AnimeGameData), [StarRailData](https://github.com/Dimbreath/StarRailData), and [ZenlessData](https://git.mero.moe/dimbreath/ZenlessData).
 
 ## Installation
