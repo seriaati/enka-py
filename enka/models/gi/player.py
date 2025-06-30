@@ -43,8 +43,9 @@ class Player(BaseModel):
         profile_picture_icon: The player's profile picture's icon.
         showcase_characters: The player's showcase characters.
         max_friendship_character_count: The maximum number of characters with friendship level 10.
-        abyss_stars: The number of stars in the Spiral Abyss.
-        theater_stars: The number of stars in the Theater Mechanicus.
+        abyss_stars: The number of stars in Spiral Abyss.
+        theater_stars: The number of stars in Imaginarium Theater.
+        theater_act: The current act in Imaginarium Theater.
     """
 
     achievements: int = Field(0, alias="finishAchievementNum")
@@ -66,6 +67,7 @@ class Player(BaseModel):
     max_friendship_character_count: int | None = Field(None, alias="fetterCount")
     abyss_stars: int | None = Field(None, alias="towerStarIndex")
     theater_stars: int | None = Field(None, alias="theaterStarIndex")
+    theater_act: int | None = Field(None, alias="theaterActIndex")
 
     model_config = {"arbitrary_types_allowed": True}
 
