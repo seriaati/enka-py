@@ -242,20 +242,21 @@ class HSRClient(BaseClient):
 
     @overload
     async def fetch_showcase(
-        self, uid: str | int, *, raw: Literal[False] = False
+        self, uid: str | int, *, raw: Literal[False] = False, use_backup: bool = ...
     ) -> ShowcaseResponse: ...
     @overload
     async def fetch_showcase(
-        self, uid: str | int, *, raw: Literal[True] = True
+        self, uid: str | int, *, raw: Literal[True] = True, use_backup: bool = ...
     ) -> dict[str, Any]: ...
     async def fetch_showcase(
-        self, uid: str | int, *, raw: bool = False
+        self, uid: str | int, *, raw: bool = False, use_backup: bool = False
     ) -> ShowcaseResponse | dict[str, Any]:
         """Fetch the player showcase of the given UID.
 
         Args:
             uid: The UID of the user.
             raw: Whether to return the raw data, defaults to False.
+            use_backup: Whether to force-use the backup API, defaults to False.
 
         Returns:
             The parsed or raw showcase data.
@@ -263,10 +264,12 @@ class HSRClient(BaseClient):
         if not str(uid).isdigit():
             raise WrongUIDFormatError
 
-        url = HSR_API_URL.format(uid)
+        url = HSR_BACKUP_API_URL.format(uid) if use_backup else HSR_API_URL.format(uid)
         try:
             data = await self._request(url)
         except EnkaAPIError:
+            if use_backup:
+                raise
             if not is_hsr_cn_uid(str(uid)):
                 url = HSR_BACKUP_API_URL.format(uid)
                 data = await self._request(url)
