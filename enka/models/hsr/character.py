@@ -262,3 +262,8 @@ class Character(BaseModel):
                 if stat.type.value == DMG_BONUS_PROPS[self.element]
             ),
         )
+
+    @field_validator("light_cone", mode="before")
+    @classmethod
+    def __no_light_cone(cls, value: dict[str, Any] | None) -> dict[str, Any] | None:
+        return value or None
