@@ -114,7 +114,7 @@ class LightCone(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def _flatten_flat(cls, values: dict[str, Any]) -> dict[str, Any]:
-        flat_ = values.pop("_flat")
+        flat_ = values.pop("_flat", {})
         values.update(flat_)
         return values
 
@@ -170,7 +170,7 @@ class Relic(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def _flatten_flat(cls, values: dict[str, Any]) -> dict[str, Any]:
-        flat_ = values.pop("_flat")
+        flat_ = values.pop("_flat", {})
         flat_["setID"] = flat_.pop("setId", flat_.get("setID", 0))
         values.update(flat_)
         return values
