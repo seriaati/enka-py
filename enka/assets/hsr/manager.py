@@ -10,6 +10,7 @@ from .file_paths import (
     META_DATA_PATH,
     PROPERTY_CONFIG_PATH,
     RELIC_DATA_PATH,
+    RELIC_SET_DATA_PATH,
     SKILL_TREE_DATA_PATH,
     TEXT_MAP_PATH,
 )
@@ -28,6 +29,7 @@ class HSRAssetManager(AssetManager):
         self.avatar_data = AssetData(AVATAR_DATA_PATH)
         self.property_config_data = AssetData(PROPERTY_CONFIG_PATH)
         self.eidolon_data = AssetData(EIDOLON_DATA_PATH)
+        self.relic_set_data = AssetData(RELIC_SET_DATA_PATH)
 
         self._assets = (
             self.text_map,
@@ -39,6 +41,7 @@ class HSRAssetManager(AssetManager):
             self.avatar_data,
             self.property_config_data,
             self.eidolon_data,
+            self.relic_set_data,
         )
 
 

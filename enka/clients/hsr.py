@@ -80,11 +80,14 @@ class HSRClient(BaseClient):
 
     def _post_process_relic(self, relic: Relic) -> None:
         text_map = self._text_map
-        relic.set_name = text_map[relic.set_name]
 
         relic_data = self._assets.relic_data[str(relic.id)]
         relic.icon = self._get_icon(relic_data["Icon"])
         relic.rarity = relic_data["Rarity"]
+        relic.set_id = relic_data["SetID"]
+
+        relic_set_data = self._assets.relic_set_data[str(relic.set_id)]
+        relic.set_name = text_map[relic_set_data["name"]]
 
         for stat in relic.stats:
             stat.name = text_map[stat.type.value]

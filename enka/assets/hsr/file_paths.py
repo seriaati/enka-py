@@ -14,6 +14,7 @@ META_DATA_PATH = ASSET_PATH / "promotions.json"
 AVATAR_DATA_PATH = ASSET_PATH / "avatars.json"
 PROPERTY_CONFIG_PATH = ASSET_PATH / "property_config.json"
 EIDOLON_DATA_PATH = ASSET_PATH / "eidolons.json"
+RELIC_SET_DATA_PATH = ASSET_PATH / "relic_set.json"
 
 ENKA_API_DOCS = "https://raw.githubusercontent.com/pizza-studio/EnkaDBGenerator/main/Sources/EnkaDBFiles/Resources/Specimen/HSR"
 ENKA_PY_ASSETS = "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/hsr"
@@ -28,4 +29,5 @@ PATH_TO_SOURCE: Final[dict[Path, str]] = {
     SKILL_TREE_DATA_PATH: f"{ENKA_PY_ASSETS}/skill_tree.json",
     PROPERTY_CONFIG_PATH: f"{ENKA_PY_ASSETS}/property_config.json",
     TEXT_MAP_PATH: f"{ENKA_PY_ASSETS}/hsr.json",
+    RELIC_SET_DATA_PATH: f"{ENKA_PY_ASSETS}/relic_set.json",
 }

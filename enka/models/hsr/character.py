@@ -153,14 +153,15 @@ class Relic(BaseModel):
     level: int = 0
     type: RelicType
     main_affix_id: int = Field(alias="mainAffixId")
-    set_name: str = Field(alias="setName")  # Returned as text map hash in the API response
-    set_id: int = Field(alias="setID")
+
     stats: list[Stat] = Field(alias="props")
     sub_affix_list: list[RelicSubAffix] = Field(alias="subAffixList", default_factory=list)
 
     # The following fields are added in post-processing
     icon: str = ""
     rarity: Literal[3, 4, 5] = 3
+    set_id: int = 0
+    set_name: str = ""
 
     @field_validator("set_name", mode="before")
     @classmethod
@@ -169,11 +170,9 @@ class Relic(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def _flatten_flat(cls, values: dict[str, Any]) -> dict[str, Any]:
-        flat_ = values.pop("_flat", {})
-        flat_["setID"] = flat_.pop("setId", flat_.get("setID", 0))
-        values.update(flat_)
-        return values
+    def _extract_props(cls, v: dict[str, Any]) -> dict[str, Any]:
+        v["props"] = v.pop("_flat", {}).get("props", [])
+        return v
 
     @computed_field
     @property
