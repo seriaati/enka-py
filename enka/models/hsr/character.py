@@ -220,6 +220,7 @@ class Character(BaseModel):
         element: The character's element (type.)
         path: The character's path.
         stats: The character's stats.
+        enhanced: Whether the character's traces are enhanced.
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -241,6 +242,8 @@ class Character(BaseModel):
     element: Element = Element.FIRE
     path: Path = Path.ABUNDANCE
     stats: dict[StatType, Stat] = Field(default_factory=dict)
+
+    enhanced: bool = Field(False, alias="enhanceId")
 
     @computed_field
     @property
