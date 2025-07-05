@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field, field_validator
 
 from .costume import Costume
@@ -46,6 +48,8 @@ class Player(BaseModel):
         abyss_stars: The number of stars in Spiral Abyss.
         theater_stars: The number of stars in Imaginarium Theater.
         theater_act: The current act in Imaginarium Theater.
+        stygian_difficulty: The maximum difficulty reached in Stygian Onslaught.
+        stygian_clear_time: The clear time for Stygian Onslaught.
     """
 
     achievements: int = Field(0, alias="finishAchievementNum")
@@ -68,6 +72,10 @@ class Player(BaseModel):
     abyss_stars: int | None = Field(None, alias="towerStarIndex")
     theater_stars: int | None = Field(None, alias="theaterStarIndex")
     theater_act: int | None = Field(None, alias="theaterActIndex")
+
+    # New fields after v5.7
+    stygian_difficulty: Literal[1, 2, 3, 4, 5, 6, 7] | None = Field(None, alias="stygianIndex")
+    stygian_clear_time: int | None = Field(None, alias="stygianSeconds")
 
     model_config = {"arbitrary_types_allowed": True}
 
