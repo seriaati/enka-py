@@ -20,11 +20,11 @@ ENKA_API_DOCS = "https://raw.githubusercontent.com/pizza-studio/EnkaDBGenerator/
 ENKA_PY_ASSETS = "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/hsr"
 
 PATH_TO_SOURCE: Final[dict[Path, str]] = {
-    CHARACTER_DATA_PATH: f"{ENKA_API_DOCS}/avatars.json",
+    CHARACTER_DATA_PATH: f"{ENKA_API_DOCS}/honker_characters.json",
     LIGHT_CONE_DATA_PATH: f"{ENKA_API_DOCS}/honker_weps.json",
     RELIC_DATA_PATH: f"{ENKA_API_DOCS}/honker_relics.json",
     META_DATA_PATH: f"{ENKA_API_DOCS}/honker_meta.json",
-    AVATAR_DATA_PATH: f"{ENKA_API_DOCS}/pfps.json",
+    AVATAR_DATA_PATH: f"{ENKA_API_DOCS}/honker_avatars.json",
     EIDOLON_DATA_PATH: f"{ENKA_API_DOCS}/honker_ranks.json",
     SKILL_TREE_DATA_PATH: f"{ENKA_PY_ASSETS}/skill_tree.json",
     PROPERTY_CONFIG_PATH: f"{ENKA_PY_ASSETS}/property_config.json",
