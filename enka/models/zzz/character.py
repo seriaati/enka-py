@@ -239,7 +239,7 @@ class Agent(BaseModel):
     level: int = Field(alias="Level")
     promotion: Literal[1, 2, 3, 4, 5, 6] = Field(alias="PromotionLevel")
     mindscape: Literal[0, 1, 2, 3, 4, 5, 6] = Field(alias="TalentLevel")
-    skin_id: int = Field(alias="SkinId")
+    skin_id: int | None = Field(alias="SkinId")
     core_skill_level_num: int = Field(alias="CoreSkillEnhancement")
 
     is_sig_engine_effect_on: bool | None = Field(alias="WeaponEffectState")
@@ -265,6 +265,12 @@ class Agent(BaseModel):
     def __convert_is_sig_engine_effect_on(cls, value: int) -> bool | None:
         # [0: None, 1: OFF, 2: ON]
         return {0: None, 1: False, 2: True}[value]
+
+    @field_validator("skin_id", mode="before")
+    @classmethod
+    def __convert_skin_id(cls, value: int | None) -> int | None:
+        # Convert skin_id to None if it is 0
+        return value if value != 0 else None
 
     @computed_field
     @property
