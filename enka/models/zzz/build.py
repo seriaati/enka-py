@@ -4,6 +4,8 @@ from pydantic import BaseModel, Field
 
 from .character import Agent
 
+__all__ = ("Build",)
+
 
 class Build(BaseModel):
     """Represents a ZZZ build.
