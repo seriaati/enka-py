@@ -15,6 +15,7 @@ WEAPON_STAR_PATH = ASSET_PATH / "weapon_star.json"
 WEAPONS_PATH = ASSET_PATH / "weapons.json"
 TITLES_PATH = ASSET_PATH / "titles.json"
 NAMECARDS_PATH = ASSET_PATH / "namecards.json"
+PFPS_PATH = ASSET_PATH / "pfps.json"
 
 ENKA_API_DOCS = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/master/store/zzz"
 ENKA_PY_ASSETS = "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/zzz"
@@ -25,6 +26,7 @@ PATH_TO_SOURCE: Final[dict[Path, str]] = {
     EQUIPMENTS_PATH: f"{ENKA_API_DOCS}/equipments.json",
     PROPERTY_PATH: f"{ENKA_API_DOCS}/property.json",
     WEAPONS_PATH: f"{ENKA_API_DOCS}/weapons.json",
+    PFPS_PATH: f"{ENKA_API_DOCS}/pfps.json",
     EQUIPMENT_LEVEL_PATH: f"{ENKA_PY_ASSETS}/equipment_level.json",
     WEAPON_LEVEL_PATH: f"{ENKA_PY_ASSETS}/weapon_level.json",
     WEAPON_STAR_PATH: f"{ENKA_PY_ASSETS}/weapon_star.json",

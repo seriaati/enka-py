@@ -263,6 +263,11 @@ class ZZZClient(BaseClient):
     def _post_process_player(self, player: models.Player) -> None:
         self._post_process_title(player.title)
 
+        # Avatar
+        pfp_data = self._assets.pfps.get(str(player.id))
+        if pfp_data:
+            player.avatar = f"https://enka.network{pfp_data['Icon']}"
+
         # Namecard
         namecard_id = player.namecard_id
         player.namecard = models.Namecard(

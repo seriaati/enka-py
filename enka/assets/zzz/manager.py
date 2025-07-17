@@ -7,6 +7,7 @@ from .file_paths import (
     EQUIPMENT_LEVEL_PATH,
     EQUIPMENTS_PATH,
     NAMECARDS_PATH,
+    PFPS_PATH,
     PROPERTY_PATH,
     TEXT_MAP_PATH,
     TITLES_PATH,
@@ -30,6 +31,7 @@ class ZZZAssetManager(AssetManager):
         self.weapons = AssetData(WEAPONS_PATH)
         self.titles = AssetData(TITLES_PATH)
         self.namecards = AssetData(NAMECARDS_PATH)
+        self.pfps = AssetData(PFPS_PATH)
 
         self._assets = (
             self.text_map,
@@ -42,6 +44,7 @@ class ZZZAssetManager(AssetManager):
             self.weapons,
             self.titles,
             self.namecards,
+            self.pfps,
         )
 
 
