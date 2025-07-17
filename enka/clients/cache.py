@@ -153,14 +153,8 @@ class RedisCache(BaseTTLCache):
         **kwargs: Any,
     ) -> None:
         self._url = url
-        self._max_connections = max_connections
-        self._retry_on_timeout = retry_on_timeout
-        self._kwargs = kwargs
         self._pool = redis.ConnectionPool.from_url(
-            self._url,
-            max_connections=self._max_connections,
-            retry_on_timeout=self._retry_on_timeout,
-            **kwargs,
+            self._url, max_connections=max_connections, retry_on_timeout=retry_on_timeout, **kwargs
         )
         self._redis = redis.Redis(connection_pool=self._pool)
 
