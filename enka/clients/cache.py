@@ -3,10 +3,12 @@ from __future__ import annotations
 import abc
 import pathlib
 import time
+from typing import Any
 
 import aiosqlite
+import redis.asyncio as redis
 
-__all__ = ("BaseTTLCache", "MemoryCache", "SQLiteCache")
+__all__ = ("BaseTTLCache", "MemoryCache", "RedisCache", "SQLiteCache")
 
 
 class BaseTTLCache(abc.ABC):
@@ -135,3 +137,49 @@ class SQLiteCache(BaseTTLCache):
     async def clear_expired(self) -> None:
         await self.conn.execute("DELETE FROM cache WHERE expires_at < ?", (time.time(),))
         await self.conn.commit()
+
+
+class RedisCache(BaseTTLCache):
+    """Redis cache implementation.
+
+    This cache uses Redis for distributed and persistent caching.
+    """
+
+    def __init__(
+        self,
+        url: str = "redis://localhost:6379",
+        max_connections: int = 10,
+        retry_on_timeout: bool = True,
+        **kwargs: Any,
+    ) -> None:
+        self._url = url
+        self._max_connections = max_connections
+        self._retry_on_timeout = retry_on_timeout
+        self._kwargs = kwargs
+        self._pool = redis.ConnectionPool.from_url(
+            self._url,
+            max_connections=self._max_connections,
+            retry_on_timeout=self._retry_on_timeout,
+            **kwargs,
+        )
+        self._redis = redis.Redis(connection_pool=self._pool)
+
+    async def start(self) -> None:
+        pass
+
+    async def close(self) -> None:
+        await self._redis.close()
+        await self._pool.disconnect()
+
+    async def get(self, key: str) -> str | None:
+        value: bytes | None = await self._redis.get(key)
+        return value.decode() if value else None
+
+    async def set(self, key: str, value: str, ttl: int) -> None:
+        await self._redis.setex(key, ttl, value)
+
+    async def delete(self, key: str) -> None:
+        await self._redis.delete(key)
+
+    async def clear_expired(self) -> None:
+        pass

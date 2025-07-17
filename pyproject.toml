@@ -23,7 +23,7 @@ Issues = "https://github.com/seriaati/enka-py/issues"
 Documentation = "https://gh.seria.moe/enka-py"
 
 [project.optional-dependencies]
-docs = ["mkdocs-material[imaging]>=9.6.11", "mkdocstrings[python]>=0.29.1"]
+redis = ["redis[hiredis]>=6.2.0"]
 
 [build-system]
 requires = ["uv_build>=0.7.19,<0.8.0"]
