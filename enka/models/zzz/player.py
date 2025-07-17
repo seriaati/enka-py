@@ -83,6 +83,7 @@ class Player(BaseModel):
     namecard_id: int = Field(alias="CallingCardId")
 
     # Fields that are not in the API response
+    namecard: Namecard = Field(default_factory=lambda: Namecard(id=0))
     avatar: str | None = None
 
     @model_validator(mode="before")

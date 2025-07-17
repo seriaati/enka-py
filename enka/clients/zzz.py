@@ -11,7 +11,7 @@ from ..assets.zzz.manager import ZZZ_ASSETS
 from ..calc.zzz import LayerGenerator, PropState
 from ..constants.common import DEFAULT_TIMEOUT, ZZZ_API_URL
 from ..enums import zzz as enums
-from ..errors import WrongUIDFormatError
+from ..errors import AssetKeyError, WrongUIDFormatError
 from ..models import zzz as models
 from ..models.zzz.build import Build
 from .base import BaseClient
@@ -270,9 +270,13 @@ class ZZZClient(BaseClient):
 
         # Namecard
         namecard_id = player.namecard_id
-        player.namecard = models.Namecard(
-            id=namecard_id, icon=self._assets.namecards[str(namecard_id)]["Icon"]
-        )
+        try:
+            icon_path = self._assets.namecards[str(namecard_id)]["Icon"]
+            icon_url = f"https://enka.network{icon_path}"
+        except AssetKeyError:
+            icon_url = ""
+        else:
+            player.namecard = models.Namecard(id=namecard_id, icon=icon_url)
 
     def _post_process_showcase(self, showcase: models.ShowcaseResponse) -> None:
         self._post_process_player(showcase.player)
