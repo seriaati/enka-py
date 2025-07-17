@@ -6,18 +6,18 @@ on:
     branches:
       - main
     paths:
-      - '**.py'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - '.github/workflows/pytest.yml'
+      - "**.py"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/pytest.yml"
   pull_request:
     branches:
       - main
     paths:
-      - '**.py'
-      - 'pyproject.toml'
-      - 'uv.lock'
-      - '.github/workflows/pytest.yml'
+      - "**.py"
+      - "pyproject.toml"
+      - "uv.lock"
+      - ".github/workflows/pytest.yml"
 
 jobs:
   pytest:
@@ -25,11 +25,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - name: Install uv
         uses: astral-sh/setup-uv@v6
+
       - name: Set up Python
         uses: actions/setup-python@v5
-        with:
-          python-version-file: ".python-version"
+
+      - name: Install Project
+        run: uv sync --frozen --no-dev --extra test
+
       - name: Run tests
-        run: uv run pytest
+        run: uv run pytest --extra test
