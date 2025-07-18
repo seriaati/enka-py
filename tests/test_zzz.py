@@ -35,4 +35,4 @@ async def test_fetch_builds(zzz_client: ZZZClient) -> None:
 
 
 async def test_rupture_character(zzz_client: ZZZClient) -> None:
-    await zzz_client.fetch_showcase("1500746647")
+    await zzz_client.fetch_showcase("1309335571")
