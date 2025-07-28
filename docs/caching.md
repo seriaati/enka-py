@@ -1,9 +1,22 @@
 # Caching
 
-enka-py has 2 built-in caching systems:
+enka-py has 3 built-in caching systems:
 
-- [`SQLiteCache`](./reference/cache.md#enka.clients.cache.SQLiteCache)
 - [`MemoryCache`](./reference/cache.md#enka.clients.cache.MemoryCache)
+- [`SQLiteCache`](./reference/cache.md#enka.clients.cache.SQLiteCache)
+- [`RedisCache`](./reference/cache.md#enka.clients.cache.RedisCache)
+
+## Installation
+
+For the different caching systems, you need to install the appropriate optional dependencies.
+
+```bash
+pip install enka[redis]
+```
+
+```bash
+pip install enka[sqlite]
+```
 
 ## How-To
 

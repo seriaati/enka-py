@@ -38,6 +38,16 @@ Developing something for Hoyoverse games? You might be interested in [other API 
 pip install enka
 ```
 
+With optional dependencies:
+
+```bash
+# For SQLite caching
+pip install enka[sqlite]
+
+# For Redis caching
+pip install enka[redis]
+```
+
 ## Quick Example
 
 ```py
