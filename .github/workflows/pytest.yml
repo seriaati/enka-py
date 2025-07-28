@@ -33,7 +33,7 @@ jobs:
         uses: actions/setup-python@v5
 
       - name: Install Project
-        run: uv sync --frozen --no-dev --group test --extra redis
+        run: uv sync --frozen --no-dev --group test
 
       - name: Run tests
         run: uv run pytest

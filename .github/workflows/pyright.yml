@@ -29,7 +29,7 @@ jobs:
         uses: astral-sh/setup-uv@v6
 
       - name: Install Project
-        run: uv sync --frozen --no-dev --group type-check --extra redis
+        run: uv sync --frozen --no-dev --group type-check --extra redis --extra sqlite
 
       - name: Run Pyright
         run: uv run pyright enka/ --outputjson
