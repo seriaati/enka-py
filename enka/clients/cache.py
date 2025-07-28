@@ -3,10 +3,11 @@ from __future__ import annotations
 import abc
 import pathlib
 import time
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import aiosqlite
-import redis.asyncio as redis
+if TYPE_CHECKING:
+    import aiosqlite
+
 
 __all__ = ("BaseTTLCache", "MemoryCache", "RedisCache", "SQLiteCache")
 
@@ -104,6 +105,12 @@ class SQLiteCache(BaseTTLCache):
         return self._conn
 
     async def start(self) -> None:
+        try:
+            import aiosqlite  # noqa: PLC0415
+        except ImportError as e:
+            msg = "aiosqlite not available. Use: pip install enka[sqlite]"
+            raise ImportError(msg) from e
+
         self._db_path.parent.mkdir(parents=True, exist_ok=True)
         self._conn = await aiosqlite.connect(self._db_path)
         await self.conn.execute(
@@ -152,6 +159,12 @@ class RedisCache(BaseTTLCache):
         retry_on_timeout: bool = True,
         **kwargs: Any,
     ) -> None:
+        try:
+            import redis.asyncio as redis  # noqa: PLC0415
+        except ImportError as e:
+            msg = "redis.asyncio not available. Use: pip install enka[redis]"
+            raise ImportError(msg) from e
+
         self._url = url
         self._pool = redis.ConnectionPool.from_url(
             self._url, max_connections=max_connections, retry_on_timeout=retry_on_timeout, **kwargs
