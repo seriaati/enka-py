@@ -67,7 +67,7 @@ markdown_extensions:
   - pymdownx.snippets
 
 nav:
-  - Home: index.md
+  - Home: README.md
   - Getting Started: getting_started.md
   - Profile Endpoint: profile.md
   - Caching: caching.md
