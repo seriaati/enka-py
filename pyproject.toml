@@ -1,6 +1,6 @@
 [project]
 name = "enka"
-version = "2.5.8"
+version = "2.5.9"
 description = "Async API wrapper for Enka Network written in Python, supports GI, HSR, and ZZZ."
 readme = "docs/README.md"
 requires-python = ">=3.10"
