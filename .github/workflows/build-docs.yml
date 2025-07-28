@@ -1,15 +1,19 @@
 name: Build and Deploy Docs
+
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
     paths:
-      - 'docs/**'
-      - 'mkdocs.yml'
-      - 'enka/**.py'
-      - '.github/workflows/build-docs.yml'
+      - "docs/**"
+      - "mkdocs.yml"
+      - "enka/**.py"
+      - ".github/workflows/build-docs.yml"
+
 permissions:
   contents: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -20,18 +24,18 @@ jobs:
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-    
+
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
       - name: Set up Python
         uses: actions/setup-python@v5
 
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
       - uses: actions/cache@v4
         with:
           key: mkdocs-material-${{ env.cache_id }}
-          path: .cache 
+          path: .cache
           restore-keys: |
             mkdocs-material-
 
