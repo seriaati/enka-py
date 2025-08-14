@@ -261,7 +261,8 @@ class ZZZClient(BaseClient):
         title.color2 = f"#{title_data['ColorB']}"
 
     def _post_process_player(self, player: models.Player) -> None:
-        self._post_process_title(player.title)
+        if player.title is not None:
+            self._post_process_title(player.title)
 
         # Avatar
         pfp_data = self._assets.pfps.get(str(player.id))

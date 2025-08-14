@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from deprecated import deprecated
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 __all__ = ("Medal", "Namecard", "Player", "Title")
 
@@ -78,7 +78,7 @@ class Player(BaseModel):
     level: int = Field(alias="Level")
     signature: str = Field(alias="Desc")
 
-    title: Title = Field(alias="TitleInfo")
+    title: Title | None = Field(alias="TitleInfo")
     id: int = Field(alias="ProfileId")
     namecard_id: int = Field(alias="CallingCardId")
 
@@ -93,8 +93,15 @@ class Player(BaseModel):
         value.update(info)
         return value
 
+    @field_validator("title", mode="after")
+    @classmethod
+    def __validate_title(cls, value: Title) -> Title | None:
+        if value.id == 0:
+            return None
+        return value
+
     @property
     @deprecated(reason="Use `title.id` instead.")
-    def title_id(self) -> int:
+    def title_id(self) -> int | None:
         """(Deprecated) The ID of the player's selected title."""
-        return self.title.id
+        return self.title.id if self.title else None
