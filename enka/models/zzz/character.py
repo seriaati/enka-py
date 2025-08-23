@@ -21,9 +21,9 @@ __all__ = (
 )
 
 
-def _to_formatted_value(value: int, type_: StatType, format_: str) -> str:
-    if type_ is StatType.ENERGY_REGEN_BASE:
-        return f"{value / 100}"
+def _to_formatted_value(value: float, type_: StatType | AgentStatType, format_: str) -> str:
+    if type_ is AgentStatType.AAA:
+        value /= 100
 
     if "%" in format_:
         return f"{round(value / 100, 1)}%"
@@ -83,12 +83,6 @@ class DriveDiscStat(Stat):
     # Fields that are not in the API response
     name: str = ""
     format: str = ""
-
-    @computed_field
-    @property
-    def formatted_value(self) -> str:
-        """The formatted value of the stat."""
-        return _to_formatted_value(self.value, self.type, self.format)
 
 
 class DriveDisc(BaseModel):
