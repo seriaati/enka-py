@@ -249,7 +249,7 @@ class Agent(BaseModel):
     elements: list[Element] = Field(default_factory=list)
     icon: AgentIcon = Field(default=None)  # pyright: ignore[reportAssignmentType]
     sig_engine_id: int = Field(default=0)
-    color: AgentColor = Field(default=None)  # pyright: ignore[reportAssignmentType]
+    color: AgentColor | None = Field(default=None)
     highlight_stats: list[StatType] = Field(default_factory=list)
     stats: dict[AgentStatType, AgentStat] = Field(default_factory=dict)
     specialty: ProfessionType = ProfessionType.UNKNOWN
@@ -265,6 +265,13 @@ class Agent(BaseModel):
     def __convert_skin_id(cls, value: int | None) -> int | None:
         # Convert skin_id to None if it is 0
         return value if value != 0 else None
+
+    @field_validator("color", mode="before")
+    @classmethod
+    def __convert_color(cls, value: dict[str, Any] | None) -> AgentColor | None:
+        if not value:
+            return None
+        return AgentColor(**value)
 
     @computed_field
     @property
