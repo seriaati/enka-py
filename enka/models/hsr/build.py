@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from decimal import Decimal
+
 from pydantic import BaseModel, Field
 
 from .character import Character
@@ -19,7 +21,7 @@ class Build(BaseModel):
 
     id: int
     name: str
-    order: int
+    order: Decimal
     live: bool
     character_id: int = Field(alias="avatar_id")
     character: Character = Field(alias="avatar_data")
