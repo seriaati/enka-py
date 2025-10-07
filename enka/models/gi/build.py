@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
-
+from ..enka.build import BaseBuild
 from .character import Character
 
 
-class Build(BaseModel):
+class Build(BaseBuild[Character]):
     """Represents a Genshin Impact build.
 
     Attributes:
@@ -16,10 +15,3 @@ class Build(BaseModel):
         character_id: The build's character ID.
         character: The build's character data.
     """
-
-    id: int
-    name: str
-    order: int
-    live: bool
-    character_id: int = Field(alias="avatar_id")
-    character: Character = Field(alias="avatar_data")
