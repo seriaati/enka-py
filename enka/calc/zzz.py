@@ -178,16 +178,15 @@ class LayerGenerator:
         enh = a.core_skill_level_num
         if a.id == 1121:
             # Ben's initial ATK increases along with his initial DEF. He gains X% of his initial DEF as ATK.
+            defense_to_atk_multiplier = (0.4, 0.46, 0.52, 0.6, 0.66, 0.72, 0.8)
             layer.add(
                 "Atk_Delta",
-                math.floor(
-                    math.floor(prop_sum.defense * (0.4, 0.46, 0.52, 0.6, 0.66, 0.72, 0.8)[enh])
-                ),
+                math.floor(math.floor(prop_sum.defense) * defense_to_atk_multiplier[enh]),
             )
 
         if a.id == 1371:
             # Yixuan gains extra Sheer Force based on her Max HP, with every 1 point of Max HP increasing Sheer Force by 0.1.
-            layer.add("SkipDefAtk_Delta", math.floor(prop_sum.max_hp * 0.1))
+            layer.add("SkipDefAtk_Delta", math.floor(math.floor(prop_sum.max_hp) * 0.1))
 
         if a.specialty is ProfessionType.RUPTURE:
             # Rupture characters gain extra Sheer Force based on their ATK, with every 1 point of ATK increasing Sheer Force by 0.3.
@@ -320,6 +319,6 @@ class PropState:
         sum_layer = PropLayer()
         for layer in self.layers:
             for key, value in layer.props.items():
-                sum_layer.add(key, value)
+                sum_layer.add(key, math.floor(value))
 
         return sum_layer
