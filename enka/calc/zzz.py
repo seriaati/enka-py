@@ -184,13 +184,12 @@ class LayerGenerator:
                 math.floor(math.floor(prop_sum.defense) * defense_to_atk_multiplier[enh]),
             )
 
-        if a.id == 1371:
-            # Yixuan gains extra Sheer Force based on her Max HP, with every 1 point of Max HP increasing Sheer Force by 0.1.
-            layer.add("SkipDefAtk_Delta", math.floor(math.floor(prop_sum.max_hp) * 0.1))
-
         if a.specialty is ProfessionType.RUPTURE:
             # Rupture characters gain extra Sheer Force based on their ATK, with every 1 point of ATK increasing Sheer Force by 0.3.
             layer.add("SkipDefAtk_Delta", math.floor(math.floor(prop_sum.atk) * 0.3))
+
+            # Rupture characters gain extra Sheer Force based on her Max HP, with every 1 point of Max HP increasing Sheer Force by 0.1.
+            layer.add("SkipDefAtk_Delta", math.floor(math.floor(prop_sum.max_hp) * 0.1))
 
         return layer
 
