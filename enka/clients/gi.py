@@ -131,8 +131,9 @@ class GenshinClient(BaseClient):
         set_info = self._assets.relics_data["Sets"][str(set_id)]
 
         artifact.name = self._text_map[artifact.name]
-        artifact.set_name = self._text_map[artifact.set_name]
+        artifact.set_name = self._text_map[set_info["Name"]]
         artifact.main_stat.name = self._text_map[artifact.main_stat.type.value]
+
         for stat in artifact.sub_stats:
             stat.name = self._text_map[stat.type.value]
 
@@ -157,9 +158,11 @@ class GenshinClient(BaseClient):
 
     def _post_process_character(self, c: Character) -> None:
         is_no_element_traveler = c.skill_depot_id in {501, 701}
+        is_traveler = c.id in {10000005, 10000007}
+        is_maniken = c.id in {10000117, 10000118}
         characer_id = (
             f"{c.id}-{c.skill_depot_id}"
-            if c.id in {10000005, 10000007} and not is_no_element_traveler
+            if (is_traveler and not is_no_element_traveler) or is_maniken
             else str(c.id)
         )
 
