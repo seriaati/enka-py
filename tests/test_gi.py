@@ -81,5 +81,5 @@ async def test_invalid_player(genshin_client: GenshinClient) -> None:
 async def test_no_element_traveler(genshin_client: GenshinClient) -> None:
     with contextlib.suppress(GameMaintenanceError):
         showcase = await genshin_client.fetch_showcase("828107378")
-        traveler = next(c for c in showcase.characters if c.name == "Aether")
+        traveler = next(c for c in showcase.characters if c.name == "Traveler")
         assert traveler.element is Element.NONE
