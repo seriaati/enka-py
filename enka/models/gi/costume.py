@@ -24,4 +24,4 @@ class Costume(BaseModel):
     @property
     def icon(self) -> Icon:
         """The costume's icon."""
-        return Icon(side_icon_ui_path=self.data["sideIconName"], is_costume=True)
+        return Icon(side_icon=self.data["SideIcon"], is_costume=True)

@@ -269,7 +269,7 @@ class Character(BaseModel):
     friendship_level: int = Field(alias="friendshipLevel")
 
     name: str = ""
-    icon: Icon = Icon(side_icon_ui_path="")
+    icon: Icon = Icon(side_icon="")
     element: Element = Element.ANEMO
     talent_order: list[int] = Field(default_factory=list)
     rarity: int = 0

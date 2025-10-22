@@ -76,7 +76,7 @@ class GenshinClient(BaseClient):
 
     def _post_process_player(self, player: Player) -> None:
         # namecard
-        namecard_icon = self._assets.namecard_data[str(player.namecard_id)]["icon"]
+        namecard_icon = self._assets.namecard_data[str(player.namecard_id)]["Icon"]
         player.namecard = Namecard(ui_path=namecard_icon)
 
         # profile picture
@@ -84,14 +84,10 @@ class GenshinClient(BaseClient):
         if len(profile_picture_id) == 8:
             profile_picture_icon = self._assets.character_data[profile_picture_id]["SideIconName"]
         else:
-            # pfps data always return circle icon, so we need to process it to side icon for the `Icon` object.
-            profile_picture_icon = (
-                self._assets.pfps_data[profile_picture_id]["iconPath"]
-                .replace("AvatarIcon", "AvatarIcon_Side")
-                .replace("_Circle", "")
-            )
+            profile_picture_icon = self._assets.pfps_data[profile_picture_id]["IconPath"]
+
         player.profile_picture_icon = Icon(
-            side_icon_ui_path=profile_picture_icon, is_costume="Costume" in profile_picture_icon
+            side_icon=profile_picture_icon, is_costume="Costume" in profile_picture_icon
         )
 
     def _post_process_showcase_character(self, showcase_character: ShowcaseCharacter) -> None:
@@ -173,7 +169,7 @@ class GenshinClient(BaseClient):
 
         # icon
         side_icon_name = data["SideIconName"]
-        c.icon = Icon(side_icon_ui_path=side_icon_name)
+        c.icon = Icon(side_icon=side_icon_name)
 
         # constellations
         if not is_no_element_traveler:

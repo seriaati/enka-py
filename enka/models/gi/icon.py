@@ -14,7 +14,7 @@ class Icon(BaseModel):
         is_costume: Whether the icon is for a costume.
     """
 
-    side_icon_ui_path: str
+    side_icon: str
     is_costume: bool = False
 
     @computed_field
@@ -24,7 +24,7 @@ class Icon(BaseModel):
 
         e.g. UI_AvatarIcon_Ambor
         """
-        return self.side_icon_ui_path.replace("Side_", "")
+        return self.side_icon.replace("Side_", "")
 
     @computed_field
     @property
@@ -33,7 +33,7 @@ class Icon(BaseModel):
 
         e.g. https://enka.network/ui/UI_AvatarIcon_Side_Ambor.png
         """
-        return f"https://enka.network/ui/{self.side_icon_ui_path}.png"
+        return f"https://enka.network{self.side_icon}"
 
     @computed_field
     @property
