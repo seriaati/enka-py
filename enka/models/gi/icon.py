@@ -81,7 +81,7 @@ class Namecard(BaseModel):
 
         e.g. https://enka.network/ui/UI_NameCardIcon_0.png
         """
-        return f"https://enka.network/ui/{self.ui_path.replace('NameCardPic', 'NameCardIcon').replace('_P', '')}.png"
+        return f"https://enka.network{self.ui_path.replace('NameCardPic', 'NameCardIcon').replace('_P', '')}"
 
     @computed_field
     @property
@@ -90,4 +90,4 @@ class Namecard(BaseModel):
 
         e.g. https://enka.network/ui/UI_NameCardPic_0_P.png
         """
-        return f"https://enka.network/ui/{self.ui_path}.png"
+        return f"https://enka.network{self.ui_path}"
