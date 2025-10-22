@@ -7,6 +7,7 @@ from .file_paths import (
     CONSTS_DATA_PATH,
     NAMECARD_DATA_PATH,
     PFPS_DATA_PATH,
+    RELICS_DATA_PATH,
     TALENTS_DATA_PATH,
     TEXT_MAP_PATH,
 )
@@ -22,6 +23,7 @@ class GIAssetManager(AssetManager):
         self.consts_data = AssetData(CONSTS_DATA_PATH)
         self.talents_data = AssetData(TALENTS_DATA_PATH)
         self.pfps_data = AssetData(PFPS_DATA_PATH)
+        self.relics_data = AssetData(RELICS_DATA_PATH)
 
         self._assets = (
             self.text_map,
@@ -30,6 +32,7 @@ class GIAssetManager(AssetManager):
             self.consts_data,
             self.talents_data,
             self.pfps_data,
+            self.relics_data,
         )
 
 

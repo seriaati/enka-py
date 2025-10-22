@@ -10,8 +10,10 @@ NAMECARD_DATA_PATH = ASSET_PATH / "namecards.json"
 CONSTS_DATA_PATH = ASSET_PATH / "consts.json"
 TALENTS_DATA_PATH = ASSET_PATH / "talents.json"
 PFPS_DATA_PATH = ASSET_PATH / "pfps.json"
+RELICS_DATA_PATH = ASSET_PATH / "relics.json"
 
-ENKA_API_DOCS = "https://raw.githubusercontent.com/pizza-studio/EnkaDBGenerator/main/Sources/EnkaDBFiles/Resources/Specimen/GI"
+PIZZA_ENKA_API_DOCS = "https://raw.githubusercontent.com/pizza-studio/EnkaDBGenerator/main/Sources/EnkaDBFiles/Resources/Specimen/GI"
+ENKA_API_DOCS = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/refs/heads/master/store/gi"
 ENKA_PY_ASSETS = "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data"
 
 PATH_TO_SOURCE = {
@@ -19,6 +21,7 @@ PATH_TO_SOURCE = {
     CHARACTER_DATA_PATH: f"{ENKA_PY_ASSETS}/characters.json",
     CONSTS_DATA_PATH: f"{ENKA_PY_ASSETS}/consts.json",
     TALENTS_DATA_PATH: f"{ENKA_PY_ASSETS}/talents.json",
-    PFPS_DATA_PATH: f"{ENKA_API_DOCS}/pfps.json",
-    NAMECARD_DATA_PATH: f"{ENKA_API_DOCS}/namecards.json",
+    PFPS_DATA_PATH: f"{PIZZA_ENKA_API_DOCS}/pfps.json",
+    NAMECARD_DATA_PATH: f"{PIZZA_ENKA_API_DOCS}/namecards.json",
+    RELICS_DATA_PATH: f"{ENKA_API_DOCS}/relics.json",
 }
