@@ -126,6 +126,10 @@ class GenshinClient(BaseClient):
                     talent.is_upgraded = True
 
     def _post_process_artifact(self, artifact: Artifact) -> None:
+        relic_info = self._assets.relics_data["Items"][str(artifact.id)]
+        set_id = relic_info["SetId"]
+        set_info = self._assets.relics_data["Sets"][str(set_id)]
+
         artifact.name = self._text_map[artifact.name]
         artifact.set_name = self._text_map[artifact.set_name]
         artifact.main_stat.name = self._text_map[artifact.main_stat.type.value]
