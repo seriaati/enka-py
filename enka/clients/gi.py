@@ -136,10 +136,9 @@ class GenshinClient(BaseClient):
     def _post_process_constellations(self, c: Character, data: dict[str, Any]) -> None:
         all_consts: list[dict[str, str]] = []
         for const_id, const in self._assets.consts_data.items():
-            if const["icon"] not in data["Consts"]:
-                continue
-            const["id"] = const_id
-            all_consts.append(const)
+            if any(const["icon"] in c_ for c_ in data["Consts"]):
+                const["id"] = const_id
+                all_consts.append(const)
 
         consts: list[Constellation] = [
             Constellation(
