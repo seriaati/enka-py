@@ -3,6 +3,8 @@ from __future__ import annotations
 from ..enka.build import BaseBuild
 from .character import Character
 
+__all__ = ("Build",)
+
 
 class Build(BaseBuild[Character]):
     """Represents a Genshin Impact build.

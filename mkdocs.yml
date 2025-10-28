@@ -46,14 +46,43 @@ theme:
 
 plugins:
   - search
-  - social
   - mkdocstrings:
       handlers:
         python:
+          paths: ["enka"]
+          inventories:
+            - https://docs.python.org/3/objects.inv
+            - https://mkdocstrings.github.io/griffe/objects.inv
+            - https://docs.pydantic.dev/latest/objects.inv
           options:
+            backlinks: tree
             docstring_style: google
+            docstring_options:
+              ignore_init_summary: true
+            docstring_section_style: list
+            parameter_headings: true
+            relative_crossrefs: true
+            scoped_crossrefs: true
+            type_parameter_headings: true
+            show_root_heading: true
+            show_root_full_path: false
             show_root_toc_entry: false
             show_symbol_type_heading: true
+            show_if_no_docstring: true
+            show_source: false
+            show_bases: false
+            separate_signature: true
+            signature_crossrefs: true
+            show_symbol_type_toc: true
+            show_signature_annotations: true
+            show_signature_type_parameters: true
+            summary: true
+            filters:
+              - "!^_"
+            unwrap_annotated: true
+            extensions:
+              - griffe_pydantic:
+                  schema: false
 
 markdown_extensions:
   - admonition
@@ -74,20 +103,19 @@ nav:
   - Update Game Assets: update_assets.md
   - Migration Guide: migration.md
   - API Reference:
-    - Genshin Impact:
-        - API Client: reference/gi/client.md
-        - Models: reference/gi/models.md
-        - Enums: reference/gi/enums.md
-    - Honkai Star Rail:
-        - API Client: reference/hsr/client.md
-        - Models: reference/hsr/models.md
-        - Enums: reference/hsr/enums.md
-    - Zenless Zone Zero:
-        - API Client: reference/zzz/client.md
-        - Models: reference/zzz/models.md
-        - Enums: reference/zzz/enums.md
-    - Exceptions: reference/errors.md
-    - Cache: reference/cache.md
-    - Profile: reference/profile.md
+      - Genshin Impact:
+          - API Client: reference/gi/client.md
+          - Models: reference/gi/models.md
+          - Enums: reference/gi/enums.md
+      - Honkai Star Rail:
+          - API Client: reference/hsr/client.md
+          - Models: reference/hsr/models.md
+          - Enums: reference/hsr/enums.md
+      - Zenless Zone Zero:
+          - API Client: reference/zzz/client.md
+          - Models: reference/zzz/models.md
+          - Enums: reference/zzz/enums.md
+      - Exceptions: reference/errors.md
+      - Cache: reference/cache.md
+      - Profile: reference/profile.md
   - Legacy: legacy.md
-
