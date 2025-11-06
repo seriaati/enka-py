@@ -124,7 +124,11 @@ class HSRClient(BaseClient):
         trace.icon = self._get_icon(
             trace_data["icon"], enka=self._use_enka_icons or "SkillIcons" in trace_data["icon"]
         )
-        trace.type = TraceType(trace_data["pointType"])
+        try:
+            trace.type = TraceType(trace_data["pointType"])
+        except ValueError:
+            trace.type = TraceType.UNKNOWN
+
         trace.max_level = trace_data["maxLevel"]
 
         for eidolon_id in unlocked_eidolon_ids:
