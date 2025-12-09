@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import math
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field, computed_field, field_validator, model_validator
@@ -21,15 +22,6 @@ __all__ = (
 )
 
 
-def _to_formatted_value(value: float, type_: StatType | AgentStatType, format_: str) -> str:
-    if type_ is AgentStatType.AAA:
-        value /= 100
-
-    if "%" in format_:
-        return f"{round(value / 100, 1)}%"
-    return str(int(value))
-
-
 class Stat(BaseModel):
     """Represents a agent's or W-Engine's stat.
 
@@ -44,12 +36,32 @@ class Stat(BaseModel):
     value: int
     name: str
     format: str
+    format_type: Literal["default", "ratio", "delta"] = "default"
 
     @computed_field
     @property
     def formatted_value(self) -> str:
         """The formatted value of the stat."""
-        return _to_formatted_value(self.value, self.type, self.format)
+        if self.format_type == "default":
+            s = str(math.floor(self.value))
+
+            if len(s) > 3:
+                s = s[:-3] + "," + s[-3:]
+            return s
+
+        if self.format_type == "ratio":
+            return f"{self.value / 100:.1f}%"
+
+        if self.format_type == "delta":
+            val = math.floor(self.value) / 100
+            s = f"{val:.2f}"
+
+            if s.endswith("0"):
+                return s[:-1]
+            return s
+
+        msg = f"Unknown format type: {self.format_type!r} for stat type {self.type.name}."
+        raise ValueError(msg)
 
 
 class AgentStat(Stat):

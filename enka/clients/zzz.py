@@ -107,6 +107,7 @@ class ZZZClient(BaseClient):
         main_stat_data = self._assets.property[str(disc.main_stat.type.value)]
         disc.main_stat.name = self._text_map[main_stat_data["Name"]]
         disc.main_stat.format = main_stat_data["Format"]
+        disc.main_stat.format_type = self._get_stat_format_type(main_stat_data)
 
         for sub in disc.sub_stats:
             sub.value *= sub.roll_times
@@ -114,6 +115,7 @@ class ZZZClient(BaseClient):
             sub_data = self._assets.property[str(sub.type.value)]
             sub.name = self._text_map[sub_data["Name"]]
             sub.format = sub_data["Format"]
+            sub.format_type = self._get_stat_format_type(sub_data)
 
     def _calc_engine_stats(self, engine: models.WEngine) -> None:
         # See https://api.enka.network/#/docs/zzz/api?id=w-engine for the formula
@@ -155,6 +157,17 @@ class ZZZClient(BaseClient):
         sub_stat_val = engine.sub_stat.value * (1 + rand_rate / 10000)
         engine.sub_stat.value = math.floor(sub_stat_val)
 
+    @staticmethod
+    def _get_stat_format_type(prop_data: dict) -> Literal["default", "ratio", "delta"]:
+        name = prop_data.get("Name", "")
+        if "Crit" in name or "Ratio" in name:
+            return "ratio"
+
+        if "pRec" in name:
+            return "delta"
+
+        return "default"
+
     def _post_process_engine(self, engine: models.WEngine) -> None:
         engine_data = self._assets.weapons[str(engine.id)]
         engine.name = self._text_map[engine_data["ItemName"]]
@@ -169,6 +182,7 @@ class ZZZClient(BaseClient):
             value=main_stat["PropertyValue"],
             name=self._text_map[main_stat_data["Name"]],
             format=main_stat_data["Format"],
+            format_type=self._get_stat_format_type(main_stat_data),
         )
 
         sub_stat = engine_data["SecondaryStat"]
@@ -178,6 +192,7 @@ class ZZZClient(BaseClient):
             value=sub_stat["PropertyValue"],
             name=self._text_map[sub_stat_data["Name"]],
             format=sub_stat_data["Format"],
+            format_type=self._get_stat_format_type(sub_stat_data),
         )
 
         self._calc_engine_stats(engine)
@@ -250,6 +265,7 @@ class ZZZClient(BaseClient):
                 value=math.floor(value),
                 name=self._text_map[self._assets.property[str(stat_type.value)]["Name"]],
                 format=self._assets.property[str(stat_type.value)]["Format"],
+                format_type=self._get_stat_format_type(self._assets.property[str(stat_type.value)]),
             )
             for stat_type, value in final_stats.items()
         }
