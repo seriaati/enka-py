@@ -357,7 +357,7 @@ wheels = [
 
 [[package]]
 name = "enka"
-version = "2.5.14"
+version = "2.5.15"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
