@@ -231,6 +231,7 @@ class Agent(BaseModel):
         skills: List of skills for the agent.
         discs: List of drive discs equipped by the agent.
         w_engine: The W-Engine associated with the agent.
+        potential_id: The ID of the agent's Potential.
         name: The name of the agent.
         rarity_num: The rarity number of the agent.
         elements: List of elements associated with the agent.
@@ -254,6 +255,7 @@ class Agent(BaseModel):
     skills: list[AgentSkill] = Field(alias="SkillLevelList")
     discs: list[DriveDisc] = Field(alias="EquippedList")
     w_engine: WEngine | None = Field(None, alias="Weapon")
+    potential_id: int = Field(alias="UpgradeId")
 
     # Fields that are not in the API response
     name: str = Field(default="")
@@ -296,3 +298,12 @@ class Agent(BaseModel):
     def core_skill_level(self) -> Literal["A", "B", "C", "D", "E", "F"]:
         """The agent's core skill level."""
         return "ABCDEF"[self.core_skill_level_num - 1]  # pyright: ignore[reportReturnType]
+
+    @computed_field
+    @property
+    def potential(self) -> int:
+        """The agent's potential level, 0 means this character has none."""
+        if self.potential_id == 0:
+            return 0
+        # Example: potential_id 117104 -> 5 (last digit +1)
+        return (self.potential_id % 10) + 1
