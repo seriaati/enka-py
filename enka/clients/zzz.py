@@ -201,6 +201,8 @@ class ZZZClient(BaseClient):
         disc_data = self._assets.equipments["Items"][str(disc.id)]
         disc.rarity_num = disc_data["Rarity"]
         disc.set_id = disc_data["SuitId"]
+        disc.set_name = self._text_map[f"EquipmentSuit_{disc.set_id}_name"]
+        disc.name = f"{disc.set_name} [{disc.slot}]"
         self._calc_disc_stats(disc)
 
     def _post_process_agent(self, agent: models.Agent) -> None:

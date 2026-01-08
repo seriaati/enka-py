@@ -130,6 +130,8 @@ class DriveDisc(BaseModel):
     # Fields that are not in the API response
     rarity_num: int = Field(default=0)
     set_id: int = Field(default=0)
+    set_name: str = ""
+    name: str = ""
 
     @field_validator("main_stat", mode="before")
     @classmethod
