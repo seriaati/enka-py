@@ -30,7 +30,7 @@ Developing something for Hoyoverse games? You might be interested in [other API 
 - Supports persistent caching using SQLite and allows custom caching strategies.
 - Implements stat calculations for HSR and ZZZ.
 - Uses [Pydantic v2](https://github.com/pydantic/pydantic), this also means full autocomplete support.
-- Seamlessly integrates with [GenshinData](https://gitlab.com/Dimbreath/AnimeGameData), [StarRailData](https://github.com/Dimbreath/StarRailData), and [ZenlessData](https://git.mero.moe/dimbreath/ZenlessData).
+- Seamlessly integrates with GenshinData, StarRailData, and ZenlessData.
 
 ## Installation
 
