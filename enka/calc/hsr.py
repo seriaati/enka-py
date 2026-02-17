@@ -83,6 +83,7 @@ DEFAULT_PROPS: Final[dict[str, float]] = {
     "AllDamageReduce": 0,
     "FatigueRatio": 0,
     "MinimumFatigueRatio": 0,
+    "ElationDamageAddedRatioBase": 0,
 }
 
 
