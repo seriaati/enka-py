@@ -99,7 +99,7 @@ class HSRClient(BaseClient):
         text_map = self._text_map
         data = self._assets.light_cones_data[str(light_cone.id)]
 
-        light_cone.name = text_map[light_cone.name]
+        light_cone.name = text_map[data["EquipmentName"]["Hash"]]
         light_cone.rarity = data["Rarity"]
         light_cone.icon = LightConeIcon(light_cone_id=light_cone.id)
         light_cone.path = Path(data["AvatarBaseType"])
