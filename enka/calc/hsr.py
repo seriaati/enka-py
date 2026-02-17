@@ -83,6 +83,7 @@ DEFAULT_PROPS: Final[dict[str, float]] = {
     "AllDamageReduce": 0,
     "FatigueRatio": 0,
     "MinimumFatigueRatio": 0,
+    "ElationDamageAddedRatio": 0,
     "ElationDamageAddedRatioBase": 0,
 }
 
@@ -174,7 +175,7 @@ class LayerGenerator:
         return layer
 
 
-class PropLayer:
+class PropLayer:  # noqa: PLR0904
     def __init__(self) -> None:
         self.props = DEFAULT_PROPS.copy()
 
@@ -272,6 +273,10 @@ class PropLayer:
     @property
     def imaginary_damage(self) -> float:
         return self.props["ImaginaryAddedRatio"] + self.props["AllDamageTypeAddedRatio"]
+
+    @property
+    def elation_damage(self) -> float:
+        return self.props["ElationDamageAddedRatioBase"] + self.props["ElationDamageAddedRatio"]
 
 
 class PropState:

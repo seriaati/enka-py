@@ -84,6 +84,7 @@ class StatType(StrEnum):
     QUANTUM_RES_BOOST = "QuantumResistance"
     IMAGINARY_DMG_BOOST = "ImaginaryAddedRatio"
     IMAGINARY_RES_BOOST = "ImaginaryResistance"
+    ELATION_DMG_BOOST = "ElationDamageAddedRatio"
 
     BASE_HP = "BaseHP"
     HP_DELTA = "HPDelta"

@@ -207,6 +207,7 @@ class HSRClient(BaseClient):
             StatType.WIND_DMG_BOOST: props.wind_damage,
             StatType.QUANTUM_DMG_BOOST: props.quantum_damage,
             StatType.IMAGINARY_DMG_BOOST: props.imaginary_damage,
+            StatType.ELATION_DMG_BOOST: props.elation_damage,
         }
 
         character.stats = {
