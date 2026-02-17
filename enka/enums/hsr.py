@@ -131,6 +131,7 @@ class Path(StrEnum):
     HARMONY = "Shaman"
     ABUNDANCE = "Priest"
     REMEMBRANCE = "Memory"
+    ELATION = "Elation"
     NONE = "None"
 
 
