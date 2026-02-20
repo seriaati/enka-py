@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import asyncio
 import contextlib
+import uuid
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import aiofiles
@@ -11,7 +14,7 @@ from loguru import logger
 from ..assets.gi.file_paths import PATH_TO_SOURCE as GI_PATH_TO_SOURCE
 from ..assets.hsr.file_paths import PATH_TO_SOURCE as HSR_PATH_TO_SOURCE
 from ..assets.zzz.file_paths import PATH_TO_SOURCE as ZZZ_PATH_TO_SOURCE
-from ..errors import AssetDownloadError, AssetKeyError
+from ..errors import AssetKeyError
 
 if TYPE_CHECKING:
     import pathlib
@@ -77,19 +80,37 @@ class AssetData(BaseAssetData):
 
     async def _download_json(self, session: aiohttp.ClientSession) -> None:
         url = PATH_TO_SOURCE[self._path]
-        logger.debug(f"Downloading from {url}")
+        file_path = Path(self._path)
 
-        async with session.get(url) as resp:
-            if resp.status != 200:
-                raise AssetDownloadError(resp.status, url)
+        await asyncio.to_thread(file_path.parent.mkdir, parents=True, exist_ok=True)
 
-            text = await resp.text()
+        temp_filename = f".tmp_{uuid.uuid4().hex}_{file_path.name}"
+        temp_path = file_path.parent / temp_filename
 
-            await aiofiles.os.makedirs(self._path.parent, exist_ok=True)
-            async with aiofiles.open(self._path, "w", encoding="utf-8") as f:
-                await f.write(text)
+        try:
+            logger.debug(f"Downloading {url} to {file_path}...")
 
-            self._data = orjson.loads(text)
+            async with session.get(url) as resp:
+                resp.raise_for_status()
+
+                async with aiofiles.open(temp_path, mode="wb") as f:
+                    async for chunk in resp.content.iter_chunked(1024):
+                        await f.write(chunk)
+
+            await aiofiles.os.replace(temp_path, file_path)
+
+        except Exception as e:
+            logger.error(f"Failed to download {url}: {e}")
+            raise
+
+        finally:
+            if await aiofiles.os.path.exists(temp_path):
+                try:
+                    await aiofiles.os.remove(temp_path)
+                except Exception as e:
+                    logger.error(f"Failed to remove temporary file {temp_path}: {e}")
+
+        self._data = await self._open_json()
 
     async def update(self, session: aiohttp.ClientSession) -> None:
         await self._download_json(session)
