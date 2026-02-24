@@ -11,7 +11,7 @@ from ..calc.hsr import LayerGenerator, PropState
 from ..constants.common import DEFAULT_TIMEOUT, HSR_API_URL, HSR_BACKUP_API_URL
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
 from ..errors import EnkaAPIError, WrongUIDFormatError
-from ..models.hsr import CharacterIcon, LightConeIcon, Player, ShowcaseResponse, Stat
+from ..models.hsr import CharacterIcon, LightConeIcon, ShowcaseResponse, Stat
 from ..models.hsr.build import Build
 from ..models.hsr.character import Eidolon
 from ..utils import is_hsr_cn_uid
@@ -19,6 +19,7 @@ from .base import BaseClient
 
 if TYPE_CHECKING:
     from ..models.enka.owner import Owner, OwnerInput
+    from ..models.hsr import Player
     from ..models.hsr.character import Character, LightCone, Relic, Trace
     from .cache import BaseTTLCache
 

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from loguru import logger as _logger
 
 from . import errors, gi, hsr, utils, zzz

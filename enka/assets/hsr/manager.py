@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from ..data import AssetData
 from ..manager import AssetManager
 from .file_paths import (

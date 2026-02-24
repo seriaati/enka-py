@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from pathlib import Path
 
 ASSET_PATH = Path(".enka_py/assets")

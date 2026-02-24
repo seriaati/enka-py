@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import math
 
 from enka.constants.common import CN_UID_PREFIXES

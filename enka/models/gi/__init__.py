@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from .build import *
 from .character import *
 from .costume import *

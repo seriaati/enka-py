@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Literal
 
 RARITY_MAP: dict[int, Literal["S", "A", "B"]] = {4: "S", 3: "A", 2: "B"}

@@ -9,9 +9,10 @@ from loguru import logger
 
 from ..constants.common import PROFILE_API_URL
 from ..errors import APIRequestTimeoutError, EnkaAPIError, raise_for_retcode
-from ..models.enka.owner import Owner, OwnerInput
+from ..models.enka.owner import Owner
 
 if TYPE_CHECKING:
+    from ..models.enka.owner import OwnerInput
     from .cache import BaseTTLCache
 
 

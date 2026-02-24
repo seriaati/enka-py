@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Final
 
 CN_UID_PREFIXES: Final[tuple[str, ...]] = ("1", "2", "5")

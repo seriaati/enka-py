@@ -2,6 +2,7 @@ line-length = 100
 target-version = "py310"
 
 [lint]
+future-annotations = true
 preview = true
 select = [
     "F",
@@ -73,7 +74,6 @@ max-complexity = 15
 convention = "google"
 
 [lint.isort]
-required-imports = ["from __future__ import annotations"]
 split-on-trailing-comma = false
 
 [format]

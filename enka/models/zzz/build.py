@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from ..enka.build import BaseBuild
 from .character import Agent
 
