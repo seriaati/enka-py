@@ -61,7 +61,6 @@ ignore = [
 "examples/*.py" = ["T201"]
 
 [lint.flake8-type-checking]
-quote-annotations = true
 runtime-evaluated-base-classes = [
     "pydantic.BaseModel",
     "pydantic_settings.BaseSettings",
