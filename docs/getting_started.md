@@ -78,6 +78,67 @@ async with enka.GenshinClient() as client:
         print("Game is in maintenance.")
 ```
 
+## Logging
+
+`enka` uses [Loguru](https://loguru.readthedocs.io/) for internal logging, and the logger is disabled by default.
+
+Enable it explicitly:
+
+```py
+from loguru import logger
+
+logger.enable("enka")
+```
+
+You can then configure your preferred log level by adding a sink.
+
+```py
+import sys
+from loguru import logger
+
+logger.enable("enka")
+
+# Optional: replace Loguru's default sink with your own configuration
+logger.remove()
+logger.add(sys.stderr, level="INFO")
+```
+
+Use `"DEBUG"` for verbose output when troubleshooting, or `"INFO"` / `"WARNING"` for quieter logs.
+
+## Gendered Text (ZZZ)
+
+Some languages (e.g. German) encode grammatical gender directly inside localized strings using the placeholder syntax `{M#...}` and `{F#...}`. For example, a title might be stored as:
+
+```text
+Wahre{M#r} Schüler{F#in} des Yunkuigipfels
+```
+
+`ZZZClient` resolves these automatically based on the `gender` option, which defaults to `enka.zzz.Gender.MALE`.
+
+```py
+import enka
+
+# Default – male variant is kept, female tokens are removed:
+# "Wahrer Schüler des Yunkuigipfels"
+async with enka.ZZZClient() as client:
+    showcase = await client.fetch_showcase(1300025292)
+    print(showcase.player.title.text)
+
+# Explicitly female:
+# "Wahre Schülerin des Yunkuigipfels"
+async with enka.ZZZClient(gender=enka.zzz.Gender.FEMALE) as client:
+    showcase = await client.fetch_showcase(1300025292)
+    print(showcase.player.title.text)
+```
+
+You can also change the gender at runtime via the `gender` property:
+
+```py
+client.gender = enka.zzz.Gender.FEMALE
+```
+
+Both `enka.zzz.Gender` enum values and plain strings (`"M"` / `"F"`) are accepted.
+
 ## Examples
 
 You can find more detailed examples in the [examples](https://github.com/seriaati/enka-py/tree/main/examples) folder.
