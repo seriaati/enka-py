@@ -27,6 +27,13 @@ class Language(StrEnum):
     SIMPLIFIED_CHINESE = "zh-cn"
 
 
+class Gender(StrEnum):
+    """ZZZ grammatical gender enum used for localized text variants."""
+
+    MALE = "M"
+    FEMALE = "F"
+
+
 class SkillType(IntEnum):
     """ZZZ character skill type."""
 

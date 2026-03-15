@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import math
+import re
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
@@ -28,14 +29,19 @@ class ZZZClient(BaseClient):
 
     Args:
         lang (Language | str): The language to use for the client, defaults to Language.ENGLISH.
+        gender (Gender | str): The grammatical gender used for gendered localized text,
+            defaults to Gender.MALE.
         headers (dict[str, Any] | None): The headers to use for the client, defaults to None.
         cache (BaseTTLCache | None): The cache to use for the client, defaults to None.
         timeout (int): The timeout for the client, defaults to DEFAULT_TIMEOUT.
     """
 
+    _TITLE_GENDER_PATTERN = re.compile(r"\{([MF])#([^{}]*)\}")
+
     def __init__(
         self,
         lang: enums.Language | str = enums.Language.ENGLISH,
+        gender: enums.Gender | str = enums.Gender.MALE,
         *,
         headers: dict[str, Any] | None = None,
         cache: BaseTTLCache | None = None,
@@ -44,6 +50,7 @@ class ZZZClient(BaseClient):
         super().__init__(headers=headers, cache=cache, timeout=timeout)
 
         self._lang = self._convert_lang(lang)
+        self._gender = self._convert_gender(gender)
         self._assets = ZZZ_ASSETS
 
     def _convert_lang(self, lang: enums.Language | str) -> enums.Language:
@@ -57,6 +64,17 @@ class ZZZClient(BaseClient):
 
         return lang
 
+    def _convert_gender(self, gender: enums.Gender | str) -> enums.Gender:
+        if isinstance(gender, str):
+            try:
+                gender = enums.Gender(gender.upper())
+            except ValueError as e:
+                available_genders = ", ".join(g.value for g in enums.Gender)
+                msg = f"Invalid gender: {gender}, must be one of {available_genders}"
+                raise ValueError(msg) from e
+
+        return gender
+
     @property
     def lang(self) -> enums.Language:
         return self._lang
@@ -65,6 +83,20 @@ class ZZZClient(BaseClient):
     def lang(self, lang: enums.Language | str) -> None:
         self._lang = self._convert_lang(lang)
         self._text_map = TextMap(self._lang, self._assets.text_map)
+
+    @property
+    def gender(self) -> enums.Gender:
+        return self._gender
+
+    @gender.setter
+    def gender(self, gender: enums.Gender | str) -> None:
+        self._gender = self._convert_gender(gender)
+
+    def _parse_gendered_text(self, text: str) -> str:
+        gender_token = self._gender.value
+        return self._TITLE_GENDER_PATTERN.sub(
+            lambda m: m.group(2) if m.group(1) == gender_token else "", text
+        )
 
     async def __aenter__(self) -> ZZZClient:
         await self.start()
@@ -274,7 +306,7 @@ class ZZZClient(BaseClient):
 
     def _post_process_title(self, title: models.Title) -> None:
         title_data = self._assets.titles[str(title.id)]
-        title.text = self._text_map[title_data["TitleText"]]
+        title.text = self._parse_gendered_text(self._text_map[title_data["TitleText"]])
         title.color1 = f"#{title_data['ColorA']}"
         title.color2 = f"#{title_data['ColorB']}"
 
