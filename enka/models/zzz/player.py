@@ -1,7 +1,9 @@
+import contextlib
 from typing import Any
 
 from deprecated import deprecated
-from pydantic import BaseModel, Field, field_validator, model_validator
+from loguru import logger
+from pydantic import BaseModel, Field, ValidationError, field_validator, model_validator
 
 __all__ = ("Medal", "Namecard", "Player", "Title")
 
@@ -90,6 +92,18 @@ class Player(BaseModel):
         info = value.pop("ProfileDetail", {})
         value.update(info)
         return value
+
+    @field_validator("medals", mode="before")
+    @classmethod
+    def __validate_medals(cls, value: list[dict[str, Any]]) -> list[Medal]:
+        valid: list[Medal] = []
+        for item in value:
+            try:
+                valid.append(Medal.model_validate(item))
+            except ValidationError:  # noqa: PERF203
+                logger.warning(f"Failed to parse medal: {item}")
+                continue
+        return valid
 
     @field_validator("title", mode="after")
     @classmethod
