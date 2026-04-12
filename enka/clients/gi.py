@@ -10,7 +10,7 @@ from ..assets.gi.manager import GI_ASSETS
 from ..constants.common import DEFAULT_TIMEOUT, GI_API_URL
 from ..constants.gi import CHARACTER_RARITY_MAP
 from ..enums.gi import Element, FightPropType, Language
-from ..errors import WrongUIDFormatError
+from ..errors import AssetKeyError, WrongUIDFormatError
 from ..models.gi import Constellation, Costume, Icon, Namecard, ShowcaseResponse
 from ..models.gi.build import Build
 from .base import BaseClient
@@ -75,35 +75,48 @@ class GenshinClient(BaseClient):
         return await super().__aexit__(exc_type, exc_val, exc_tb)
 
     def _post_process_player(self, player: Player) -> None:
-        # namecard
-        namecard_icon = self._assets.namecard_data[str(player.namecard_id)]["icon"]
-        player.namecard = Namecard(ui_path=namecard_icon)
-
-        # profile picture
-        profile_picture_id = str(player.profile_picture_id)
-        if len(profile_picture_id) == 8:
-            profile_picture_icon = self._assets.character_data[profile_picture_id]["SideIconName"]
-        else:
-            # pfps data always return circle icon, so we need to process it to side icon for the `Icon` object.
-            profile_picture_icon = (
-                self._assets.pfps_data[profile_picture_id]["iconPath"]
-                .replace("AvatarIcon", "AvatarIcon_Side")
-                .replace("_Circle", "")
+        try:
+            namecard_icon = self._assets.namecard_data[str(player.namecard_id)]["icon"]
+            player.namecard = Namecard(ui_path=namecard_icon)
+        except AssetKeyError:
+            logger.error(
+                f"Namecard data not found for {player.namecard_id}, consider calling update_assets()"
             )
-        player.profile_picture_icon = Icon(
-            side_icon_ui_path=profile_picture_icon, is_costume="Costume" in profile_picture_icon
-        )
+
+        profile_picture_id = str(player.profile_picture_id)
+        try:
+            if len(profile_picture_id) == 8:
+                profile_picture_icon = self._assets.character_data[profile_picture_id][
+                    "SideIconName"
+                ]
+            else:
+                profile_picture_icon = (
+                    self._assets.pfps_data[profile_picture_id]["iconPath"]
+                    .replace("AvatarIcon", "AvatarIcon_Side")
+                    .replace("_Circle", "")
+                )
+            player.profile_picture_icon = Icon(
+                side_icon_ui_path=profile_picture_icon, is_costume="Costume" in profile_picture_icon
+            )
+        except AssetKeyError:
+            logger.error(
+                f"Profile picture data not found for {player.profile_picture_id}, consider calling update_assets()"
+            )
 
     def _post_process_showcase_character(self, showcase_character: ShowcaseCharacter) -> None:
         if showcase_character.costume_id is None:
             return
 
-        # costume
-        costume_data = self._assets.character_data[str(showcase_character.id)]["Costumes"]
-        if costume_data is not None:
-            showcase_character.costume = Costume(
-                id=showcase_character.costume_id,
-                data=costume_data[str(showcase_character.costume_id)],
+        try:
+            costume_data = self._assets.character_data[str(showcase_character.id)]["Costumes"]
+            if costume_data is not None:
+                showcase_character.costume = Costume(
+                    id=showcase_character.costume_id,
+                    data=costume_data[str(showcase_character.costume_id)],
+                )
+        except AssetKeyError:
+            logger.error(
+                f"Character data not found for {showcase_character.id}, consider calling update_assets()"
             )
 
     def _post_process_weapon(self, weapon: Weapon) -> None:
@@ -113,17 +126,22 @@ class GenshinClient(BaseClient):
 
     def _post_process_talents(self, c: Character, data: dict[str, Any]) -> None:
         for talent in c.talents:
-            talent_data = self._assets.talents_data[str(talent.id)]
-            talent.name = self._text_map[talent_data["nameTextMapHash"]]
-            talent.icon = f"https://enka.network/ui/{talent_data['icon']}.png"
-            if c.talent_extra_level_map:
-                proud_map: dict[str, int] = data["ProudMap"]
-                proud_id = proud_map.get(str(talent.id))
-                if proud_id is None:
-                    continue
-                if extra_level := c.talent_extra_level_map.get(str(proud_id), 0):
-                    talent.level += extra_level
-                    talent.is_upgraded = True
+            try:
+                talent_data = self._assets.talents_data[str(talent.id)]
+                talent.name = self._text_map[talent_data["nameTextMapHash"]]
+                talent.icon = f"https://enka.network/ui/{talent_data['icon']}.png"
+                if c.talent_extra_level_map:
+                    proud_map: dict[str, int] = data["ProudMap"]
+                    proud_id = proud_map.get(str(talent.id))
+                    if proud_id is None:
+                        continue
+                    if extra_level := c.talent_extra_level_map.get(str(proud_id), 0):
+                        talent.level += extra_level
+                        talent.is_upgraded = True
+            except AssetKeyError:
+                logger.error(
+                    f"Talent data not found for {talent.id}, consider calling update_assets()"
+                )
 
     def _post_process_artifact(self, artifact: Artifact) -> None:
         artifact.name = self._text_map[artifact.name]
@@ -140,15 +158,25 @@ class GenshinClient(BaseClient):
                 const["id"] = const_id
                 all_consts.append(const)
 
-        consts: list[Constellation] = [
-            Constellation(
-                id=int(const["id"]),
-                name=self._text_map[const["nameTextMapHash"]],
-                icon=f"https://enka.network/ui/{const['icon']}.png",
-                unlocked=any(const["id"] == str(c.id) for c in c.constellations),
+        consts: list[Constellation] = []
+        for const in all_consts:
+            const_id = const["id"]
+            try:
+                name = self._text_map[const["nameTextMapHash"]]
+            except AssetKeyError:
+                logger.error(
+                    f"Constellation data not found for {const_id}, consider calling update_assets()"
+                )
+                continue
+
+            consts.append(
+                Constellation(
+                    id=int(const_id),
+                    name=name,
+                    icon=f"https://enka.network/ui/{const['icon']}.png",
+                    unlocked=any(const_id == str(c.id) for c in c.constellations),
+                )
             )
-            for const in all_consts
-        ]
         c.constellations = consts
 
     def _post_process_character(self, c: Character) -> None:
@@ -161,7 +189,13 @@ class GenshinClient(BaseClient):
             else str(c.id)
         )
 
-        data = self._assets.character_data[characer_id]
+        try:
+            data = self._assets.character_data[characer_id]
+        except AssetKeyError:
+            logger.error(
+                f"Character data not found for {characer_id}, consider calling update_assets()"
+            )
+            return
         # name
         character_name_text_map_hash = data["NameTextMapHash"]
         c.name = self._text_map[character_name_text_map_hash]

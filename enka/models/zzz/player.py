@@ -1,4 +1,3 @@
-import contextlib
 from typing import Any
 
 from deprecated import deprecated

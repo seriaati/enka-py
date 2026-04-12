@@ -10,7 +10,7 @@ from ..assets.hsr.manager import HSR_ASSETS
 from ..calc.hsr import LayerGenerator, PropState
 from ..constants.common import DEFAULT_TIMEOUT, HSR_API_URL, HSR_BACKUP_API_URL
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
-from ..errors import EnkaAPIError, WrongUIDFormatError
+from ..errors import AssetKeyError, EnkaAPIError, WrongUIDFormatError
 from ..models.hsr import CharacterIcon, LightConeIcon, ShowcaseResponse, Stat
 from ..models.hsr.build import Build
 from ..models.hsr.character import Eidolon
@@ -82,44 +82,50 @@ class HSRClient(BaseClient):
     def _post_process_relic(self, relic: Relic) -> None:
         text_map = self._text_map
 
-        relic_data = self._assets.relic_data[str(relic.id)]
-        relic.icon = self._get_icon(relic_data["Icon"])
-        relic.rarity = relic_data["Rarity"]
-        relic.set_id = relic_data["SetID"]
+        try:
+            relic_data = self._assets.relic_data[str(relic.id)]
+            relic.icon = self._get_icon(relic_data["Icon"])
+            relic.rarity = relic_data["Rarity"]
+            relic.set_id = relic_data["SetID"]
 
-        relic_set_data = self._assets.relic_set_data[str(relic.set_id)]
-        relic.set_name = text_map[relic_set_data["name"]]
+            relic_set_data = self._assets.relic_set_data[str(relic.set_id)]
+            relic.set_name = text_map[relic_set_data["name"]]
 
-        for stat in relic.stats:
-            stat.name = text_map[stat.type.value]
-            stat.icon = self._get_icon(
-                self._assets.property_config_data[stat.type.value], enka=self._use_enka_icons
-            )
+            for stat in relic.stats:
+                stat.name = text_map[stat.type.value]
+                stat.icon = self._get_icon(
+                    self._assets.property_config_data[stat.type.value], enka=self._use_enka_icons
+                )
+        except AssetKeyError:
+            logger.error(f"Relic data not found for {relic.id}, consider calling update_assets()")
 
     def _post_process_light_cone(self, light_cone: LightCone) -> None:
         text_map = self._text_map
-        data = self._assets.light_cones_data[str(light_cone.id)]
+        try:
+            data = self._assets.light_cones_data[str(light_cone.id)]
 
-        light_cone.name = text_map[data["EquipmentName"]["Hash"]]
-        light_cone.rarity = data["Rarity"]
-        light_cone.icon = LightConeIcon(light_cone_id=light_cone.id)
-        light_cone.path = Path(data["AvatarBaseType"])
+            light_cone.name = text_map[data["EquipmentName"]["Hash"]]
+            light_cone.rarity = data["Rarity"]
+            light_cone.icon = LightConeIcon(light_cone_id=light_cone.id)
+            light_cone.path = Path(data["AvatarBaseType"])
 
-        for stat in light_cone.stats:
-            stat.name = text_map[stat.type.value]
-            stat.icon = self._get_icon(
-                self._assets.property_config_data[stat.type.value], enka=self._use_enka_icons
+            for stat in light_cone.stats:
+                stat.name = text_map[stat.type.value]
+                stat.icon = self._get_icon(
+                    self._assets.property_config_data[stat.type.value], enka=self._use_enka_icons
+                )
+        except AssetKeyError:
+            logger.error(
+                f"Light cone data not found for {light_cone.id}, consider calling update_assets()"
             )
 
     def _post_process_trace(self, trace: Trace, unlocked_eidolon_ids: list[int]) -> None:
         skill_tree_data = self._assets.skill_tree_data
-        trace_data = skill_tree_data[str(trace.id)]
-
         try:
-            skill_ids: list[int] = trace_data["skillIds"]
-        except KeyError as e:
-            msg = "Skill IDs not found in trace data, please update the assets with `update_assets`"
-            raise RuntimeError(msg) from e
+            trace_data = skill_tree_data[str(trace.id)]
+        except AssetKeyError:
+            logger.error(f"Trace data not found for {trace.id}, consider calling update_assets()")
+            return
 
         trace.anchor = trace_data["anchor"]
         trace.icon = self._get_icon(
@@ -133,18 +139,32 @@ class HSRClient(BaseClient):
         trace.max_level = trace_data["maxLevel"]
 
         for eidolon_id in unlocked_eidolon_ids:
-            eidolon_data = self._assets.eidolon_data[str(eidolon_id)]
+            try:
+                eidolon_data = self._assets.eidolon_data[str(eidolon_id)]
+            except AssetKeyError:
+                logger.error(
+                    f"Eidolon data not found for {eidolon_id}, consider calling update_assets()"
+                )
+                continue
 
-            for skill_id in skill_ids:
-                if str(skill_id) in eidolon_data["SkillAddLevelList"]:
-                    trace.level += eidolon_data["SkillAddLevelList"][str(skill_id)]
-                    trace.boosted = True
-                    break
+            unprefixed_id = str(trace.id).removeprefix("1")
+
+            if unprefixed_id in eidolon_data["SkillAddLevelList"]:
+                trace.level += eidolon_data["SkillAddLevelList"][unprefixed_id]
+                trace.boosted = True
+                break
 
     def _post_process_character(self, character: Character) -> None:
         character.icon = CharacterIcon(character_id=character.id)
 
-        character_data = self._assets.character_data[str(character.id)]
+        try:
+            character_data = self._assets.character_data[str(character.id)]
+        except AssetKeyError:
+            logger.error(
+                f"Character data not found for {character.id}, consider calling update_assets()"
+            )
+            return
+
         text_map_hash = character_data["AvatarName"]["Hash"]
         character.name = self._text_map[text_map_hash]
         character.rarity = character_data["Rarity"]
@@ -154,7 +174,14 @@ class HSRClient(BaseClient):
         # Eidolons
         eidolon_ids: list[int] = character_data["RankIDList"]
         for i, eidolon_id in enumerate(eidolon_ids, start=1):
-            eidolon_data = self._assets.eidolon_data[str(eidolon_id)]
+            try:
+                eidolon_data = self._assets.eidolon_data[str(eidolon_id)]
+            except AssetKeyError:
+                logger.error(
+                    f"Eidolon data not found for {eidolon_id}, consider calling update_assets()"
+                )
+                continue
+
             character.eidolons.append(
                 Eidolon(
                     id=eidolon_id,
@@ -211,20 +238,30 @@ class HSRClient(BaseClient):
             StatType.ELATION_DMG_BOOST: props.elation_damage,
         }
 
-        character.stats = {
-            stat_type: Stat(
+        character.stats = {}
+        for stat_type, value in final_stats.items():
+            try:
+                icon_data = self._assets.property_config_data[stat_type.value]
+            except AssetKeyError:
+                logger.error(
+                    f"Property config data not found for {stat_type.value}, consider calling update_assets()"
+                )
+                continue
+
+            character.stats[stat_type] = Stat(
                 type=stat_type,
                 value=value,
                 name=self._text_map[stat_type.value],
-                icon=self._get_icon(
-                    self._assets.property_config_data[stat_type.value], enka=self._use_enka_icons
-                ),
+                icon=self._get_icon(icon_data, enka=self._use_enka_icons),
             )
-            for stat_type, value in final_stats.items()
-        }
 
     def _post_process_player(self, player: Player) -> None:
-        player.icon = self._get_icon(self._assets.avatar_data[player.icon]["Icon"])
+        try:
+            player.icon = self._get_icon(self._assets.avatar_data[player.icon]["Icon"])
+        except AssetKeyError:
+            logger.error(
+                f"Avatar data not found for {player.icon}, consider calling update_assets()"
+            )
 
     def _post_process_showcase(self, showcase: ShowcaseResponse) -> None:
         for character in showcase.characters:

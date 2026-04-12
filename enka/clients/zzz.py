@@ -201,44 +201,59 @@ class ZZZClient(BaseClient):
         return "default"
 
     def _post_process_engine(self, engine: models.WEngine) -> None:
-        engine_data = self._assets.weapons[str(engine.id)]
-        engine.name = self._text_map[engine_data["ItemName"]]
-        engine.rarity_num = engine_data["Rarity"]
-        engine.specialty = enums.ProfessionType(engine_data["ProfessionType"])
-        engine.icon = f"https://enka.network{engine_data['ImagePath']}"
+        try:
+            engine_data = self._assets.weapons[str(engine.id)]
+            engine.name = self._text_map[engine_data["ItemName"]]
+            engine.rarity_num = engine_data["Rarity"]
+            engine.specialty = enums.ProfessionType(engine_data["ProfessionType"])
+            engine.icon = f"https://enka.network{engine_data['ImagePath']}"
 
-        main_stat = engine_data["MainStat"]
-        main_stat_data = self._assets.property[str(main_stat["PropertyId"])]
-        engine.main_stat = models.Stat(
-            type=enums.StatType(main_stat["PropertyId"]),
-            value=main_stat["PropertyValue"],
-            name=self._text_map[main_stat_data["Name"]],
-            format=main_stat_data["Format"],
-            format_type=self._get_stat_format_type(main_stat_data),
-        )
+            main_stat = engine_data["MainStat"]
+            main_stat_data = self._assets.property[str(main_stat["PropertyId"])]
+            engine.main_stat = models.Stat(
+                type=enums.StatType(main_stat["PropertyId"]),
+                value=main_stat["PropertyValue"],
+                name=self._text_map[main_stat_data["Name"]],
+                format=main_stat_data["Format"],
+                format_type=self._get_stat_format_type(main_stat_data),
+            )
 
-        sub_stat = engine_data["SecondaryStat"]
-        sub_stat_data = self._assets.property[str(sub_stat["PropertyId"])]
-        engine.sub_stat = models.Stat(
-            type=enums.StatType(sub_stat["PropertyId"]),
-            value=sub_stat["PropertyValue"],
-            name=self._text_map[sub_stat_data["Name"]],
-            format=sub_stat_data["Format"],
-            format_type=self._get_stat_format_type(sub_stat_data),
-        )
+            sub_stat = engine_data["SecondaryStat"]
+            sub_stat_data = self._assets.property[str(sub_stat["PropertyId"])]
+            engine.sub_stat = models.Stat(
+                type=enums.StatType(sub_stat["PropertyId"]),
+                value=sub_stat["PropertyValue"],
+                name=self._text_map[sub_stat_data["Name"]],
+                format=sub_stat_data["Format"],
+                format_type=self._get_stat_format_type(sub_stat_data),
+            )
 
-        self._calc_engine_stats(engine)
+            self._calc_engine_stats(engine)
+        except AssetKeyError:
+            logger.error(
+                f"W-Engine data not found for {engine.id}, consider calling update_assets()"
+            )
 
     def _post_process_disc(self, disc: models.DriveDisc) -> None:
-        disc_data = self._assets.equipments["Items"][str(disc.id)]
-        disc.rarity_num = disc_data["Rarity"]
-        disc.set_id = disc_data["SuitId"]
-        disc.set_name = self._text_map[f"EquipmentSuit_{disc.set_id}_name"]
-        disc.name = f"{disc.set_name} [{disc.slot}]"
-        self._calc_disc_stats(disc)
+        try:
+            disc_data = self._assets.equipments["Items"][str(disc.id)]
+            disc.rarity_num = disc_data["Rarity"]
+            disc.set_id = disc_data["SuitId"]
+            disc.set_name = self._text_map[f"EquipmentSuit_{disc.set_id}_name"]
+            disc.name = f"{disc.set_name} [{disc.slot}]"
+            self._calc_disc_stats(disc)
+        except (AssetKeyError, KeyError):
+            logger.error(
+                f"Drive disc data not found for {disc.id}, consider calling update_assets()"
+            )
 
     def _post_process_agent(self, agent: models.Agent) -> None:
-        data = self._assets.avatars[str(agent.id)]
+        try:
+            data = self._assets.avatars[str(agent.id)]
+        except AssetKeyError:
+            logger.error(f"Agent data not found for {agent.id}, consider calling update_assets()")
+            return
+
         agent.name = self._text_map[data["Name"]]
         agent.rarity_num = data["Rarity"]
         agent.elements = [enums.Element(e) for e in data["ElementTypes"]]
@@ -305,10 +320,13 @@ class ZZZClient(BaseClient):
         }
 
     def _post_process_title(self, title: models.Title) -> None:
-        title_data = self._assets.titles[str(title.id)]
-        title.text = self._parse_gendered_text(self._text_map[title_data["TitleText"]])
-        title.color1 = f"#{title_data['ColorA']}"
-        title.color2 = f"#{title_data['ColorB']}"
+        try:
+            title_data = self._assets.titles[str(title.id)]
+            title.text = self._parse_gendered_text(self._text_map[title_data["TitleText"]])
+            title.color1 = f"#{title_data['ColorA']}"
+            title.color2 = f"#{title_data['ColorB']}"
+        except AssetKeyError:
+            logger.error(f"Title data not found for {title.id}, consider calling update_assets()")
 
     def _post_process_player(self, player: models.Player) -> None:
         if player.title is not None:

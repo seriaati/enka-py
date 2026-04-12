@@ -15,6 +15,7 @@ async def test_fetch_showcase(hsr_client: HSRClient) -> None:
         await hsr_client.fetch_showcase("809162009")
 
 
+@pytest.mark.skip(reason="Can't find a trailblazer showcase for now.")
 async def test_trailblazer_showcase(hsr_client: HSRClient) -> None:
     with contextlib.suppress(GameMaintenanceError):
         await hsr_client.fetch_showcase("123456786")

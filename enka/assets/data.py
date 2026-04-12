@@ -134,3 +134,10 @@ class TextMap(BaseAssetData):
         self, lang: gi.Language | hsr.Language | zzz.Language, text_map: AssetData
     ) -> None:
         super().__init__(text_map[lang.value])
+
+    def __getitem__(self, key: str) -> Any:
+        try:
+            return self.data[str(key)]
+        except KeyError:
+            logger.error(f"TextMap key {key!r} not found, consider calling update_assets()")
+            return str(key)
