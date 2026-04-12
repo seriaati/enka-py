@@ -127,12 +127,6 @@ class HSRClient(BaseClient):
             logger.error(f"Trace data not found for {trace.id}, consider calling update_assets()")
             return
 
-        try:
-            skill_ids: list[int] = trace_data["skillIds"]
-        except KeyError as e:
-            msg = "Skill IDs not found in trace data, please update the assets with `update_assets`"
-            raise RuntimeError(msg) from e
-
         trace.anchor = trace_data["anchor"]
         trace.icon = self._get_icon(
             trace_data["icon"], enka=self._use_enka_icons or "SkillIcons" in trace_data["icon"]
@@ -153,11 +147,12 @@ class HSRClient(BaseClient):
                 )
                 continue
 
-            for skill_id in skill_ids:
-                if str(skill_id) in eidolon_data["SkillAddLevelList"]:
-                    trace.level += eidolon_data["SkillAddLevelList"][str(skill_id)]
-                    trace.boosted = True
-                    break
+            unprefixed_id = str(trace.id).removeprefix("1")
+
+            if unprefixed_id in eidolon_data["SkillAddLevelList"]:
+                trace.level += eidolon_data["SkillAddLevelList"][unprefixed_id]
+                trace.boosted = True
+                break
 
     def _post_process_character(self, character: Character) -> None:
         character.icon = CharacterIcon(character_id=character.id)

@@ -14,16 +14,17 @@ PROPERTY_CONFIG_PATH = ASSET_PATH / "property_config.json"
 EIDOLON_DATA_PATH = ASSET_PATH / "eidolons.json"
 RELIC_SET_DATA_PATH = ASSET_PATH / "relic_set.json"
 
-ENKA_API_DOCS = "https://raw.githubusercontent.com/pizza-studio/EnkaDBGenerator/main/Sources/EnkaDBFiles/Resources/Specimen/HSR"
+PIZZA_ENKA_API_DOCS = "https://raw.githubusercontent.com/pizza-studio/EnkaDBGenerator/main/Sources/EnkaDBFiles/Resources/Specimen/HSR"
+ENKA_API_DOCS = "https://github.com/EnkaNetwork/API-docs/raw/refs/heads/master/store/hsr"
 ENKA_PY_ASSETS = "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data/hsr"
 
 PATH_TO_SOURCE: Final[dict[Path, str]] = {
-    CHARACTER_DATA_PATH: f"{ENKA_API_DOCS}/honker_characters.json",
-    LIGHT_CONE_DATA_PATH: f"{ENKA_API_DOCS}/honker_weps.json",
-    RELIC_DATA_PATH: f"{ENKA_API_DOCS}/honker_relics.json",
-    META_DATA_PATH: f"{ENKA_API_DOCS}/honker_meta.json",
-    AVATAR_DATA_PATH: f"{ENKA_API_DOCS}/honker_avatars.json",
-    EIDOLON_DATA_PATH: f"{ENKA_API_DOCS}/honker_ranks.json",
+    CHARACTER_DATA_PATH: f"{PIZZA_ENKA_API_DOCS}/honker_characters.json",
+    LIGHT_CONE_DATA_PATH: f"{PIZZA_ENKA_API_DOCS}/honker_weps.json",
+    RELIC_DATA_PATH: f"{PIZZA_ENKA_API_DOCS}/honker_relics.json",
+    META_DATA_PATH: f"{PIZZA_ENKA_API_DOCS}/honker_meta.json",
+    AVATAR_DATA_PATH: f"{PIZZA_ENKA_API_DOCS}/honker_avatars.json",
+    EIDOLON_DATA_PATH: f"{ENKA_API_DOCS}/ranks.json",
     SKILL_TREE_DATA_PATH: f"{ENKA_PY_ASSETS}/skill_tree.json",
     PROPERTY_CONFIG_PATH: f"{ENKA_PY_ASSETS}/property_config.json",
     TEXT_MAP_PATH: f"{ENKA_PY_ASSETS}/hsr.json",
