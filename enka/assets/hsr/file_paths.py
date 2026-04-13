@@ -7,6 +7,7 @@ TEXT_MAP_PATH = ASSET_PATH / "text_map.json"
 CHARACTER_DATA_PATH = ASSET_PATH / "characters.json"
 LIGHT_CONE_DATA_PATH = ASSET_PATH / "light_cone.json"
 RELIC_DATA_PATH = ASSET_PATH / "relic.json"
+SKILL_DATA_PATH = ASSET_PATH / "skill.json"
 SKILL_TREE_DATA_PATH = ASSET_PATH / "skill_tree.json"
 META_DATA_PATH = ASSET_PATH / "promotions.json"
 AVATAR_DATA_PATH = ASSET_PATH / "avatars.json"
@@ -22,6 +23,7 @@ PATH_TO_SOURCE: Final[dict[Path, str]] = {
     CHARACTER_DATA_PATH: f"{PIZZA_ENKA_API_DOCS}/honker_characters.json",
     LIGHT_CONE_DATA_PATH: f"{PIZZA_ENKA_API_DOCS}/honker_weps.json",
     RELIC_DATA_PATH: f"{PIZZA_ENKA_API_DOCS}/honker_relics.json",
+    SKILL_DATA_PATH: f"{ENKA_PY_ASSETS}/skill.json",
     META_DATA_PATH: f"{PIZZA_ENKA_API_DOCS}/honker_meta.json",
     AVATAR_DATA_PATH: f"{PIZZA_ENKA_API_DOCS}/honker_avatars.json",
     EIDOLON_DATA_PATH: f"{ENKA_API_DOCS}/ranks.json",

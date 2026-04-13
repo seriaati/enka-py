@@ -9,6 +9,7 @@ from .file_paths import (
     PROPERTY_CONFIG_PATH,
     RELIC_DATA_PATH,
     RELIC_SET_DATA_PATH,
+    SKILL_DATA_PATH,
     SKILL_TREE_DATA_PATH,
     TEXT_MAP_PATH,
 )
@@ -20,6 +21,7 @@ class HSRAssetManager(AssetManager):
     def __init__(self) -> None:
         self.text_map = AssetData(TEXT_MAP_PATH)
         self.character_data = AssetData(CHARACTER_DATA_PATH)
+        self.skill_data = AssetData(SKILL_DATA_PATH)
         self.skill_tree_data = AssetData(SKILL_TREE_DATA_PATH)
         self.light_cones_data = AssetData(LIGHT_CONE_DATA_PATH)
         self.relic_data = AssetData(RELIC_DATA_PATH)
@@ -32,6 +34,7 @@ class HSRAssetManager(AssetManager):
         self._assets = (
             self.text_map,
             self.character_data,
+            self.skill_data,
             self.skill_tree_data,
             self.light_cones_data,
             self.relic_data,

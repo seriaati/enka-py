@@ -120,23 +120,38 @@ class HSRClient(BaseClient):
             )
 
     def _post_process_trace(self, trace: Trace, unlocked_eidolon_ids: list[int]) -> None:
+        skill_data = self._assets.skill_data
         skill_tree_data = self._assets.skill_tree_data
+
         try:
-            trace_data = skill_tree_data[str(trace.id)]
+            tree_data = skill_tree_data[str(trace.id)]
         except AssetKeyError:
             logger.error(f"Trace data not found for {trace.id}, consider calling update_assets()")
             return
 
-        trace.anchor = trace_data["anchor"]
+        try:
+            data = skill_data[str(trace.id)]
+        except AssetKeyError:
+            # No logging error here because the data is partially incomplete, I can't find data
+            # for traces of characters with Enhancement, like Sparkle's Almanac.
+            pass
+        else:
+            trace.name = self._text_map[data["name"]]
+            trace.description = self._text_map[data["desc"]]
+            trace.effect = data["effect"]
+            trace.short_description = self._text_map[data["simple_desc"]]
+            trace.type_description = self._text_map[data["type_desc"]]
+
+        trace.anchor = tree_data["anchor"]
         trace.icon = self._get_icon(
-            trace_data["icon"], enka=self._use_enka_icons or "SkillIcons" in trace_data["icon"]
+            tree_data["icon"], enka=self._use_enka_icons or "SkillIcons" in tree_data["icon"]
         )
         try:
-            trace.type = TraceType(trace_data["pointType"])
+            trace.type = TraceType(tree_data["pointType"])
         except ValueError:
             trace.type = TraceType.UNKNOWN
 
-        trace.max_level = trace_data["maxLevel"]
+        trace.max_level = tree_data["maxLevel"]
 
         for eidolon_id in unlocked_eidolon_ids:
             try:

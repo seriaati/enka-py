@@ -33,6 +33,12 @@ class Trace(BaseModel):
     max_level: int = 0
     anchor: str = ""
     type: TraceType = TraceType.UNKNOWN
+    name: str = ""
+    description: str = ""
+    short_description: str = ""
+    type_description: str = ""
+    effect: str = ""
+    tag: str = ""
 
 
 class Stat(BaseModel):
