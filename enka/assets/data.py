@@ -136,6 +136,8 @@ class TextMap(BaseAssetData):
         super().__init__(text_map[lang.value])
 
     def __getitem__(self, key: str) -> Any:
+        if not key:
+            return key
         try:
             return self.data[str(key)]
         except KeyError:
