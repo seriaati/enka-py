@@ -200,7 +200,7 @@ class HSRClient(BaseClient):
             character.eidolons.append(
                 Eidolon(
                     id=eidolon_id,
-                    icon=self._get_icon(eidolon_data["IconPath"]),
+                    icon=self._get_icon(eidolon_data["IconPath"].removeprefix("/ui/hsr/")),
                     unlocked=i <= character.eidolons_unlocked,
                 )
             )
