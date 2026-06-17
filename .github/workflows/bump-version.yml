@@ -2,6 +2,15 @@ name: Bump Version
 
 on:
   workflow_dispatch:
+    inputs:
+      level:
+        description: "Version bump level"
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
 jobs:
   create-release:
@@ -16,7 +25,8 @@ jobs:
         uses: seriaati/update-ver-num@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-        
+          bump_type: ${{ github.event.inputs.level }}
+
       - name: Create release
         uses: seriaati/create-release@main
         with:
