@@ -35,6 +35,7 @@ dev = [
     "griffe-pydantic>=1.1.7",
     "redis[hiredis]>=6.2.0",
     "aiosqlite>=0.20.0",
+    "ruff>=0.15.17",
 ]
 docs = [
     "mkdocs-material>=9.6.15",
