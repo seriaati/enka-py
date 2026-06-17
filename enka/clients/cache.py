@@ -179,8 +179,10 @@ class RedisCache(BaseTTLCache):
         await self._pool.disconnect()
 
     async def get(self, key: str) -> str | None:
-        value: bytes | None = await self._redis.get(key)
-        return value.decode() if value else None
+        value = await self._redis.get(key)
+        if isinstance(value, bytes):
+            return value.decode()
+        return value
 
     async def set(self, key: str, value: str, ttl: int) -> None:
         await self._redis.setex(key, ttl, value)
