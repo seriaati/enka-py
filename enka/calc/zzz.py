@@ -50,6 +50,8 @@ DEFAULT_PROPS: Final[dict[str, float]] = {
     "AddedDamageRatio_Elec_Delta": 0,
     "AddedDamageRatio_Ether_Base": 0,
     "AddedDamageRatio_Ether_Delta": 0,
+    "AddedDamageRatio_Wind_Base": 0,
+    "AddedDamageRatio_Wind_Delta": 0,
     "RpRecover_Base": 0,
     "RpRecover_Ratio": 0,
     "RpRecover_Delta": 0,
@@ -102,6 +104,8 @@ PROP_ID_TO_NAME: Final[dict[int, str]] = {
     32003: "RpRecover_Delta",
     32201: "SkipDefDamageRatio_Base",
     32203: "SkipDefDamageRatio_Delta",
+    32301: "AddedDamageRatio_Wind_Base",
+    32303: "AddedDamageRatio_Wind_Delta",
 }
 
 

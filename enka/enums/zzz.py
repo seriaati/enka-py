@@ -166,6 +166,7 @@ class Element(StrEnum):
     FIRE_FROST = "FireFrost"
     AURIC_ETHER = "AuricEther"
     ZHEN_ASSAULT = "ZhenZhenAssault"
+    WIND = "Wind"
     UNKNOWN = "Unknown"
 
     @property
