@@ -390,9 +390,14 @@ sqlite = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "aiosqlite" },
+    { name = "griffe-pydantic" },
+    { name = "mkdocs-material" },
+    { name = "mkdocstrings", extra = ["python"] },
     { name = "pyright" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
+    { name = "redis", extra = ["hiredis"] },
 ]
 docs = [
     { name = "griffe-pydantic" },
@@ -422,9 +427,14 @@ provides-extras = ["redis", "sqlite"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "aiosqlite", specifier = ">=0.20.0" },
+    { name = "griffe-pydantic", specifier = ">=1.1.7" },
+    { name = "mkdocs-material", specifier = ">=9.6.15" },
+    { name = "mkdocstrings", extras = ["python"], specifier = ">=0.29.1" },
     { name = "pyright", specifier = ">=1.1.408" },
     { name = "pytest", specifier = ">=8.3.3" },
     { name = "pytest-asyncio", specifier = ">=0.24.0" },
+    { name = "redis", extras = ["hiredis"], specifier = ">=6.2.0" },
 ]
 docs = [
     { name = "griffe-pydantic", specifier = ">=1.1.7" },
