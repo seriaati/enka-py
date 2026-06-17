@@ -106,6 +106,9 @@ class StatType(IntEnum):
     ETHER_DMG_BONUS_BASE = 31901
     ETHER_DMG_BONUS_FLAT = 31903
 
+    WIND_DMG_BONUS_BASE = 32301
+    WIND_DMG_BONUS_FLAT = 32303
+
     AAA_BASE = 32001
     """Automatic Adrelanine Accumulation base."""
     AAA_PERCENT = 32002
@@ -140,6 +143,7 @@ class AgentStatType(IntEnum):
     ICE_DMG_BONUS = 317
     ELECTRIC_DMG_BONUS = 318
     ETHER_DMG_BONUS = 319
+    WIND_DMG_BONUS = 323
     SHEER_DMG_BONUS = 322
 
 
