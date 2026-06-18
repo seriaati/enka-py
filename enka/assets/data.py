@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 import aiofiles
 import aiofiles.os
+import aiohttp
 import orjson
 from loguru import logger
 
@@ -19,11 +20,18 @@ from ..errors import AssetKeyError
 if TYPE_CHECKING:
     import pathlib
 
-    import aiohttp
-
     from ..enums import gi, hsr, zzz
 
 PATH_TO_SOURCE = GI_PATH_TO_SOURCE | HSR_PATH_TO_SOURCE | ZZZ_PATH_TO_SOURCE
+
+# Streaming download tuning. `total` is intentionally unset: it would cap the
+# entire body read and trip on large files over slow links. `sock_read` is a
+# per-read inactivity timeout that resets on every chunk, so steady downloads of
+# any size succeed while genuinely stalled connections still abort.
+DOWNLOAD_TIMEOUT = aiohttp.ClientTimeout(total=None, sock_connect=10, sock_read=30)
+DOWNLOAD_CHUNK_SIZE = 1024 * 64
+DOWNLOAD_MAX_RETRIES = 3
+DOWNLOAD_RETRY_BACKOFF = 1  # base seconds, doubled each retry
 
 
 class BaseAssetData:
@@ -78,6 +86,18 @@ class AssetData(BaseAssetData):
                 return orjson.loads(await f.read())
         return None
 
+    async def _stream_to_file(
+        self, session: aiohttp.ClientSession, url: str, temp_path: Path, file_path: Path
+    ) -> None:
+        async with session.get(url, timeout=DOWNLOAD_TIMEOUT) as resp:
+            resp.raise_for_status()
+
+            async with aiofiles.open(temp_path, mode="wb") as f:
+                async for chunk in resp.content.iter_chunked(DOWNLOAD_CHUNK_SIZE):
+                    await f.write(chunk)
+
+        await aiofiles.os.replace(temp_path, file_path)
+
     async def _download_json(self, session: aiohttp.ClientSession) -> None:
         url = PATH_TO_SOURCE[self._path]
         file_path = Path(self._path)
@@ -88,20 +108,31 @@ class AssetData(BaseAssetData):
         temp_path = file_path.parent / temp_filename
 
         try:
-            logger.debug(f"Downloading {url} to {file_path}...")
+            for attempt in range(1, DOWNLOAD_MAX_RETRIES + 1):
+                logger.debug(
+                    f"Downloading {url} to {file_path} (attempt {attempt}/{DOWNLOAD_MAX_RETRIES})..."
+                )
+                try:
+                    await self._stream_to_file(session, url, temp_path, file_path)
+                    break
+                except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+                    # 4xx responses are not transient (e.g. 404); don't retry them.
+                    if isinstance(e, aiohttp.ClientResponseError) and e.status < 500:
+                        logger.error(f"Failed to download {url}: {e}")
+                        raise
 
-            async with session.get(url) as resp:
-                resp.raise_for_status()
+                    if attempt == DOWNLOAD_MAX_RETRIES:
+                        logger.error(
+                            f"Failed to download {url} after {DOWNLOAD_MAX_RETRIES} attempts: {e}"
+                        )
+                        raise
 
-                async with aiofiles.open(temp_path, mode="wb") as f:
-                    async for chunk in resp.content.iter_chunked(1024):
-                        await f.write(chunk)
-
-            await aiofiles.os.replace(temp_path, file_path)
-
-        except Exception as e:
-            logger.error(f"Failed to download {url}: {e}")
-            raise
+                    backoff = DOWNLOAD_RETRY_BACKOFF * 2 ** (attempt - 1)
+                    logger.warning(
+                        f"Download of {url} failed (attempt {attempt}/{DOWNLOAD_MAX_RETRIES}): "
+                        f"{e}; retrying in {backoff}s"
+                    )
+                    await asyncio.sleep(backoff)
 
         finally:
             if await aiofiles.os.path.exists(temp_path):
