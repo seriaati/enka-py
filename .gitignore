@@ -154,3 +154,4 @@ cython_debug/
 test.py
 .enka_py/*
 .vscode/
+.serena/
