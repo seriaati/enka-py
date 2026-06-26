@@ -268,7 +268,7 @@ class Character(BaseModel):
 
     name: str = ""
     icon: Icon = Icon(side_icon_ui_path="")
-    element: Element = Element.ANEMO
+    element: Element = Element.NONE
     talent_order: list[int] = Field(default_factory=list)
     rarity: int = 0
     namecard: Namecard | None = None
