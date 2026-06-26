@@ -181,11 +181,13 @@ class GenshinClient(BaseClient):
 
     def _post_process_character(self, c: Character) -> None:
         is_no_element_traveler = c.skill_depot_id in {501, 701}
+        is_no_element_manekin = c.skill_depot_id in {11801, 11701}
         is_traveler = c.id in {10000005, 10000007}
-        is_maniken = c.id in {10000117, 10000118}
+        is_manekin = c.id in {10000117, 10000118}
         characer_id = (
             f"{c.id}-{c.skill_depot_id}"
-            if (is_traveler and not is_no_element_traveler) or is_maniken
+            if (is_traveler and not is_no_element_traveler)
+            or (is_manekin and not is_no_element_manekin)
             else str(c.id)
         )
 
