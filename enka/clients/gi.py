@@ -185,7 +185,9 @@ class GenshinClient(BaseClient):
 
     def _post_process_character(self, c: Character) -> None:
         is_no_element_traveler = c.skill_depot_id in {501, 701}
-        characer_id = f"{c.id}-{c.skill_depot_id}"
+        is_traveler = c.id in {10000005, 10000007}
+        is_manekin = c.id in {10000117, 10000118}
+        characer_id = f"{c.id}-{c.skill_depot_id}" if is_traveler or is_manekin else str(c.id)
 
         try:
             data = self._assets.character_data[characer_id]
