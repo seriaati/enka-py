@@ -81,3 +81,8 @@ async def test_no_element_traveler(genshin_client: GenshinClient) -> None:
         showcase = await genshin_client.fetch_showcase("828107378")
         traveler = next(c for c in showcase.characters if c.name == "Traveler")
         assert traveler.element is Element.NONE
+
+
+async def test_no_element_manekin(genshin_client: GenshinClient) -> None:
+    with contextlib.suppress(GameMaintenanceError):
+        await genshin_client.fetch_showcase("753961395")
