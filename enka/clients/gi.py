@@ -196,6 +196,7 @@ class GenshinClient(BaseClient):
                 f"Character data not found for {characer_id}, consider calling update_assets()"
             )
             return
+
         # name
         character_name_text_map_hash = data["NameTextMapHash"]
         c.name = self._text_map[character_name_text_map_hash]
@@ -212,11 +213,10 @@ class GenshinClient(BaseClient):
         self._post_process_talents(c, data)
 
         # talent order
-        c.talent_order = [100540] if is_no_element_traveler else data["SkillOrder"]
+        c.talent_order = data["SkillOrder"]
 
         # element
-        element = data["Element"]
-        c.element = Element.NONE if is_no_element_traveler else Element(element)
+        c.element = Element(data["Element"])
 
         # rarity
         c.rarity = CHARACTER_RARITY_MAP[data["QualityType"]]
