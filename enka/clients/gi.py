@@ -144,8 +144,12 @@ class GenshinClient(BaseClient):
                 )
 
     def _post_process_artifact(self, artifact: Artifact) -> None:
+        data = self._assets.artifacts_data.get("Items", {}).get(str(artifact.id))
+        set_id = data["SetId"] if data else None
+        set_name_data = self._assets.artifacts_data.get("Sets", {}).get(str(set_id))
+
+        artifact.set_name = self._text_map[set_name_data["Name"]]
         artifact.name = self._text_map[artifact.name]
-        artifact.set_name = self._text_map[artifact.set_name]
         artifact.main_stat.name = self._text_map[artifact.main_stat.type.value]
 
         for stat in artifact.sub_stats:
