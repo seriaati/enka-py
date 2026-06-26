@@ -76,7 +76,7 @@ class GenshinClient(BaseClient):
 
     def _post_process_player(self, player: Player) -> None:
         try:
-            namecard_icon = self._assets.namecard_data[str(player.namecard_id)]["icon"]
+            namecard_icon = self._assets.namecard_data[str(player.namecard_id)]["Icon"]
             player.namecard = Namecard(ui_path=namecard_icon)
         except AssetKeyError:
             logger.error(
@@ -91,7 +91,7 @@ class GenshinClient(BaseClient):
                 ]
             else:
                 profile_picture_icon = (
-                    self._assets.pfps_data[profile_picture_id]["iconPath"]
+                    self._assets.pfps_data[profile_picture_id]["IconPath"]
                     .replace("AvatarIcon", "AvatarIcon_Side")
                     .replace("_Circle", "")
                 )
@@ -181,13 +181,11 @@ class GenshinClient(BaseClient):
 
     def _post_process_character(self, c: Character) -> None:
         is_no_element_traveler = c.skill_depot_id in {501, 701}
-        is_no_element_manekin = c.skill_depot_id in {11801, 11701}
         is_traveler = c.id in {10000005, 10000007}
         is_manekin = c.id in {10000117, 10000118}
         characer_id = (
             f"{c.id}-{c.skill_depot_id}"
-            if (is_traveler and not is_no_element_traveler)
-            or (is_manekin and not is_no_element_manekin)
+            if (is_traveler and not is_no_element_traveler) or is_manekin
             else str(c.id)
         )
 
