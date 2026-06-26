@@ -108,7 +108,7 @@ class GenshinClient(BaseClient):
             return
 
         try:
-            costume_data = self._assets.character_data[str(showcase_character.id)]["Costumes"]
+            costume_data = self._assets.character_data[str(showcase_character.id)].get("Costumes")
             if costume_data is not None:
                 showcase_character.costume = Costume(
                     id=showcase_character.costume_id,
