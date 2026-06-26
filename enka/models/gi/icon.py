@@ -1,7 +1,7 @@
 __all__ = ("Icon", "Namecard")
 
 
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel, computed_field, field_validator
 
 
 class Icon(BaseModel):
@@ -14,6 +14,11 @@ class Icon(BaseModel):
 
     side_icon_ui_path: str
     is_costume: bool = False
+
+    @field_validator("side_icon_ui_path", mode="after")
+    @classmethod
+    def __correct_path(cls, v: str) -> str:
+        return v.removeprefix("/ui/").removesuffix(".png")
 
     @computed_field
     @property
@@ -71,6 +76,11 @@ class Namecard(BaseModel):
     """
 
     ui_path: str
+
+    @field_validator("ui_path", mode="after")
+    @classmethod
+    def __correct_path(cls, v: str) -> str:
+        return v.removeprefix("/ui/").removesuffix(".jpg")
 
     @computed_field
     @property
