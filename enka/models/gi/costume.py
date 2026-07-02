@@ -14,6 +14,7 @@ class Costume(BaseModel):
        id: The costume's ID.
        icon: The costume's icon.
     """
+
     id: int
     data: dict[str, Any]
 
