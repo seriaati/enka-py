@@ -8,6 +8,12 @@ __all__ = ("Costume",)
 
 
 class Costume(BaseModel):
+    """Represents a character's costume.
+
+    Attributes:
+       id: The costume's ID.
+       icon: The costume's icon.
+    """
     id: int
     data: dict[str, Any]
 
