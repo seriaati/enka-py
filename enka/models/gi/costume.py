@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from pydantic import BaseModel, computed_field
 
@@ -8,18 +8,15 @@ __all__ = ("Costume",)
 
 
 class Costume(BaseModel):
-    """Represents a character's costume.
-
-    Attributes:
-       id: The costume's ID.
-       icon: The costume's icon.
-    """
-
     id: int
     data: dict[str, Any]
 
     @computed_field
     @property
-    def icon(self) -> Icon:
-        """The costume's icon."""
-        return Icon(side_icon_ui_path=self.data["SideIcon"], is_costume=True)
+    def icon(self) -> Optional[Icon]:
+        path = self.data.get("sideIconName")
+
+        if not path:
+            return None
+
+        return Icon(side_icon_ui_path=path, is_costume=True)
