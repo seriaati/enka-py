@@ -170,6 +170,7 @@ class Element(StrEnum):
     FIRE_FROST = "FireFrost"
     AURIC_ETHER = "AuricEther"
     ZHEN_ASSAULT = "ZhenZhenAssault"
+    LUMIFLUX = "Lumiflux"
     WIND = "Wind"
     UNKNOWN = "Unknown"
 
