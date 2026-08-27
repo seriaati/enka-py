@@ -23,4 +23,4 @@ __all__ = (
     "zzz",
 )
 
-_logger.disable("enka")  # noqa: RUF067
+_logger.disable("enka")  # ruff: ignore[non-empty-init-module]

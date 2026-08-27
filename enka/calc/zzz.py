@@ -198,7 +198,7 @@ class LayerGenerator:
         return layer
 
 
-class PropLayer:  # noqa: PLR0904
+class PropLayer:  # ruff: ignore[too-many-public-methods]
     def __init__(self) -> None:
         self.props = DEFAULT_PROPS.copy()
 

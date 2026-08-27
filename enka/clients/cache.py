@@ -106,7 +106,7 @@ class SQLiteCache(BaseTTLCache):
 
     async def start(self) -> None:
         try:
-            import aiosqlite  # noqa: PLC0415
+            import aiosqlite  # ruff: ignore[import-outside-top-level]
         except ImportError as e:
             msg = "aiosqlite not available. Use: pip install enka[sqlite]"
             raise ImportError(msg) from e
@@ -160,7 +160,7 @@ class RedisCache(BaseTTLCache):
         **kwargs: Any,
     ) -> None:
         try:
-            import redis.asyncio as redis  # noqa: PLC0415
+            import redis.asyncio as redis  # ruff: ignore[import-outside-top-level]
         except ImportError as e:
             msg = "redis.asyncio not available. Use: pip install enka[redis]"
             raise ImportError(msg) from e

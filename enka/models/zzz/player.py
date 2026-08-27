@@ -99,7 +99,7 @@ class Player(BaseModel):
         for item in value:
             try:
                 valid.append(Medal.model_validate(item))
-            except ValidationError:  # noqa: PERF203
+            except ValidationError:  # ruff: ignore[try-except-in-loop]
                 logger.warning(f"Failed to parse medal: {item}")
                 continue
         return valid
