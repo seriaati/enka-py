@@ -30,7 +30,7 @@ jobs:
         uses: astral-sh/setup-uv@v8.3.2
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
 
       - name: Install Project
         run: uv sync --frozen --no-dev --group test
