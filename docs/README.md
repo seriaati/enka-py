@@ -54,11 +54,13 @@ pip install enka[redis]
 import enka
 import asyncio
 
+
 async def main() -> None:
     async with enka.GenshinClient(enka.gi.Language.ENGLISH) as client:
-      response = await client.fetch_showcase(901211014)
-      print(response.player.nickname)
-      print(response.characters[0].name)
+        response = await client.fetch_showcase(901211014)
+        print(response.player.nickname)
+        print(response.characters[0].name)
+
 
 asyncio.run(main())
 ```
