@@ -156,6 +156,7 @@ class ProfessionType(StrEnum):
     SUPPORT = "Support"
     ANOMALY = "Anomaly"
     RUPTURE = "Rupture"
+    ARMORER = "Armorer"
     UNKNOWN = "Unknown"
 
 
