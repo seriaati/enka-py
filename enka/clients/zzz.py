@@ -293,7 +293,7 @@ class ZZZClient(BaseClient):
             enums.AgentStatType.IMPACT: props.break_stun,
             enums.AgentStatType.CRIT_RATE: props.crit,
             enums.AgentStatType.CRIT_DMG: props.crit_dmg,
-            enums.AgentStatType.SHARP_CRIT_DMG: props.sharp_crit_dmg,
+            enums.AgentStatType.LACERATION_DMG: props.laceration_dmg,
             enums.AgentStatType.PEN_RATIO: props.pen_ratio,
             enums.AgentStatType.PEN: props.pen_delta,
             enums.AgentStatType.ENERGY_REGEN: props.sp_recover,

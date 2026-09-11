@@ -205,7 +205,7 @@ class PropLayer:  # ruff: ignore[too-many-public-methods]
         return self.props["CritDmg_Base"] + self.props["CritDmg_Delta"]
 
     @property
-    def sharp_crit_dmg(self) -> float:
+    def laceration_dmg(self) -> float:
         return self.props["SharpCriticalDamage_Base"] + self.props["SharpCriticalDamage_Delta"]
 
     @property
