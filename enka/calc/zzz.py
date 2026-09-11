@@ -59,6 +59,9 @@ PROP_ID_TO_NAME: Final[dict[int, str]] = {
     32203: "SkipDefDamageRatio_Delta",
     32301: "AddedDamageRatio_Wind_Base",
     32303: "AddedDamageRatio_Wind_Delta",
+    32401: "EpRecover_Base",
+    32402: "EpRecover_Ratio",
+    32403: "EpRecover_Delta",
 }
 
 
