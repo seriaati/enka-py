@@ -1,91 +1,11 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..assets.hsr.manager import HSRAssetManager
     from ..models.hsr import Character, LightCone, Relic
-
-DEFAULT_PROPS: Final[dict[str, float]] = {
-    "BaseHP": 0,
-    "HPAddedRatio": 0,
-    "HPDelta": 0,
-    "HPConvert": 0,
-    "BaseAttack": 0,
-    "AttackAddedRatio": 0,
-    "AttackDelta": 0,
-    "AttackConvert": 0,
-    "BaseDefence": 0,
-    "DefenceAddedRatio": 0,
-    "DefenceDelta": 0,
-    "DefenceConvert": 0,
-    "BaseSpeed": 0,
-    "SpeedAddedRatio": 0,
-    "SpeedDelta": 0,
-    "SpeedConvert": 0,
-    "CriticalChance": 0,
-    "CriticalChanceBase": 0,
-    "CriticalDamage": 0,
-    "CriticalDamageBase": 0,
-    "SPRatio": 0,
-    "SPRatioBase": 0,
-    "SPRatioConvert": 0,
-    "StatusProbability": 0,
-    "StatusProbabilityBase": 0,
-    "StatusProbabilityConvert": 0,
-    "StatusResistance": 0,
-    "StatusResistanceBase": 0,
-    "StatusResistanceConvert": 0,
-    "HealRatioBase": 0,
-    "HealRatioConvert": 0,
-    "HealTakenRatio": 0,
-    "ShieldAddedRatio": 0,
-    "ShieldTakenRatio": 0,
-    "AggroBase": 0,
-    "AggroAddedRatio": 0,
-    "AggroDelta": 0,
-    "BreakDamageAddedRatio": 0,
-    "BreakDamageAddedRatioBase": 0,
-    "AllDamageTypeResistance": 0,
-    "PhysicalResistanceDelta": 0,
-    "FireResistanceDelta": 0,
-    "IceResistanceDelta": 0,
-    "ThunderResistanceDelta": 0,
-    "QuantumResistanceDelta": 0,
-    "ImaginaryResistanceDelta": 0,
-    "WindResistanceDelta": 0,
-    "PhysicalPenetrate": 0,
-    "FirePenetrate": 0,
-    "IcePenetrate": 0,
-    "ThunderPenetrate": 0,
-    "QuantumPenetrate": 0,
-    "ImaginaryPenetrate": 0,
-    "WindPenetrate": 0,
-    "AllDamageTypeTakenRatio": 0,
-    "PhysicalTakenRatio": 0,
-    "FireTakenRatio": 0,
-    "IceTakenRatio": 0,
-    "ThunderTakenRatio": 0,
-    "QuantumTakenRatio": 0,
-    "ImaginaryTakenRatio": 0,
-    "WindTakenRatio": 0,
-    "AllDamageTypeAddedRatio": 0,
-    "DOTDamageAddedRatio": 0,
-    "PhysicalAddedRatio": 0,
-    "FireAddedRatio": 0,
-    "IceAddedRatio": 0,
-    "ThunderAddedRatio": 0,
-    "QuantumAddedRatio": 0,
-    "ImaginaryAddedRatio": 0,
-    "WindAddedRatio": 0,
-    "StanceBreakAddedRatio": 0,
-    "AllDamageReduce": 0,
-    "FatigueRatio": 0,
-    "MinimumFatigueRatio": 0,
-    "ElationDamageAddedRatio": 0,
-    "ElationDamageAddedRatioBase": 0,
-}
 
 
 class LayerGenerator:
@@ -177,13 +97,9 @@ class LayerGenerator:
 
 class PropLayer:  # ruff: ignore[too-many-public-methods]
     def __init__(self) -> None:
-        self.props = DEFAULT_PROPS.copy()
+        self.props: defaultdict[str, float] = defaultdict(float)
 
     def add(self, name: str, value: float) -> None:
-        if name not in self.props:
-            msg = f"Invalid stat name: {name!r}"
-            raise ValueError(msg)
-
         self.props[name] += value
 
     @property

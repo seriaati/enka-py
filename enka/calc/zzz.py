@@ -10,55 +10,6 @@ if TYPE_CHECKING:
     from enka.assets.zzz.manager import ZZZAssetManager
     from enka.models.zzz.character import Agent, DriveDisc, WEngine
 
-DEFAULT_PROPS: Final[dict[str, float]] = {
-    "HpMax_Base": 0,
-    "HpMax_Ratio": 0,
-    "HpMax_Delta": 0,
-    "Atk_Base": 0,
-    "Atk_Ratio": 0,
-    "Atk_Delta": 0,
-    "BreakStun_Base": 0,
-    "BreakStun_Ratio": 0,
-    "SkipDefAtk_Base": 0,
-    "SkipDefAtk_Delta": 0,
-    "Def_Base": 0,
-    "Def_Ratio": 0,
-    "Def_Delta": 0,
-    "Crit_Base": 0,
-    "Crit_Delta": 0,
-    "CritDmg_Base": 0,
-    "CritDmg_Delta": 0,
-    "PenRatio_Base": 0,
-    "PenRatio_Delta": 0,
-    "PenDelta_Base": 0,
-    "PenDelta_Delta": 0,
-    "SpRecover_Base": 0,
-    "SpRecover_Ratio": 0,
-    "SpRecover_Delta": 0,
-    "ElementMystery_Base": 0,
-    "ElementMystery_Delta": 0,
-    "ElementAbnormalPower_Base": 0,
-    "ElementAbnormalPower_Ratio": 0,
-    "ElementAbnormalPower_Delta": 0,
-    "AddedDamageRatio_Physics_Base": 0,
-    "AddedDamageRatio_Physics_Delta": 0,
-    "AddedDamageRatio_Fire_Base": 0,
-    "AddedDamageRatio_Fire_Delta": 0,
-    "AddedDamageRatio_Ice_Base": 0,
-    "AddedDamageRatio_Ice_Delta": 0,
-    "AddedDamageRatio_Elec_Base": 0,
-    "AddedDamageRatio_Elec_Delta": 0,
-    "AddedDamageRatio_Ether_Base": 0,
-    "AddedDamageRatio_Ether_Delta": 0,
-    "AddedDamageRatio_Wind_Base": 0,
-    "AddedDamageRatio_Wind_Delta": 0,
-    "RpRecover_Base": 0,
-    "RpRecover_Ratio": 0,
-    "RpRecover_Delta": 0,
-    "SkipDefDamageRatio_Base": 0,
-    "SkipDefDamageRatio_Delta": 0,
-}
-
 PROP_ID_TO_NAME: Final[dict[int, str]] = {
     11101: "HpMax_Base",
     11102: "HpMax_Ratio",
@@ -200,13 +151,9 @@ class LayerGenerator:
 
 class PropLayer:  # ruff: ignore[too-many-public-methods]
     def __init__(self) -> None:
-        self.props = DEFAULT_PROPS.copy()
+        self.props: defaultdict[str, float] = defaultdict(float)
 
     def add(self, name: str, value: float) -> None:
-        if name not in self.props:
-            msg = f"Invalid stat name: {name!r}"
-            raise ValueError(msg)
-
         self.props[name] += value
 
     @property
