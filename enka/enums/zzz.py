@@ -72,6 +72,9 @@ class StatType(IntEnum):
     CRIT_DMG_BASE = 21101
     CRIT_DMG_FLAT = 21103
 
+    SHARP_CRIT_DMG_BASE = 21301
+    SHARP_CRIT_DMG_FLAT = 21303
+
     PEN_RATIO_BASE = 23101
     PEN_RATIO_FLAT = 23103
 
@@ -119,6 +122,13 @@ class StatType(IntEnum):
     SHEER_DMG_BONUS_BASE = 32201
     SHEER_DMG_BONUS_FLAT = 32203
 
+    ASA_BASE = 32401
+    """Automatic Sharpness Accumulation base."""
+    ASA_PERCENT = 32402
+    """Automatic Sharpness Accumulation percent."""
+    ASA_FLAT = 32403
+    """Automatic Sharpness Accumulation flat."""
+
 
 class AgentStatType(IntEnum):
     """ZZZ stat type for agents."""
@@ -129,6 +139,7 @@ class AgentStatType(IntEnum):
     IMPACT = 122
     CRIT_RATE = 201
     CRIT_DMG = 211
+    SHARP_CRIT_DMG = 213
     ANOMALY_PROFICIENCY = 312
     ANOMALY_MASTERY = 314
     PEN_RATIO = 231
@@ -137,6 +148,8 @@ class AgentStatType(IntEnum):
     SHEER_FORCE = 123
     AAA = 320
     """Automatic Adrenaline Accumulation."""
+    ASA = 324
+    """Automatic Sharpness Accumulation."""
 
     PHYSICAL_DMG_BONUS = 315
     FIRE_DMG_BONUS = 316

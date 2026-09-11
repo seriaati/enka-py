@@ -30,6 +30,8 @@ PROP_ID_TO_NAME: Final[dict[int, str]] = {
     20103: "Crit_Delta",
     21101: "CritDmg_Base",
     21103: "CritDmg_Delta",
+    21301: "SharpCriticalDamage_Base",
+    21303: "SharpCriticalDamage_Delta",
     23101: "PenRatio_Base",
     23103: "PenRatio_Delta",
     23201: "PenDelta_Base",
@@ -203,6 +205,10 @@ class PropLayer:  # ruff: ignore[too-many-public-methods]
         return self.props["CritDmg_Base"] + self.props["CritDmg_Delta"]
 
     @property
+    def sharp_crit_dmg(self) -> float:
+        return self.props["SharpCriticalDamage_Base"] + self.props["SharpCriticalDamage_Delta"]
+
+    @property
     def pen_ratio(self) -> float:
         return self.props["PenRatio_Base"] + self.props["PenRatio_Delta"]
 
@@ -267,6 +273,13 @@ class PropLayer:  # ruff: ignore[too-many-public-methods]
         return (
             self.props["RpRecover_Base"] * (1 + self.props["RpRecover_Ratio"] / 10_000)
             + self.props["RpRecover_Delta"]
+        )
+
+    @property
+    def ep_recover(self) -> float:
+        return (
+            self.props["EpRecover_Base"] * (1 + self.props["EpRecover_Ratio"] / 10_000)
+            + self.props["EpRecover_Delta"]
         )
 
 
