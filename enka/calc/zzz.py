@@ -4,6 +4,8 @@ import math
 from collections import defaultdict
 from typing import TYPE_CHECKING, Final
 
+from loguru import logger
+
 from ..enums.zzz import ProfessionType
 
 if TYPE_CHECKING:
@@ -64,6 +66,13 @@ class LayerGenerator:
     def __init__(self, assets: ZZZAssetManager) -> None:
         self._assets = assets
 
+    def _add(self, layer: PropLayer, prop_id: int, value: float) -> None:
+        name = PROP_ID_TO_NAME.get(prop_id)
+        if name is None:
+            logger.error(f"Unknown ZZZ prop ID {prop_id}, skipping")
+            return
+        layer.add(name, value)
+
     def character(self, a: Agent) -> PropLayer:
         layer = PropLayer()
         excel = self._assets.avatars.data[str(a.id)]
@@ -76,7 +85,7 @@ class LayerGenerator:
                 promotion = 0
 
             computed = base + growth + promotion
-            layer.add(PROP_ID_TO_NAME[int(prop_id)], computed)
+            self._add(layer, int(prop_id), computed)
 
         return layer
 
@@ -86,15 +95,15 @@ class LayerGenerator:
         props = excel["CoreEnhancementProps"][a.core_skill_level_num]
 
         for prop_id, core in props.items():
-            layer.add(PROP_ID_TO_NAME[int(prop_id)], core)
+            self._add(layer, int(prop_id), core)
 
         return layer
 
     def weapon(self, w: WEngine) -> PropLayer:
         layer = PropLayer()
 
-        layer.add(PROP_ID_TO_NAME[w.main_stat.type.value], w.main_stat.value)
-        layer.add(PROP_ID_TO_NAME[w.sub_stat.type.value], w.sub_stat.value)
+        self._add(layer, w.main_stat.type.value, w.main_stat.value)
+        self._add(layer, w.sub_stat.type.value, w.sub_stat.value)
 
         return layer
 
@@ -102,10 +111,10 @@ class LayerGenerator:
         layer = PropLayer()
 
         for d in ds:
-            layer.add(PROP_ID_TO_NAME[d.main_stat.type.value], d.main_stat.value)
+            self._add(layer, d.main_stat.type.value, d.main_stat.value)
 
             for sub in d.sub_stats:
-                layer.add(PROP_ID_TO_NAME[sub.type.value], sub.value)
+                self._add(layer, sub.type.value, sub.value)
 
         return layer
 
@@ -122,7 +131,7 @@ class LayerGenerator:
             set_data = self._assets.equipments["Suits"][str(set_id)]
             bonus_props: dict[str, int] = set_data["SetBonusProps"]
             for prop_id, value in bonus_props.items():
-                layer.add(PROP_ID_TO_NAME[int(prop_id)], value)
+                self._add(layer, int(prop_id), value)
 
         return layer
 
