@@ -14,7 +14,7 @@ The `enka-api` package will continue to be available, but new updates will be re
 ## Introduction
 
 enka.py is an async API wrapper for [Enka Network](https://enka.network/) written in Python.  
-Developing something for Hoyoverse games? You might be interested in [other API wrappers](https://github.com/seriaati#api-wrappers) written by me.
+Developing something for Hoyoverse games? You might be interested in [other API wrappers](https://projects.seria.moe/projects/#wrapper) written by me.
 
 - [Enka Network API docs](http://api.enka.network/)
 - [Documentation for this wrapper](https://gh.seria.moe/enka-py)
