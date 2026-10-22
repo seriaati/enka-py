@@ -37,9 +37,9 @@ class CharacterIcon(BaseModel):
         """Character icon in card shape.
 
         Provided by Project Yatta.
-        e.g. https://api.yatta.top/hsr/assets/UI//avatar/medium/1001.png
+        e.g. https://sr.yatta.moe/hsr/assets/UI//avatar/medium/1001.png
         """
-        return f"https://api.yatta.top/hsr/assets/UI//avatar/medium/{self.character_id}.png"
+        return f"https://sr.yatta.moe/hsr/assets/UI//avatar/medium/{self.character_id}.png"
 
 
 class LightConeIcon(BaseModel):
@@ -66,6 +66,6 @@ class LightConeIcon(BaseModel):
         """Light cone icon item.
 
         Provided by Project Yatta.
-        e.g. https://api.yatta.top/hsr/assets/UI//equipment/medium/20000.png
+        e.g. https://sr.yatta.moe/hsr/assets/UI//equipment/medium/20000.png
         """
-        return f"https://api.yatta.top/hsr/assets/UI//equipment/medium/{self.light_cone_id}.png"
+        return f"https://sr.yatta.moe/hsr/assets/UI//equipment/medium/{self.light_cone_id}.png"
