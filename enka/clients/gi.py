@@ -149,7 +149,9 @@ class GenshinClient(BaseClient):
         set_name_data = self._assets.artifacts_data.get("Sets", {}).get(str(set_id))
 
         artifact.set_name = self._text_map[set_name_data["Name"]]
-        artifact.name = self._text_map[artifact.name]
+        # Look up the name by ID, saved builds can carry stale nameTextMapHash values
+        item_data = self._assets.artifact_items_data.get("Items", {}).get(str(artifact.id), {})
+        artifact.name = self._text_map[item_data.get("nameTextMapHash", artifact.name)]
         artifact.main_stat.name = self._text_map[artifact.main_stat.type.value]
 
         for stat in artifact.sub_stats:

@@ -2,6 +2,7 @@ from ..data import AssetData
 from ..manager import AssetManager
 from .file_paths import (
     ARITFACTS_PATH,
+    ARTIFACT_ITEMS_PATH,
     CHARACTER_DATA_PATH,
     CONSTS_DATA_PATH,
     NAMECARD_DATA_PATH,
@@ -22,6 +23,7 @@ class GIAssetManager(AssetManager):
         self.talents_data = AssetData(TALENTS_DATA_PATH)
         self.pfps_data = AssetData(PFPS_DATA_PATH)
         self.artifacts_data = AssetData(ARITFACTS_PATH)
+        self.artifact_items_data = AssetData(ARTIFACT_ITEMS_PATH)
 
         self._assets = (
             self.text_map,
@@ -31,6 +33,7 @@ class GIAssetManager(AssetManager):
             self.talents_data,
             self.pfps_data,
             self.artifacts_data,
+            self.artifact_items_data,
         )
 
 
