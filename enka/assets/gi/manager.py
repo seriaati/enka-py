@@ -9,6 +9,7 @@ from .file_paths import (
     PFPS_DATA_PATH,
     TALENTS_DATA_PATH,
     TEXT_MAP_PATH,
+    WEAPONS_DATA_PATH,
 )
 
 
@@ -24,6 +25,7 @@ class GIAssetManager(AssetManager):
         self.pfps_data = AssetData(PFPS_DATA_PATH)
         self.artifacts_data = AssetData(ARITFACTS_PATH)
         self.artifact_items_data = AssetData(ARTIFACT_ITEMS_PATH)
+        self.weapons_data = AssetData(WEAPONS_DATA_PATH)
 
         self._assets = (
             self.text_map,
@@ -34,6 +36,7 @@ class GIAssetManager(AssetManager):
             self.pfps_data,
             self.artifacts_data,
             self.artifact_items_data,
+            self.weapons_data,
         )
 
 

@@ -120,7 +120,9 @@ class GenshinClient(BaseClient):
             )
 
     def _post_process_weapon(self, weapon: Weapon) -> None:
-        weapon.name = self._text_map[weapon.name]
+        # Look up the name by ID, saved builds can carry stale nameTextMapHash values
+        weapon_data = self._assets.weapons_data.get(str(weapon.item_id), {})
+        weapon.name = self._text_map[weapon_data.get("nameTextMapHash", weapon.name)]
         for stat in weapon.stats:
             stat.name = self._text_map[stat.type.value]
 

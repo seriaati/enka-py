@@ -10,6 +10,7 @@ TALENTS_DATA_PATH = ASSET_PATH / "talents.json"
 PFPS_DATA_PATH = ASSET_PATH / "pfps.json"
 ARITFACTS_PATH = ASSET_PATH / "artifacts.json"
 ARTIFACT_ITEMS_PATH = ASSET_PATH / "artifact_items.json"
+WEAPONS_DATA_PATH = ASSET_PATH / "weapons.json"
 
 _ENKA_API_DOCS = "https://raw.githubusercontent.com/EnkaNetwork/API-docs/refs/heads/master/store/gi"
 _ENKA_PY_ASSETS = "https://raw.githubusercontent.com/seriaati/enka-py-assets/main/data"
@@ -23,4 +24,5 @@ PATH_TO_SOURCE = {
     NAMECARD_DATA_PATH: f"{_ENKA_API_DOCS}/namecards.json",
     ARITFACTS_PATH: f"{_ENKA_API_DOCS}/relics.json",
     ARTIFACT_ITEMS_PATH: f"{_ENKA_PY_ASSETS}/artifacts.json",
+    WEAPONS_DATA_PATH: f"{_ENKA_PY_ASSETS}/weapons.json",
 }
