@@ -32,6 +32,8 @@ class GenshinClient(BaseClient):
         headers: The headers to use for the client, defaults to None.
         cache: The cache to use for the client, defaults to None.
         timeout (int): The timeout for the client, defaults to DEFAULT_TIMEOUT.
+        auto_update_assets (bool): Whether to update assets when a response has data that is
+            missing from them, defaults to True.
     """
 
     def __init__(
@@ -41,8 +43,11 @@ class GenshinClient(BaseClient):
         headers: dict[str, Any] | None = None,
         cache: BaseTTLCache | None = None,
         timeout: int = DEFAULT_TIMEOUT,
+        auto_update_assets: bool = True,
     ) -> None:
-        super().__init__(headers=headers, cache=cache, timeout=timeout, auto_update_assets=False)
+        super().__init__(
+            headers=headers, cache=cache, timeout=timeout, auto_update_assets=auto_update_assets
+        )
 
         self._lang = self._convert_lang(lang)
         self._assets = GI_ASSETS
@@ -82,6 +87,7 @@ class GenshinClient(BaseClient):
             logger.error(
                 f"Namecard data not found for {player.namecard_id}, consider calling update_assets()"
             )
+            self._missing_assets = True
 
         profile_picture_id = str(player.profile_picture_id)
         try:
@@ -102,6 +108,7 @@ class GenshinClient(BaseClient):
             logger.error(
                 f"Profile picture data not found for {player.profile_picture_id}, consider calling update_assets()"
             )
+            self._missing_assets = True
 
     def _post_process_showcase_character(self, showcase_character: ShowcaseCharacter) -> None:
         if showcase_character.costume_id is None:
@@ -114,14 +121,22 @@ class GenshinClient(BaseClient):
                     id=showcase_character.costume_id,
                     data=costume_data[str(showcase_character.costume_id)],
                 )
-        except AssetKeyError:
+        except KeyError:
             logger.error(
-                f"Character data not found for {showcase_character.id}, consider calling update_assets()"
+                f"Costume data not found for {showcase_character.costume_id}, consider calling update_assets()"
             )
+            self._missing_assets = True
 
     def _post_process_weapon(self, weapon: Weapon) -> None:
         # Look up the name by ID, saved builds can carry stale nameTextMapHash values
-        weapon_data = self._assets.weapons_data.get(str(weapon.item_id), {})
+        weapon_data = self._assets.weapons_data.get(str(weapon.item_id))
+        if weapon_data is None:
+            logger.error(
+                f"Weapon data not found for {weapon.item_id}, consider calling update_assets()"
+            )
+            self._missing_assets = True
+            weapon_data = {}
+
         weapon.name = self._text_map[weapon_data.get("nameTextMapHash", weapon.name)]
         for stat in weapon.stats:
             stat.name = self._text_map[stat.type.value]
@@ -144,13 +159,21 @@ class GenshinClient(BaseClient):
                 logger.error(
                     f"Talent data not found for {talent.id}, consider calling update_assets()"
                 )
+                self._missing_assets = True
 
     def _post_process_artifact(self, artifact: Artifact) -> None:
         data = self._assets.artifacts_data.get("Items", {}).get(str(artifact.id))
         set_id = data["SetId"] if data else None
         set_name_data = self._assets.artifacts_data.get("Sets", {}).get(str(set_id))
 
-        artifact.set_name = self._text_map[set_name_data["Name"]]
+        if set_name_data is None:
+            logger.error(
+                f"Artifact data not found for {artifact.id}, consider calling update_assets()"
+            )
+            self._missing_assets = True
+        else:
+            artifact.set_name = self._text_map[set_name_data["Name"]]
+
         # Look up the name by ID, saved builds can carry stale nameTextMapHash values
         item_data = self._assets.artifact_items_data.get("Items", {}).get(str(artifact.id), {})
         artifact.name = self._text_map[item_data.get("nameTextMapHash", artifact.name)]
@@ -199,6 +222,7 @@ class GenshinClient(BaseClient):
             logger.error(
                 f"Character data not found for {characer_id}, consider calling update_assets()"
             )
+            self._missing_assets = True
             return
 
         # name
@@ -234,7 +258,13 @@ class GenshinClient(BaseClient):
         if c.costume_id is not None:
             costume_data = data.get("Costumes")
             if costume_data is not None:
-                c.costume = Costume(id=c.costume_id, data=costume_data[str(c.costume_id)])
+                try:
+                    c.costume = Costume(id=c.costume_id, data=costume_data[str(c.costume_id)])
+                except KeyError:
+                    logger.error(
+                        f"Costume data not found for {c.costume_id}, consider calling update_assets()"
+                    )
+                    self._missing_assets = True
 
         # weapon
         weapon = c.weapon
@@ -251,6 +281,8 @@ class GenshinClient(BaseClient):
             stat.name = self._text_map.get(stat_type.name)
 
     def _post_process_showcase(self, showcase: ShowcaseResponse) -> None:
+        self._missing_assets = False
+
         # player
         self._post_process_player(showcase.player)
 
@@ -306,9 +338,10 @@ class GenshinClient(BaseClient):
         if raw:
             return data
 
-        data = copy.deepcopy(data)
-        showcase = ShowcaseResponse(**data)
-        self._post_process_showcase(showcase)
+        showcase = self.parse_showcase(data)
+        if self._should_update_assets(self._assets):
+            await self.update_assets()
+            showcase = self.parse_showcase(data)
         return showcase
 
     def parse_showcase(self, data: dict[str, Any]) -> ShowcaseResponse:
@@ -325,6 +358,19 @@ class GenshinClient(BaseClient):
         self._post_process_showcase(showcase)
         return showcase
 
+    def _parse_builds(self, data: dict[str, Any]) -> dict[str, list[Build]]:
+        self._missing_assets = False
+        result: dict[str, list[Build]] = {}
+
+        for key, builds in copy.deepcopy(data).items():
+            result[key] = []
+            for build in builds:
+                build_ = Build(**build)
+                self._post_process_character(build_.character)
+                result[key].append(build_)
+
+        return result
+
     async def fetch_builds(self, owner: Owner | OwnerInput) -> dict[str, list[Build]]:
         """Fetch the character builds of the given owner.
 
@@ -335,13 +381,8 @@ class GenshinClient(BaseClient):
             Character ID to list of builds mapping.
         """
         data = await self._request_profile(owner)
-        result: dict[str, list[Build]] = {}
-
-        for key, builds in data.items():
-            result[key] = []
-            for build in builds:
-                build_ = Build(**build)
-                self._post_process_character(build_.character)
-                result[key].append(build_)
-
+        result = self._parse_builds(data)
+        if self._should_update_assets(self._assets):
+            await self.update_assets()
+            result = self._parse_builds(data)
         return result

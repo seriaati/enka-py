@@ -1,7 +1,10 @@
 import contextlib
+from typing import Any
 
 import pytest
 
+from enka.assets.data import AssetData
+from enka.clients.base import BaseClient
 from enka.errors import GameMaintenanceError
 from enka.gi import Element, GenshinClient, Language
 
@@ -86,3 +89,36 @@ async def test_no_element_traveler(genshin_client: GenshinClient) -> None:
 async def test_no_element_manekin(genshin_client: GenshinClient) -> None:
     with contextlib.suppress(GameMaintenanceError):
         await genshin_client.fetch_showcase("753961395")
+
+
+async def test_stale_assets(genshin_client: GenshinClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    assets = genshin_client._assets
+    updates: list[AssetData] = []
+
+    async def update(self: AssetData, _: Any) -> None:  # ruff: ignore[unused-async]
+        updates.append(self)
+
+    with contextlib.suppress(GameMaintenanceError):
+        raw = await genshin_client.fetch_showcase("901211014", raw=True)
+        name = genshin_client.parse_showcase(raw).characters[0].artifacts[0].name
+        artifact = next(e for e in raw["avatarInfoList"][0]["equipList"] if "reliquary" in e)
+        artifact["itemId"] = 99999
+
+        async def request(*_: Any) -> dict[str, Any]:  # ruff: ignore[unused-async]
+            return raw
+
+        monkeypatch.setattr(BaseClient, "_request", request)
+        monkeypatch.setattr(AssetData, "update", update)
+        monkeypatch.setattr(assets, "updated_at", None)
+
+        async with GenshinClient(auto_update_assets=False) as client:
+            showcase = await client.fetch_showcase("901211014")
+        assert showcase.characters[0].artifacts[0].name == name
+        assert not updates
+
+        await genshin_client.fetch_showcase("901211014")
+        assert len(updates) == len(assets._assets)
+
+        # The artifact is still missing, but assets were just refreshed
+        await genshin_client.fetch_showcase("901211014")
+        assert len(updates) == len(assets._assets)
