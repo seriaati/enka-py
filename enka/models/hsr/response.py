@@ -18,6 +18,7 @@ class ShowcaseResponse(BaseModel):
         player: The player.
         ttl: The time to live of the response.
         uid: The UID of the showcase.
+        region: The server region of the showcase's UID (e.g. "EU", "ASIA").
         owner: The owner of the showcase's account, if any.
     """
 
@@ -25,6 +26,7 @@ class ShowcaseResponse(BaseModel):
     player: Player = Field(alias="detailInfo")
     ttl: int = 0
     uid: str
+    region: str | None = None
     owner: Owner | None = None
 
     @model_validator(mode="before")

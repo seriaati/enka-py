@@ -4,6 +4,7 @@ import pytest
 
 from enka.errors import GameMaintenanceError
 from enka.hsr import HSRClient, Language
+from enka.models.hsr import ShowcaseResponse
 
 
 async def test_update_assets(hsr_client: HSRClient) -> None:
@@ -48,6 +49,35 @@ async def test_raw_and_parse(hsr_client: HSRClient) -> None:
     with contextlib.suppress(GameMaintenanceError):
         raw = await hsr_client.fetch_showcase("809162009", raw=True)
         hsr_client.parse_showcase(raw)
+
+
+def test_4_7_fields() -> None:
+    showcase = ShowcaseResponse.model_validate(
+        {
+            "detailInfo": {
+                "uid": 702829957,
+                "nickname": "Proxymer",
+                "level": 70,
+                "birthday": 229,
+                "personalCardId": 253000,
+                "recordInfo": {"avatarCount": 48},
+                "avatarDetailList": [
+                    {
+                        "avatarId": 1213,
+                        "level": 80,
+                        "promotion": 6,
+                        "rank": 1,
+                        "skillTreeList": [],
+                    }
+                ],
+            },
+            "uid": "702829957",
+            "region": "EU",
+        }
+    )
+    assert showcase.region == "EU"
+    assert showcase.player.birthday == 229
+    assert showcase.player.personal_card_id == 253000
 
 
 async def test_empty_substat_list(hsr_client: HSRClient) -> None:

@@ -38,6 +38,8 @@ class Player(BaseModel):
         equilibrium_level: The player's equilibrium level.
         friend_count: The number of friends the player has.
         stats: The player's statistics.
+        personal_card_id: The ID of the player's personal card.
+        birthday: The player's birthday in MMDD format (e.g. 229 is Feb 29), None if not set.
     """
 
     nickname: str
@@ -47,6 +49,8 @@ class Player(BaseModel):
     equilibrium_level: int = Field(0, alias="worldLevel")
     friend_count: int = Field(0, alias="friendCount")
     stats: PlayerStats = Field(alias="recordInfo")
+    personal_card_id: int | None = Field(None, alias="personalCardId")
+    birthday: int | None = None
 
     # The following fields are added in post-processing
     icon: str = Field("", alias="headIcon")
