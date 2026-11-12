@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import time
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -16,6 +17,9 @@ __all__ = ("AssetManager",)
 class AssetManager:
     """Base asset manager."""
 
+    updated_at: float | None = None
+    """time.monotonic() of the last update, None if never updated in this process."""
+
     def __init__(self) -> None:
         self._assets: Sequence[AssetData] = ()
 
@@ -30,6 +34,7 @@ class AssetManager:
             asset._data = None
 
     async def update(self, session: aiohttp.ClientSession) -> None:
+        self.updated_at = time.monotonic()
         tasks: list[asyncio.Task[None]] = [
             asyncio.create_task(asset.update(session)) for asset in self._assets
         ]

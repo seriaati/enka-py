@@ -3,6 +3,8 @@ from typing import Any
 
 import pytest
 
+from enka.assets.data import AssetData
+from enka.clients.base import BaseClient
 from enka.constants.hsr import DMG_BONUS_PROPS
 from enka.errors import GameMaintenanceError
 from enka.hsr import Element, HSRClient, Language
@@ -161,3 +163,35 @@ def test_stale_assets(hsr_client: HSRClient) -> None:
     for character in showcase.characters:
         assert character.highest_dmg_bonus_stat.type in DMG_BONUS_PROPS.values()
         character.model_dump()
+
+
+async def test_stale_assets_refresh(hsr_client: HSRClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    assets = hsr_client._assets
+    updates: list[AssetData] = []
+
+    async def request(*_: Any) -> dict[str, Any]:  # ruff: ignore[unused-async]
+        return _stale_asset_showcase()
+
+    async def update(self: AssetData, _: Any) -> None:  # ruff: ignore[unused-async]
+        updates.append(self)
+        if self is assets.avatar_data:
+            monkeypatch.setitem(self.data, "999999", {"Icon": "SpriteOutput/AvatarRoundIcon/1.png"})
+
+    monkeypatch.setattr(BaseClient, "_request", request)
+    monkeypatch.setattr(AssetData, "update", update)
+    monkeypatch.setattr(assets, "updated_at", None)
+
+    async with HSRClient(auto_update_assets=False) as client:
+        showcase = await client.fetch_showcase("702829957")
+    assert not showcase.player.icon
+    assert not updates
+
+    showcase = await hsr_client.fetch_showcase("702829957")
+    assert showcase.player.icon.startswith("https://")
+    assert len(updates) == len(assets._assets)
+
+    # Light cone 99999 is still missing, but assets were just refreshed
+    showcase = await hsr_client.fetch_showcase("702829957")
+    assert len(updates) == len(assets._assets)
+    assert showcase.characters[0].stats == {}
+    assert showcase.characters[2].stats

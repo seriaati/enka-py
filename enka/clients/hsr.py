@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import time
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
@@ -8,7 +9,12 @@ from loguru import logger
 from ..assets.data import TextMap
 from ..assets.hsr.manager import HSR_ASSETS
 from ..calc.hsr import LayerGenerator, PropState
-from ..constants.common import DEFAULT_TIMEOUT, HSR_API_URL, HSR_BACKUP_API_URL
+from ..constants.common import (
+    ASSET_REFRESH_COOLDOWN,
+    DEFAULT_TIMEOUT,
+    HSR_API_URL,
+    HSR_BACKUP_API_URL,
+)
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
 from ..errors import AssetKeyError, EnkaAPIError, WrongUIDFormatError
 from ..models.hsr import CharacterIcon, LightConeIcon, ShowcaseResponse, Stat
@@ -34,23 +40,28 @@ class HSRClient(BaseClient):
         headers (dict[str, Any] | None): The headers to use for the client, defaults to None.
         cache (BaseTTLCache | None): The cache to use for the client, defaults to None.
         use_enka_icons (bool): Whether to get stat icons from Enka, defaults to True.
+        auto_update_assets (bool): Whether to update assets when a response has data that is
+            missing from them, defaults to True.
         timeout (int): The timeout for the client, defaults to DEFAULT_TIMEOUT.
     """
 
-    def __init__(
+    def __init__(  # ruff: ignore[too-many-arguments]
         self,
         lang: Language | str = Language.ENGLISH,
         *,
         headers: dict[str, Any] | None = None,
         cache: BaseTTLCache | None = None,
         use_enka_icons: bool = True,
+        auto_update_assets: bool = True,
         timeout: int = DEFAULT_TIMEOUT,
     ) -> None:
         super().__init__(headers=headers, cache=cache, timeout=timeout)
 
         self._lang = self._convert_lang(lang)
         self._use_enka_icons = use_enka_icons
+        self._auto_update_assets = auto_update_assets
         self._assets = HSR_ASSETS
+        self._missing_assets = False
 
     def _convert_lang(self, lang: Language | str) -> Language:
         if not isinstance(lang, Language):
@@ -98,6 +109,7 @@ class HSRClient(BaseClient):
                 )
         except AssetKeyError:
             logger.error(f"Relic data not found for {relic.id}, consider calling update_assets()")
+            self._missing_assets = True
 
     def _post_process_light_cone(self, light_cone: LightCone) -> None:
         text_map = self._text_map
@@ -119,6 +131,7 @@ class HSRClient(BaseClient):
             logger.error(
                 f"Light cone data not found for {light_cone.id}, consider calling update_assets()"
             )
+            self._missing_assets = True
 
     def _post_process_trace(self, trace: Trace, unlocked_eidolon_ids: list[int]) -> None:
         skill_data = self._assets.skill_data
@@ -128,6 +141,7 @@ class HSRClient(BaseClient):
             tree_data = skill_tree_data[str(trace.id)]
         except AssetKeyError:
             logger.error(f"Trace data not found for {trace.id}, consider calling update_assets()")
+            self._missing_assets = True
             return
 
         try:
@@ -161,6 +175,7 @@ class HSRClient(BaseClient):
                 logger.error(
                     f"Eidolon data not found for {eidolon_id}, consider calling update_assets()"
                 )
+                self._missing_assets = True
                 continue
 
             unprefixed_id = str(trace.id).removeprefix("1")
@@ -184,6 +199,7 @@ class HSRClient(BaseClient):
             logger.error(
                 f"Character data not found for {character.id}, consider calling update_assets()"
             )
+            self._missing_assets = True
             return
 
         text_map_hash = character_data["AvatarName"]["Hash"]
@@ -201,6 +217,7 @@ class HSRClient(BaseClient):
                 logger.error(
                     f"Eidolon data not found for {eidolon_id}, consider calling update_assets()"
                 )
+                self._missing_assets = True
                 continue
 
             character.eidolons.append(
@@ -236,6 +253,7 @@ class HSRClient(BaseClient):
             logger.error(
                 f"Stat data {e} not found for {character.id}, consider calling update_assets()"
             )
+            self._missing_assets = True
             return
 
         props = prop_state.sum()
@@ -270,6 +288,7 @@ class HSRClient(BaseClient):
                 logger.error(
                     f"Property config data not found for {stat_type.value}, consider calling update_assets()"
                 )
+                self._missing_assets = True
                 continue
 
             character.stats[stat_type] = Stat(
@@ -287,8 +306,10 @@ class HSRClient(BaseClient):
                 f"Avatar data not found for {player.icon}, consider calling update_assets()"
             )
             player.icon = ""
+            self._missing_assets = True
 
     def _post_process_showcase(self, showcase: ShowcaseResponse) -> None:
+        self._missing_assets = False
         for character in showcase.characters:
             self._post_process_character(character)
         self._post_process_player(showcase.player)
@@ -310,6 +331,17 @@ class HSRClient(BaseClient):
         await self._assets.update(self.session)
         self._text_map = TextMap(self.lang, self._assets.text_map)
         logger.info("HSR assets updated")
+
+    async def _refresh_stale_assets(self) -> bool:
+        if not self._auto_update_assets:
+            return False
+
+        updated_at = self._assets.updated_at
+        if updated_at is not None and time.monotonic() - updated_at < ASSET_REFRESH_COOLDOWN:
+            return False
+
+        await self.update_assets()
+        return True
 
     @overload
     async def fetch_showcase(
@@ -352,9 +384,9 @@ class HSRClient(BaseClient):
         if raw:
             return data
 
-        data = copy.deepcopy(data)
-        showcase = ShowcaseResponse(**data)
-        self._post_process_showcase(showcase)
+        showcase = self.parse_showcase(data)
+        if self._missing_assets and await self._refresh_stale_assets():
+            showcase = self.parse_showcase(data)
         return showcase
 
     def parse_showcase(self, data: dict[str, Any]) -> ShowcaseResponse:
@@ -371,6 +403,19 @@ class HSRClient(BaseClient):
         self._post_process_showcase(showcase)
         return showcase
 
+    def _parse_builds(self, data: dict[str, Any]) -> dict[str, list[Build]]:
+        self._missing_assets = False
+        result: dict[str, list[Build]] = {}
+
+        for key, builds in copy.deepcopy(data).items():
+            result[key] = []
+            for build in builds:
+                build_ = Build(**build)
+                self._post_process_character(build_.character)
+                result[key].append(build_)
+
+        return result
+
     async def fetch_builds(self, owner: Owner | OwnerInput) -> dict[str, list[Build]]:
         """Fetch the character builds of the given owner.
 
@@ -381,13 +426,7 @@ class HSRClient(BaseClient):
             Character ID to list of builds mapping.
         """
         data = await self._request_profile(owner)
-        result: dict[str, list[Build]] = {}
-
-        for key, builds in data.items():
-            result[key] = []
-            for build in builds:
-                build_ = Build(**build)
-                self._post_process_character(build_.character)
-                result[key].append(build_)
-
+        result = self._parse_builds(data)
+        if self._missing_assets and await self._refresh_stale_assets():
+            result = self._parse_builds(data)
         return result
