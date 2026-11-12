@@ -1,17 +1,19 @@
 from __future__ import annotations
 
 import asyncio
+import time
 from typing import TYPE_CHECKING, Any
 
 import aiohttp
 import orjson
 from loguru import logger
 
-from ..constants.common import PROFILE_API_URL
+from ..constants.common import ASSET_REFRESH_COOLDOWN, PROFILE_API_URL
 from ..errors import APIRequestTimeoutError, EnkaAPIError, raise_for_retcode
 from ..models.enka.owner import Owner
 
 if TYPE_CHECKING:
+    from ..assets.manager import AssetManager
     from ..models.enka.owner import OwnerInput
     from .cache import BaseTTLCache
 
@@ -20,12 +22,19 @@ class BaseClient:
     """Base client with requesting capabilities."""
 
     def __init__(
-        self, *, headers: dict[str, Any] | None, cache: BaseTTLCache | None, timeout: int
+        self,
+        *,
+        headers: dict[str, Any] | None,
+        cache: BaseTTLCache | None,
+        timeout: int,
+        auto_update_assets: bool,
     ) -> None:
         self._headers = headers or {"User-Agent": "enka-py"}
         self._session: aiohttp.ClientSession | None = None
         self._cache = cache
         self._timeout = timeout
+        self._auto_update_assets = auto_update_assets
+        self._missing_assets = False
 
     @property
     def session(self) -> aiohttp.ClientSession:
@@ -52,6 +61,13 @@ class BaseClient:
         await self.session.close()
         if self._cache is not None:
             await self._cache.close()
+
+    def _should_update_assets(self, assets: AssetManager) -> bool:
+        if not (self._missing_assets and self._auto_update_assets):
+            return False
+
+        updated_at = assets.updated_at
+        return updated_at is None or time.monotonic() - updated_at >= ASSET_REFRESH_COOLDOWN
 
     async def _request(self, url: str) -> dict[str, Any]:
         if self._cache is not None:

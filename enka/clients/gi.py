@@ -42,7 +42,7 @@ class GenshinClient(BaseClient):
         cache: BaseTTLCache | None = None,
         timeout: int = DEFAULT_TIMEOUT,
     ) -> None:
-        super().__init__(headers=headers, cache=cache, timeout=timeout)
+        super().__init__(headers=headers, cache=cache, timeout=timeout, auto_update_assets=False)
 
         self._lang = self._convert_lang(lang)
         self._assets = GI_ASSETS

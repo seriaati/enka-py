@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-import time
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 from loguru import logger
@@ -9,12 +8,7 @@ from loguru import logger
 from ..assets.data import TextMap
 from ..assets.hsr.manager import HSR_ASSETS
 from ..calc.hsr import LayerGenerator, PropState
-from ..constants.common import (
-    ASSET_REFRESH_COOLDOWN,
-    DEFAULT_TIMEOUT,
-    HSR_API_URL,
-    HSR_BACKUP_API_URL,
-)
+from ..constants.common import DEFAULT_TIMEOUT, HSR_API_URL, HSR_BACKUP_API_URL
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
 from ..errors import AssetKeyError, EnkaAPIError, WrongUIDFormatError
 from ..models.hsr import CharacterIcon, LightConeIcon, ShowcaseResponse, Stat
@@ -55,13 +49,13 @@ class HSRClient(BaseClient):
         auto_update_assets: bool = True,
         timeout: int = DEFAULT_TIMEOUT,
     ) -> None:
-        super().__init__(headers=headers, cache=cache, timeout=timeout)
+        super().__init__(
+            headers=headers, cache=cache, timeout=timeout, auto_update_assets=auto_update_assets
+        )
 
         self._lang = self._convert_lang(lang)
         self._use_enka_icons = use_enka_icons
-        self._auto_update_assets = auto_update_assets
         self._assets = HSR_ASSETS
-        self._missing_assets = False
 
     def _convert_lang(self, lang: Language | str) -> Language:
         if not isinstance(lang, Language):
@@ -332,17 +326,6 @@ class HSRClient(BaseClient):
         self._text_map = TextMap(self.lang, self._assets.text_map)
         logger.info("HSR assets updated")
 
-    async def _refresh_stale_assets(self) -> bool:
-        if not self._auto_update_assets:
-            return False
-
-        updated_at = self._assets.updated_at
-        if updated_at is not None and time.monotonic() - updated_at < ASSET_REFRESH_COOLDOWN:
-            return False
-
-        await self.update_assets()
-        return True
-
     @overload
     async def fetch_showcase(
         self, uid: str | int, *, raw: Literal[False] = False, use_backup: bool = ...
@@ -385,7 +368,8 @@ class HSRClient(BaseClient):
             return data
 
         showcase = self.parse_showcase(data)
-        if self._missing_assets and await self._refresh_stale_assets():
+        if self._should_update_assets(self._assets):
+            await self.update_assets()
             showcase = self.parse_showcase(data)
         return showcase
 
@@ -427,6 +411,7 @@ class HSRClient(BaseClient):
         """
         data = await self._request_profile(owner)
         result = self._parse_builds(data)
-        if self._missing_assets and await self._refresh_stale_assets():
+        if self._should_update_assets(self._assets):
+            await self.update_assets()
             result = self._parse_builds(data)
         return result
