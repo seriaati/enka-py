@@ -265,11 +265,7 @@ class Character(BaseModel):
         return max(
             (stat for stat in self.stats.values() if stat.type in DMG_BONUS_PROPS.values()),
             key=lambda stat: stat.value,
-            default=next(
-                stat
-                for stat in self.stats.values()
-                if stat.type.value == DMG_BONUS_PROPS[self.element]
-            ),
+            default=Stat(type=StatType(DMG_BONUS_PROPS[self.element]), value=0),
         )
 
     @field_validator("affinitive_eidolons", mode="before")

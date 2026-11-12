@@ -101,12 +101,13 @@ class HSRClient(BaseClient):
 
     def _post_process_light_cone(self, light_cone: LightCone) -> None:
         text_map = self._text_map
+        light_cone.icon = LightConeIcon(light_cone_id=light_cone.id)
+
         try:
             data = self._assets.light_cones_data[str(light_cone.id)]
 
             light_cone.name = text_map[data["EquipmentName"]["Hash"]]
             light_cone.rarity = data["Rarity"]
-            light_cone.icon = LightConeIcon(light_cone_id=light_cone.id)
             light_cone.path = Path(data["AvatarBaseType"])
 
             for stat in light_cone.stats:
@@ -172,6 +173,11 @@ class HSRClient(BaseClient):
     def _post_process_character(self, character: Character) -> None:
         character.icon = CharacterIcon(character_id=character.id)
 
+        for relic in character.relics:
+            self._post_process_relic(relic)
+        if character.light_cone is not None:
+            self._post_process_light_cone(character.light_cone)
+
         try:
             character_data = self._assets.character_data[str(character.id)]
         except AssetKeyError:
@@ -209,25 +215,28 @@ class HSRClient(BaseClient):
             self._post_process_trace(
                 trace, [e.id for e in character.eidolons[: character.eidolons_unlocked]]
             )
-        for relic in character.relics:
-            self._post_process_relic(relic)
-        if character.light_cone is not None:
-            self._post_process_light_cone(character.light_cone)
 
         # Credit to Enka Network for stat calculation logic
         generator = LayerGenerator(self._assets)
         prop_state = PropState()
 
-        prop_state.add(generator.character(character))
-        if character.light_cone is not None:
-            prop_state.add(generator.light_cone(character.light_cone))
+        # meta_data is nested plain dicts, so a missing ID raises KeyError, not AssetKeyError
+        try:
+            prop_state.add(generator.character(character))
+            if character.light_cone is not None:
+                prop_state.add(generator.light_cone(character.light_cone))
 
-            if character.light_cone.path == character.path:
-                prop_state.add(generator.light_cone_skill(character.light_cone))
+                if character.light_cone.path == character.path:
+                    prop_state.add(generator.light_cone_skill(character.light_cone))
 
-        prop_state.add(generator.relics(character.relics))
-        prop_state.add(generator.relic_set(character.relics))
-        prop_state.add(generator.skill_tree(character))
+            prop_state.add(generator.relics(character.relics))
+            prop_state.add(generator.relic_set(character.relics))
+            prop_state.add(generator.skill_tree(character))
+        except KeyError as e:
+            logger.error(
+                f"Stat data {e} not found for {character.id}, consider calling update_assets()"
+            )
+            return
 
         props = prop_state.sum()
 
@@ -277,6 +286,7 @@ class HSRClient(BaseClient):
             logger.error(
                 f"Avatar data not found for {player.icon}, consider calling update_assets()"
             )
+            player.icon = ""
 
     def _post_process_showcase(self, showcase: ShowcaseResponse) -> None:
         for character in showcase.characters:
