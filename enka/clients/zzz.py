@@ -261,6 +261,12 @@ class ZZZClient(BaseClient):
         return True
 
     def _post_process_agent(self, agent: models.Agent) -> None:
+        gear_found = True
+        for disc in agent.discs:
+            gear_found &= self._post_process_disc(disc)
+        if agent.w_engine is not None:
+            gear_found &= self._post_process_engine(agent.w_engine)
+
         try:
             data = self._assets.avatars[str(agent.id)]
         except AssetKeyError:
@@ -278,12 +284,6 @@ class ZZZClient(BaseClient):
         agent.color = models.AgentColor(**data["Colors"])
         agent.highlight_stats = [enums.StatType(stat) for stat in data["HighlightProps"]]
         agent.specialty = enums.ProfessionType(data["ProfessionType"])
-
-        gear_found = True
-        for disc in agent.discs:
-            gear_found &= self._post_process_disc(disc)
-        if agent.w_engine is not None:
-            gear_found &= self._post_process_engine(agent.w_engine)
 
         # Stats computed without the gear's data would be wrong
         if not gear_found:

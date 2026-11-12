@@ -74,9 +74,10 @@ async def test_stale_assets(zzz_client: ZZZClient, monkeypatch: pytest.MonkeyPat
     with contextlib.suppress(GameMaintenanceError):
         raw = await zzz_client.fetch_showcase("1300025292", raw=True)
         agents = raw["PlayerInfo"]["ShowcaseDetail"]["AvatarList"]
-        unknown_engine, unknown_discs, known = [
+        unknown_engine, unknown_discs, unknown_agent, known = [
             i for i, agent in enumerate(agents) if len(agent["EquippedList"]) >= 2
-        ][:3]
+        ][:4]
+        agents[unknown_agent]["Id"] = 9999
         agents[unknown_engine]["Weapon"]["Id"] = 99999
         for disc in agents[unknown_discs]["EquippedList"][:2]:
             disc["Equipment"]["Id"] = 99999
@@ -94,6 +95,12 @@ async def test_stale_assets(zzz_client: ZZZClient, monkeypatch: pytest.MonkeyPat
         assert showcase.agents[unknown_discs].stats == {}
         assert showcase.agents[known].stats
         assert not updates
+
+        agent = showcase.agents[unknown_agent]
+        assert agent.stats == {}
+        assert agent.w_engine is not None
+        assert agent.w_engine.name
+        assert agent.discs[0].set_name
 
         await zzz_client.fetch_showcase("1300025292")
         assert len(updates) == len(assets._assets)
