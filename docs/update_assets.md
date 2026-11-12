@@ -18,17 +18,17 @@ async with enka.GenshinClient() as client:
 !!! note  
     The language you set for the client doesn't matter, the asset updater updates assets for all languages.
 
-## Automatic Updates (HSR)
+## Automatic Updates
 
-When `HSRClient.fetch_showcase` or `HSRClient.fetch_builds` runs into data that is missing from the local assets (e.g. a character released in a new game version), it updates the assets and parses the response again. This happens at most once per hour, counting manual `update_assets()` calls.  
-If the data is still missing afterwards (the sources can lag behind a new game version), the response is returned anyway: the affected character has an empty `stats` and default values for the fields that couldn't be filled.
+When `fetch_showcase` or `fetch_builds` runs into data that is missing from the local assets (e.g. a character released in a new game version), the client updates the assets and parses the response again. This happens at most once per hour for each game, counting manual `update_assets()` calls.  
+If the data is still missing afterwards (the sources can lag behind a new game version), the response is returned anyway, with default values for the fields that couldn't be filled. In HSR and ZZZ, a character whose data or equipment is missing has an empty `stats`.
 
 `parse_showcase` is not async, so it never updates assets.
 
 To turn this off and only update assets yourself:
 
 ```py
-client = enka.HSRClient(auto_update_assets=False)
+client = enka.GenshinClient(auto_update_assets=False)
 ```
 
 ## Sources
