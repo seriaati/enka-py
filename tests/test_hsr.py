@@ -5,7 +5,7 @@ import pytest
 
 from enka.constants.hsr import DMG_BONUS_PROPS
 from enka.errors import GameMaintenanceError
-from enka.hsr import HSRClient, Language
+from enka.hsr import Element, HSRClient, Language
 from enka.models.hsr import ShowcaseResponse
 
 
@@ -155,6 +155,8 @@ def test_stale_assets(hsr_client: HSRClient) -> None:
     assert unknown_character.light_cone.icon.light_cone_id == 99999
 
     assert known.stats
+    assert known.element != Element.PHYSICAL
+    assert known.highest_dmg_bonus_stat.type == DMG_BONUS_PROPS[known.element]
 
     for character in showcase.characters:
         assert character.highest_dmg_bonus_stat.type in DMG_BONUS_PROPS.values()

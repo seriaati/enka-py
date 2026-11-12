@@ -261,11 +261,12 @@ class Character(BaseModel):
     @computed_field
     @property
     def highest_dmg_bonus_stat(self) -> Stat:
-        """Character's highest damage bonus stat."""
+        """Character's highest damage bonus stat, the one of their element wins ties."""
+        element_stat_type = DMG_BONUS_PROPS[self.element]
         return max(
             (stat for stat in self.stats.values() if stat.type in DMG_BONUS_PROPS.values()),
-            key=lambda stat: stat.value,
-            default=Stat(type=StatType(DMG_BONUS_PROPS[self.element]), value=0),
+            key=lambda stat: (stat.value, stat.type == element_stat_type),
+            default=Stat(type=StatType(element_stat_type), value=0),
         )
 
     @field_validator("affinitive_eidolons", mode="before")
