@@ -62,13 +62,7 @@ def test_4_7_fields() -> None:
                 "personalCardId": 253000,
                 "recordInfo": {"avatarCount": 48},
                 "avatarDetailList": [
-                    {
-                        "avatarId": 1213,
-                        "level": 80,
-                        "promotion": 6,
-                        "rank": 1,
-                        "skillTreeList": [],
-                    }
+                    {"avatarId": 1213, "level": 80, "promotion": 6, "rank": 1, "skillTreeList": []}
                 ],
             },
             "uid": "702829957",
