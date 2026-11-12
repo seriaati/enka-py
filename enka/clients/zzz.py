@@ -34,11 +34,13 @@ class ZZZClient(BaseClient):
         headers (dict[str, Any] | None): The headers to use for the client, defaults to None.
         cache (BaseTTLCache | None): The cache to use for the client, defaults to None.
         timeout (int): The timeout for the client, defaults to DEFAULT_TIMEOUT.
+        auto_update_assets (bool): Whether to update assets when a response has data that is
+            missing from them, defaults to True.
     """
 
     _TITLE_GENDER_PATTERN = re.compile(r"\{([MF])#([^{}]*)\}")
 
-    def __init__(
+    def __init__(  # ruff: ignore[too-many-arguments]
         self,
         lang: enums.Language | str = enums.Language.ENGLISH,
         gender: enums.Gender | str = enums.Gender.MALE,
@@ -46,8 +48,11 @@ class ZZZClient(BaseClient):
         headers: dict[str, Any] | None = None,
         cache: BaseTTLCache | None = None,
         timeout: int = DEFAULT_TIMEOUT,
+        auto_update_assets: bool = True,
     ) -> None:
-        super().__init__(headers=headers, cache=cache, timeout=timeout, auto_update_assets=False)
+        super().__init__(
+            headers=headers, cache=cache, timeout=timeout, auto_update_assets=auto_update_assets
+        )
 
         self._lang = self._convert_lang(lang)
         self._gender = self._convert_gender(gender)
@@ -200,7 +205,7 @@ class ZZZClient(BaseClient):
 
         return "default"
 
-    def _post_process_engine(self, engine: models.WEngine) -> None:
+    def _post_process_engine(self, engine: models.WEngine) -> bool:
         try:
             engine_data = self._assets.weapons[str(engine.id)]
             engine.name = self._text_map[engine_data["ItemName"]]
@@ -233,8 +238,12 @@ class ZZZClient(BaseClient):
             logger.error(
                 f"W-Engine data not found for {engine.id}, consider calling update_assets()"
             )
+            self._missing_assets = True
+            return False
 
-    def _post_process_disc(self, disc: models.DriveDisc) -> None:
+        return True
+
+    def _post_process_disc(self, disc: models.DriveDisc) -> bool:
         try:
             disc_data = self._assets.equipments["Items"][str(disc.id)]
             disc.rarity_num = disc_data["Rarity"]
@@ -246,12 +255,17 @@ class ZZZClient(BaseClient):
             logger.error(
                 f"Drive disc data not found for {disc.id}, consider calling update_assets()"
             )
+            self._missing_assets = True
+            return False
+
+        return True
 
     def _post_process_agent(self, agent: models.Agent) -> None:
         try:
             data = self._assets.avatars[str(agent.id)]
         except AssetKeyError:
             logger.error(f"Agent data not found for {agent.id}, consider calling update_assets()")
+            self._missing_assets = True
             return
 
         agent.name = self._text_map[data["Name"]]
@@ -265,12 +279,25 @@ class ZZZClient(BaseClient):
         agent.highlight_stats = [enums.StatType(stat) for stat in data["HighlightProps"]]
         agent.specialty = enums.ProfessionType(data["ProfessionType"])
 
+        gear_found = True
         for disc in agent.discs:
-            self._post_process_disc(disc)
-
+            gear_found &= self._post_process_disc(disc)
         if agent.w_engine is not None:
-            self._post_process_engine(agent.w_engine)
+            gear_found &= self._post_process_engine(agent.w_engine)
 
+        # Stats computed without the gear's data would be wrong
+        if not gear_found:
+            return
+
+        try:
+            self._calc_agent_stats(agent)
+        except KeyError as e:
+            logger.error(
+                f"Stat data {e} not found for {agent.id}, consider calling update_assets()"
+            )
+            self._missing_assets = True
+
+    def _calc_agent_stats(self, agent: models.Agent) -> None:
         # Credit to Enka Network for the stats calculation logic
         generator = LayerGenerator(self._assets)
         prop_state = PropState()
@@ -329,6 +356,7 @@ class ZZZClient(BaseClient):
             title.color2 = f"#{title_data['ColorB']}"
         except AssetKeyError:
             logger.error(f"Title data not found for {title.id}, consider calling update_assets()")
+            self._missing_assets = True
 
     def _post_process_player(self, player: models.Player) -> None:
         if player.title is not None:
@@ -338,6 +366,9 @@ class ZZZClient(BaseClient):
         pfp_data = self._assets.pfps.get(str(player.id))
         if pfp_data:
             player.avatar = f"https://enka.network{pfp_data['Icon']}"
+        else:
+            logger.error(f"Avatar data not found for {player.id}, consider calling update_assets()")
+            self._missing_assets = True
 
         # Namecard
         namecard_id = player.namecard_id
@@ -345,11 +376,15 @@ class ZZZClient(BaseClient):
             icon_path = self._assets.namecards[str(namecard_id)]["Icon"]
             icon_url = f"https://enka.network{icon_path}"
         except AssetKeyError:
-            icon_url = ""
+            logger.error(
+                f"Namecard data not found for {namecard_id}, consider calling update_assets()"
+            )
+            self._missing_assets = True
         else:
             player.namecard = models.Namecard(id=namecard_id, icon=icon_url)
 
     def _post_process_showcase(self, showcase: models.ShowcaseResponse) -> None:
+        self._missing_assets = False
         self._post_process_player(showcase.player)
         for agent in showcase.agents:
             self._post_process_agent(agent)
@@ -382,9 +417,10 @@ class ZZZClient(BaseClient):
         if raw:
             return data
 
-        data = copy.deepcopy(data)
-        showcase = models.ShowcaseResponse(**data)
-        self._post_process_showcase(showcase)
+        showcase = self.parse_showcase(data)
+        if self._should_update_assets(self._assets):
+            await self.update_assets()
+            showcase = self.parse_showcase(data)
         return showcase
 
     def parse_showcase(self, data: dict[str, Any]) -> models.ShowcaseResponse:
@@ -401,6 +437,19 @@ class ZZZClient(BaseClient):
         self._post_process_showcase(showcase)
         return showcase
 
+    def _parse_builds(self, data: dict[str, Any]) -> dict[str, list[Build]]:
+        self._missing_assets = False
+        result: dict[str, list[Build]] = {}
+
+        for key, builds in copy.deepcopy(data).items():
+            result[key] = []
+            for build in builds:
+                build_ = Build(**build)
+                self._post_process_agent(build_.character)
+                result[key].append(build_)
+
+        return result
+
     async def fetch_builds(self, owner: Owner | OwnerInput) -> dict[str, list[Build]]:
         """Fetch the character builds of the given owner.
 
@@ -411,13 +460,8 @@ class ZZZClient(BaseClient):
             Character ID to list of builds mapping.
         """
         data = await self._request_profile(owner)
-        result: dict[str, list[Build]] = {}
-
-        for key, builds in data.items():
-            result[key] = []
-            for build in builds:
-                build_ = Build(**build)
-                self._post_process_agent(build_.character)
-                result[key].append(build_)
-
+        result = self._parse_builds(data)
+        if self._should_update_assets(self._assets):
+            await self.update_assets()
+            result = self._parse_builds(data)
         return result

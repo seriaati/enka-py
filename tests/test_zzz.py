@@ -1,7 +1,10 @@
 import contextlib
+from typing import Any
 
 import pytest
 
+from enka.assets.data import AssetData
+from enka.clients.base import BaseClient
 from enka.errors import GameMaintenanceError, PlayerDoesNotExistError
 from enka.zzz import Gender, Language, ZZZClient
 
@@ -59,3 +62,42 @@ def test_gendered_title_text_parsing(gender: Gender, expected: str) -> None:
     client = ZZZClient(gender=gender)
     parsed = client._parse_gendered_text("Wahre{M#r} Schüler{F#in} des Yunkuigipfels")
     assert parsed == expected
+
+
+async def test_stale_assets(zzz_client: ZZZClient, monkeypatch: pytest.MonkeyPatch) -> None:
+    assets = zzz_client._assets
+    updates: list[AssetData] = []
+
+    async def update(self: AssetData, _: Any) -> None:  # ruff: ignore[unused-async]
+        updates.append(self)
+
+    with contextlib.suppress(GameMaintenanceError):
+        raw = await zzz_client.fetch_showcase("1300025292", raw=True)
+        agents = raw["PlayerInfo"]["ShowcaseDetail"]["AvatarList"]
+        unknown_engine, unknown_discs, known = [
+            i for i, agent in enumerate(agents) if len(agent["EquippedList"]) >= 2
+        ][:3]
+        agents[unknown_engine]["Weapon"]["Id"] = 99999
+        for disc in agents[unknown_discs]["EquippedList"][:2]:
+            disc["Equipment"]["Id"] = 99999
+
+        async def request(*_: Any) -> dict[str, Any]:  # ruff: ignore[unused-async]
+            return raw
+
+        monkeypatch.setattr(BaseClient, "_request", request)
+        monkeypatch.setattr(AssetData, "update", update)
+        monkeypatch.setattr(assets, "updated_at", None)
+
+        async with ZZZClient(auto_update_assets=False) as client:
+            showcase = await client.fetch_showcase("1300025292")
+        assert showcase.agents[unknown_engine].stats == {}
+        assert showcase.agents[unknown_discs].stats == {}
+        assert showcase.agents[known].stats
+        assert not updates
+
+        await zzz_client.fetch_showcase("1300025292")
+        assert len(updates) == len(assets._assets)
+
+        # The gear is still missing, but assets were just refreshed
+        await zzz_client.fetch_showcase("1300025292")
+        assert len(updates) == len(assets._assets)
