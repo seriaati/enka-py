@@ -68,6 +68,7 @@ def test_4_7_fields() -> None:
                         "promotion": 6,
                         "rank": 1,
                         "skillTreeList": [],
+                        "exRankList": [121301],
                     }
                 ],
             },
@@ -78,6 +79,10 @@ def test_4_7_fields() -> None:
     assert showcase.region == "EU"
     assert showcase.player.birthday == 229
     assert showcase.player.personal_card_id == 253000
+    eidolon = showcase.characters[0].affinitive_eidolons[0]
+    assert eidolon.id == 121301
+    assert eidolon.icon.endswith("Avatar/1213/SkillIcon_1213_ExRank01.png")
+    assert eidolon.unlocked
 
 
 async def test_empty_substat_list(hsr_client: HSRClient) -> None:

@@ -217,6 +217,8 @@ class Character(BaseModel):
         relics: List of the character's relics.
         eidolons: List of the character's eidolons.
         eidolons_unlocked: The number of unlocked eidolons.
+        affinitive_eidolons: List of the character's unlocked affinitive eidolons,
+            added in game version 4.7
         is_assist: Whether the character is an assist character.
         icon: The character's icon.
         name: The character's name.
@@ -237,6 +239,7 @@ class Character(BaseModel):
     relics: list[Relic] = Field(alias="relicList", default_factory=list)
     eidolons: list[Eidolon] = Field(default_factory=list)
     eidolons_unlocked: int = Field(0, alias="rank")
+    affinitive_eidolons: list[Eidolon] = Field(alias="exRankList", default_factory=list)
     is_assist: bool = Field(False, alias="_assist")
 
     # Following fields are added in post-processing
@@ -268,6 +271,20 @@ class Character(BaseModel):
                 if stat.type.value == DMG_BONUS_PROPS[self.element]
             ),
         )
+
+    @field_validator("affinitive_eidolons", mode="before")
+    @classmethod
+    def _convert_affinitive_eidolons(cls, value: list[int]) -> list[dict[str, Any]]:
+        # The API only gives the IDs of unlocked ones and there is no asset data for them,
+        # so the icon is derived from the ID ({character_id}{index:02}) like Enka's site does.
+        return [
+            {
+                "id": id_,
+                "icon": f"https://enka.network/ui/hsr/SpriteOutput/SkillIcons/Avatar/{id_ // 100}/SkillIcon_{id_ // 100}_ExRank{id_ % 100:02}.png",
+                "unlocked": True,
+            }
+            for id_ in value
+        ]
 
     @field_validator("light_cone", mode="before")
     @classmethod
