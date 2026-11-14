@@ -10,7 +10,7 @@ from loguru import logger
 from ..assets.data import TextMap
 from ..assets.zzz.manager import ZZZ_ASSETS
 from ..calc.zzz import LayerGenerator, PropState
-from ..constants.common import DEFAULT_TIMEOUT, ZZZ_API_URL
+from ..constants.common import DEFAULT_MAX_RETRIES, DEFAULT_TIMEOUT, ZZZ_API_URL
 from ..enums import zzz as enums
 from ..errors import AssetKeyError, WrongUIDFormatError
 from ..models import zzz as models
@@ -36,6 +36,8 @@ class ZZZClient(BaseClient):
         timeout (int): The timeout for the client, defaults to DEFAULT_TIMEOUT.
         auto_update_assets (bool): Whether to update assets when a response has data that is
             missing from them, defaults to True.
+        max_retries (int): The number of times to retry a request when Enka or the game
+            servers time out (504), defaults to DEFAULT_MAX_RETRIES, 0 disables retrying.
     """
 
     _TITLE_GENDER_PATTERN = re.compile(r"\{([MF])#([^{}]*)\}")
@@ -49,9 +51,14 @@ class ZZZClient(BaseClient):
         cache: BaseTTLCache | None = None,
         timeout: int = DEFAULT_TIMEOUT,
         auto_update_assets: bool = True,
+        max_retries: int = DEFAULT_MAX_RETRIES,
     ) -> None:
         super().__init__(
-            headers=headers, cache=cache, timeout=timeout, auto_update_assets=auto_update_assets
+            headers=headers,
+            cache=cache,
+            timeout=timeout,
+            auto_update_assets=auto_update_assets,
+            max_retries=max_retries,
         )
 
         self._lang = self._convert_lang(lang)

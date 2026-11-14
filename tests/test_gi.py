@@ -1,6 +1,9 @@
-import contextlib
-from typing import Any
+from __future__ import annotations
 
+import contextlib
+from typing import TYPE_CHECKING, Any
+
+import aiohttp
 import pytest
 
 from enka.assets.data import AssetData
@@ -13,6 +16,9 @@ from enka.errors import (
     raise_for_retcode,
 )
 from enka.gi import Element, GenshinClient, Language
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 
 async def test_update_assets(genshin_client: GenshinClient) -> None:
@@ -99,6 +105,31 @@ def test_profile_unavailable_error() -> None:
 
     with pytest.raises(GatewayTimeoutError):
         raise_for_retcode(504, "upstream_timeout")
+
+
+class GatewayTimeoutResponse:
+    status = 504
+
+    async def json(self, **_: Any) -> dict[str, str]:
+        return {"code": "upstream_timeout", "message": "Timed out."}
+
+
+@pytest.mark.parametrize("max_retries", [0, 2])
+async def test_gateway_timeout_retries(monkeypatch: pytest.MonkeyPatch, max_retries: int) -> None:
+    calls = 0
+
+    @contextlib.asynccontextmanager
+    async def get(*_: Any) -> AsyncGenerator[GatewayTimeoutResponse]:
+        nonlocal calls
+        calls += 1
+        yield GatewayTimeoutResponse()
+
+    async with GenshinClient(max_retries=max_retries) as client:
+        monkeypatch.setattr(aiohttp.ClientSession, "get", get)
+        with pytest.raises(GatewayTimeoutError):
+            await client.fetch_showcase("901211014")
+
+    assert calls == max_retries + 1
 
 
 async def test_profile_unavailable_showcase(genshin_client: GenshinClient) -> None:

@@ -6,6 +6,7 @@ __all__ = (
     "EnkaAPIError",
     "EnkaPyError",
     "GameMaintenanceError",
+    "GatewayTimeoutError",
     "GeneralServerError",
     "InvalidItemTypeError",
     "PlayerDoesNotExistError",
@@ -82,7 +83,7 @@ class AlgoScrewedUpMassivelyError(EnkaAPIError):
 
 
 class GatewayTimeoutError(EnkaAPIError):
-    """Raised when a gateway timeout occurs."""
+    """Raised when Enka or the game servers time out, the request can be retried."""
 
     def __str__(self) -> str:
         return "Gateway timeout"

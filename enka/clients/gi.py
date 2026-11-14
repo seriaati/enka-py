@@ -7,7 +7,7 @@ from loguru import logger
 
 from ..assets.data import TextMap
 from ..assets.gi.manager import GI_ASSETS
-from ..constants.common import DEFAULT_TIMEOUT, GI_API_URL
+from ..constants.common import DEFAULT_MAX_RETRIES, DEFAULT_TIMEOUT, GI_API_URL
 from ..constants.gi import CHARACTER_RARITY_MAP
 from ..enums.gi import Element, FightPropType, Language
 from ..errors import AssetKeyError, WrongUIDFormatError
@@ -34,9 +34,11 @@ class GenshinClient(BaseClient):
         timeout (int): The timeout for the client, defaults to DEFAULT_TIMEOUT.
         auto_update_assets (bool): Whether to update assets when a response has data that is
             missing from them, defaults to True.
+        max_retries (int): The number of times to retry a request when Enka or the game
+            servers time out (504), defaults to DEFAULT_MAX_RETRIES, 0 disables retrying.
     """
 
-    def __init__(
+    def __init__(  # ruff: ignore[too-many-arguments]
         self,
         lang: Language | str = Language.ENGLISH,
         *,
@@ -44,9 +46,14 @@ class GenshinClient(BaseClient):
         cache: BaseTTLCache | None = None,
         timeout: int = DEFAULT_TIMEOUT,
         auto_update_assets: bool = True,
+        max_retries: int = DEFAULT_MAX_RETRIES,
     ) -> None:
         super().__init__(
-            headers=headers, cache=cache, timeout=timeout, auto_update_assets=auto_update_assets
+            headers=headers,
+            cache=cache,
+            timeout=timeout,
+            auto_update_assets=auto_update_assets,
+            max_retries=max_retries,
         )
 
         self._lang = self._convert_lang(lang)

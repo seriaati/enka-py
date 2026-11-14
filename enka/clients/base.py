@@ -9,7 +9,7 @@ import orjson
 from loguru import logger
 
 from ..constants.common import ASSET_REFRESH_COOLDOWN, PROFILE_API_URL
-from ..errors import APIRequestTimeoutError, EnkaAPIError, raise_for_retcode
+from ..errors import APIRequestTimeoutError, EnkaAPIError, GatewayTimeoutError, raise_for_retcode
 from ..models.enka.owner import Owner
 
 if TYPE_CHECKING:
@@ -28,12 +28,14 @@ class BaseClient:
         cache: BaseTTLCache | None,
         timeout: int,
         auto_update_assets: bool,
+        max_retries: int,
     ) -> None:
         self._headers = headers or {"User-Agent": "enka-py"}
         self._session: aiohttp.ClientSession | None = None
         self._cache = cache
         self._timeout = timeout
         self._auto_update_assets = auto_update_assets
+        self._max_retries = max_retries
         self._missing_assets = False
 
     @property
@@ -78,28 +80,35 @@ class BaseClient:
 
         logger.debug(f"Requesting {url}")
 
-        try:
-            async with self.session.get(url) as resp:
-                if resp.status != 200:
-                    # Rate limits and the backup API may not return a JSON object
-                    try:
-                        error = await resp.json(content_type=None)
-                    except ValueError:
-                        error = None
-                    if not isinstance(error, dict):
-                        error = {}
-                    raise_for_retcode(resp.status, error.get("code"), error.get("message"))
+        retries = 0
+        while True:
+            try:
+                async with self.session.get(url) as resp:
+                    if resp.status != 200:
+                        # Rate limits and the backup API may not return a JSON object
+                        try:
+                            error = await resp.json(content_type=None)
+                        except ValueError:
+                            error = None
+                        if not isinstance(error, dict):
+                            error = {}
+                        raise_for_retcode(resp.status, error.get("code"), error.get("message"))
 
-                data: dict[str, Any] = await resp.json()
-                if self._cache is not None:
-                    await self._cache.set(url, orjson.dumps(data).decode(), ttl=60)
-                return data
-        except Exception as e:
-            if isinstance(e, asyncio.TimeoutError):
-                raise APIRequestTimeoutError from e
-            if isinstance(e, EnkaAPIError):
-                raise
-            raise EnkaAPIError from e
+                    data: dict[str, Any] = await resp.json()
+                    if self._cache is not None:
+                        await self._cache.set(url, orjson.dumps(data).decode(), ttl=60)
+                    return data
+            except GatewayTimeoutError:  # ruff: ignore[try-except-in-loop]
+                if retries >= self._max_retries:
+                    raise
+                retries += 1
+                logger.debug(f"Gateway timeout, retrying {url} ({retries}/{self._max_retries})")
+            except Exception as e:
+                if isinstance(e, asyncio.TimeoutError):
+                    raise APIRequestTimeoutError from e
+                if isinstance(e, EnkaAPIError):
+                    raise
+                raise EnkaAPIError from e
 
     async def _request_profile(self, owner: Owner | OwnerInput) -> dict[str, Any]:
         if isinstance(owner, Owner):

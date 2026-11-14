@@ -85,6 +85,12 @@ Errors returned by the API also carry the `code` and `message` from the response
         print(e.code, e.message)  # e.g. "not_found", "Player not found."
 ```
 
+`GatewayTimeoutError` (504) means Enka or the game servers timed out. The client retries these requests once before raising, pass `max_retries` to change that (`0` disables retrying).
+
+```py
+client = enka.GenshinClient(max_retries=3)
+```
+
 ### Unavailable Profiles (Genshin Impact)
 
 For some players (e.g. frozen accounts), the game returns their characters but not their profile:

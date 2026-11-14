@@ -8,7 +8,7 @@ from loguru import logger
 from ..assets.data import TextMap
 from ..assets.hsr.manager import HSR_ASSETS
 from ..calc.hsr import LayerGenerator, PropState
-from ..constants.common import DEFAULT_TIMEOUT, HSR_API_URL, HSR_BACKUP_API_URL
+from ..constants.common import DEFAULT_MAX_RETRIES, DEFAULT_TIMEOUT, HSR_API_URL, HSR_BACKUP_API_URL
 from ..enums.hsr import Element, Language, Path, StatType, TraceType
 from ..errors import AssetKeyError, EnkaAPIError, WrongUIDFormatError
 from ..models.hsr import CharacterIcon, LightConeIcon, ShowcaseResponse, Stat
@@ -37,6 +37,8 @@ class HSRClient(BaseClient):
         auto_update_assets (bool): Whether to update assets when a response has data that is
             missing from them, defaults to True.
         timeout (int): The timeout for the client, defaults to DEFAULT_TIMEOUT.
+        max_retries (int): The number of times to retry a request when Enka or the game
+            servers time out (504), defaults to DEFAULT_MAX_RETRIES, 0 disables retrying.
     """
 
     def __init__(  # ruff: ignore[too-many-arguments]
@@ -48,9 +50,14 @@ class HSRClient(BaseClient):
         use_enka_icons: bool = True,
         auto_update_assets: bool = True,
         timeout: int = DEFAULT_TIMEOUT,
+        max_retries: int = DEFAULT_MAX_RETRIES,
     ) -> None:
         super().__init__(
-            headers=headers, cache=cache, timeout=timeout, auto_update_assets=auto_update_assets
+            headers=headers,
+            cache=cache,
+            timeout=timeout,
+            auto_update_assets=auto_update_assets,
+            max_retries=max_retries,
         )
 
         self._lang = self._convert_lang(lang)
