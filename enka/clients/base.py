@@ -81,7 +81,14 @@ class BaseClient:
         try:
             async with self.session.get(url) as resp:
                 if resp.status != 200:
-                    raise_for_retcode(resp.status)
+                    # Rate limits and the backup API may not return a JSON object
+                    try:
+                        error = await resp.json(content_type=None)
+                    except ValueError:
+                        error = None
+                    if not isinstance(error, dict):
+                        error = {}
+                    raise_for_retcode(resp.status, error.get("code"), error.get("message"))
 
                 data: dict[str, Any] = await resp.json()
                 if self._cache is not None:

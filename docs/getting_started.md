@@ -78,6 +78,13 @@ async with enka.GenshinClient() as client:
         print("Game is in maintenance.")
 ```
 
+Errors returned by the API also carry the `code` and `message` from the response, see the [API docs](https://api.enka.network/#/api?id=http-response-codes) for the list of codes.
+
+```py
+    except enka.errors.EnkaAPIError as e:
+        print(e.code, e.message)  # e.g. "not_found", "Player not found."
+```
+
 ## Logging
 
 `enka` uses [Loguru](https://loguru.readthedocs.io/) for internal logging, and the logger is disabled by default.

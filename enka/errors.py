@@ -16,7 +16,16 @@ __all__ = (
 
 
 class EnkaAPIError(Exception):
-    """Base exception class for Enka API."""
+    """Base exception class for Enka API.
+
+    Attributes:
+        code: The string error code returned by the API, if any.
+        message: The error message returned by the API, if any.
+    """
+
+    def __init__(self, code: str | None = None, message: str | None = None) -> None:
+        self.code = code
+        self.message = message
 
     def __str__(self) -> str:
         return "An error occurred while requesting the API"
@@ -78,25 +87,25 @@ class APIRequestTimeoutError(EnkaAPIError):
         return "API request timed out"
 
 
-def raise_for_retcode(retcode: int) -> None:
-    """Raises an exception based on the retcode."""
+def raise_for_retcode(retcode: int, code: str | None = None, message: str | None = None) -> None:
+    """Raises an exception based on the retcode and the error code."""
     match retcode:
         case 400:
-            raise WrongUIDFormatError
+            raise WrongUIDFormatError(code, message)
         case 404:
-            raise PlayerDoesNotExistError
+            raise PlayerDoesNotExistError(code, message)
         case 424:
-            raise GameMaintenanceError
+            raise GameMaintenanceError(code, message)
         case 429:
-            raise RateLimitedError
+            raise RateLimitedError(code, message)
         case 500:
-            raise GeneralServerError
+            raise GeneralServerError(code, message)
         case 503:
-            raise AlgoScrewedUpMassivelyError
+            raise AlgoScrewedUpMassivelyError(code, message)
         case 504:
-            raise GatewayTimeoutError
+            raise GatewayTimeoutError(code, message)
         case _:
-            raise EnkaAPIError
+            raise EnkaAPIError(code, message)
 
 
 class EnkaPyError(Exception):

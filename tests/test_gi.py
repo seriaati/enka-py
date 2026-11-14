@@ -5,7 +5,7 @@ import pytest
 
 from enka.assets.data import AssetData
 from enka.clients.base import BaseClient
-from enka.errors import GameMaintenanceError
+from enka.errors import GameMaintenanceError, PlayerDoesNotExistError
 from enka.gi import Element, GenshinClient, Language
 
 
@@ -77,6 +77,13 @@ async def test_raw_and_parse(genshin_client: GenshinClient) -> None:
 async def test_invalid_player(genshin_client: GenshinClient) -> None:
     with contextlib.suppress(GameMaintenanceError):
         await genshin_client.fetch_showcase("901211015")
+
+
+async def test_error_code(genshin_client: GenshinClient) -> None:
+    with pytest.raises(PlayerDoesNotExistError) as exc_info:
+        await genshin_client.fetch_showcase("999999999")
+    assert exc_info.value.code == "not_found"
+    assert exc_info.value.message
 
 
 async def test_no_element_traveler(genshin_client: GenshinClient) -> None:
