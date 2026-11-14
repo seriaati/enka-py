@@ -5,7 +5,13 @@ import pytest
 
 from enka.assets.data import AssetData
 from enka.clients.base import BaseClient
-from enka.errors import GameMaintenanceError, PlayerDoesNotExistError
+from enka.errors import (
+    GameMaintenanceError,
+    GatewayTimeoutError,
+    PlayerDoesNotExistError,
+    ProfileUnavailableError,
+    raise_for_retcode,
+)
 from enka.gi import Element, GenshinClient, Language
 
 
@@ -84,6 +90,26 @@ async def test_error_code(genshin_client: GenshinClient) -> None:
         await genshin_client.fetch_showcase("999999999")
     assert exc_info.value.code == "not_found"
     assert exc_info.value.message
+
+
+def test_profile_unavailable_error() -> None:
+    with pytest.raises(ProfileUnavailableError) as exc_info:
+        raise_for_retcode(404, "profile_unavailable", "Profile unavailable.")
+    assert exc_info.value.code == "profile_unavailable"
+
+    with pytest.raises(GatewayTimeoutError):
+        raise_for_retcode(504, "upstream_timeout")
+
+
+async def test_profile_unavailable_showcase(genshin_client: GenshinClient) -> None:
+    with contextlib.suppress(GameMaintenanceError):
+        showcase = await genshin_client.fetch_showcase("782651148")
+        assert showcase.profile_unavailable
+        assert showcase.player.nickname == "???"
+        assert showcase.characters
+
+        with pytest.raises(ProfileUnavailableError):
+            await genshin_client.fetch_showcase("782651148", info_only=True)
 
 
 async def test_no_element_traveler(genshin_client: GenshinClient) -> None:

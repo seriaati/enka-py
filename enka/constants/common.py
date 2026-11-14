@@ -1,7 +1,8 @@
 from typing import Final
 
 CN_UID_PREFIXES: Final[tuple[str, ...]] = ("1", "2", "5")
-DEFAULT_TIMEOUT: Final[int] = 5  # Seconds before API request times out
+# Seconds before API request times out, showcases with an unavailable profile take ~6s
+DEFAULT_TIMEOUT: Final[int] = 10
 ASSET_REFRESH_COOLDOWN: Final[int] = 3600  # Seconds between automatic asset updates
 
 HSR_API_URL: Final[str] = "https://enka.network/api/hsr/uid/{}"

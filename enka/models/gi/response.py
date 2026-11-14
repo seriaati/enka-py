@@ -18,6 +18,8 @@ class ShowcaseResponse(BaseModel):
         ttl: The time to live of the response.
         uid: The UID of the showcase.
         owner: The owner of the showcase's account.
+        profile_unavailable: Whether the game didn't return the player's profile,
+            if True, `player` only contains placeholder data.
     """
 
     characters: list[Character] = Field(alias="avatarInfoList", default_factory=list)
@@ -25,6 +27,7 @@ class ShowcaseResponse(BaseModel):
     ttl: int
     uid: str
     owner: Owner | None = None
+    profile_unavailable: bool = Field(False, alias="profileUnavailable")
 
     @field_validator("characters", mode="before")
     @classmethod

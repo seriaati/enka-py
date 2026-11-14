@@ -9,6 +9,7 @@ __all__ = (
     "GeneralServerError",
     "InvalidItemTypeError",
     "PlayerDoesNotExistError",
+    "ProfileUnavailableError",
     "RateLimitedError",
     "WrongUIDFormatError",
     "raise_for_retcode",
@@ -43,6 +44,13 @@ class PlayerDoesNotExistError(EnkaAPIError):
 
     def __str__(self) -> str:
         return "Player does not exist"
+
+
+class ProfileUnavailableError(PlayerDoesNotExistError):
+    """Raised when the player exists, but the game doesn't return their profile."""
+
+    def __str__(self) -> str:
+        return "Player exists, but their profile is unavailable"
 
 
 class GameMaintenanceError(EnkaAPIError):
@@ -89,6 +97,9 @@ class APIRequestTimeoutError(EnkaAPIError):
 
 def raise_for_retcode(retcode: int, code: str | None = None, message: str | None = None) -> None:
     """Raises an exception based on the retcode and the error code."""
+    if code == "profile_unavailable":
+        raise ProfileUnavailableError(code, message)
+
     match retcode:
         case 400:
             raise WrongUIDFormatError(code, message)

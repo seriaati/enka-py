@@ -85,6 +85,13 @@ Errors returned by the API also carry the `code` and `message` from the response
         print(e.code, e.message)  # e.g. "not_found", "Player not found."
 ```
 
+### Unavailable Profiles (Genshin Impact)
+
+For some players (e.g. frozen accounts), the game returns their characters but not their profile:
+
+- If the showcase has characters, `ShowcaseResponse.profile_unavailable` is `True`, and `player` only contains placeholder data (nickname `???`, level 1).
+- Otherwise, `ProfileUnavailableError` is raised. It is a subclass of `PlayerDoesNotExistError`.
+
 ## Logging
 
 `enka` uses [Loguru](https://loguru.readthedocs.io/) for internal logging, and the logger is disabled by default.
